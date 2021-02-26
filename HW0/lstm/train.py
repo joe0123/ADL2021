@@ -153,7 +153,7 @@ if __name__ == "__main__":
     parser.add_argument("--saved_dir", default="./ckpt", type=str)
     parser.add_argument("--optimizer", default="adam", type=str)
     parser.add_argument("--initializer", default="orthogonal_", type=str)
-    parser.add_argument("--epoch_num", default=50, type=int)
+    parser.add_argument("--epoch_num", default=15, type=int)
     parser.add_argument("--batch_size", default=64, type=int)
     parser.add_argument("--lr", default=2e-4, type=float)
     parser.add_argument("--dropout", default=0.5, type=float)
