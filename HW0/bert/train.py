@@ -91,7 +91,7 @@ class Trainer:
         self.train_dataset = args.dataset(args, "train", tokenizer)
         self.valid_dataset = args.dataset(args, "valid", tokenizer)
         
-        self.best_ckpt = os.path.join(args.saved_dir, "best.ckpt")
+        self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
         logger.info('\n')
     
     def _reset_params(self):
@@ -193,18 +193,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_data", default="../data/train.csv", type=str)
     parser.add_argument("--valid_data", default="../data/dev.csv", type=str)
-    parser.add_argument("--saved_dir", default="./ckpt", type=str)
+    parser.add_argument("--ckpt_dir", default="./ckpt", type=str)
     parser.add_argument("--optimizer", default="adam", type=str)
     parser.add_argument("--warmup", default="linear", type=str)
     parser.add_argument("--initializer", default="xavier_uniform_", type=str)
-    parser.add_argument("--epoch_num", default=3, type=int)
-    parser.add_argument("--batch_size", default=8, type=int, help="try 16, 32, 64")
+    parser.add_argument("--epoch_num", default=5, type=int)
+    parser.add_argument("--batch_size", default=16, type=int, help="try 16, 32, 64")
     parser.add_argument("--lr", default=3e-5, type=float, help="*e-5 are recommended")
     parser.add_argument("--dropout", default=0.5, type=float)
     parser.add_argument("--l2reg", default=0.01, type=float)
     parser.add_argument("--update_step", default=8, type=int, help="number of steps to accum gradients before update")
     parser.add_argument("--log_step", default=500, type=int, help="number of steps to print the loss during training")
-    parser.add_argument("--eval_step", default=2000, type=int, help="number of steps to evaluate the model during training")
+    parser.add_argument("--eval_step", default=1000, type=int, help="number of steps to evaluate the model during training")
     parser.add_argument("--bert_dim", default=768, type=int)
     parser.add_argument("--pretrained_bert", default="bert_base", \
                         choices=["bert_base", "bert_ml_base", "roberta_base"], type=str)
@@ -217,8 +217,8 @@ if __name__ == "__main__":
 
 # Configure some settings
     seed_config(args)
-    os.makedirs(args.saved_dir, exist_ok=True)
-    args_file = os.path.join(args.saved_dir, "args.json")
+    os.makedirs(args.ckpt_dir, exist_ok=True)
+    args_file = os.path.join(args.ckpt_dir, "args.json")
     with open(args_file, 'w') as f:
         json.dump(vars(args), f, indent=4)
     args = args_mapping(args)
@@ -227,7 +227,7 @@ if __name__ == "__main__":
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.StreamHandler(sys.stdout))
-    log_file = os.path.join(args.saved_dir, "log")
+    log_file = os.path.join(args.ckpt_dir, "log")
     logger.addHandler(logging.FileHandler(log_file))
 
 # Start training

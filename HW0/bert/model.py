@@ -25,6 +25,5 @@ class BERT_based(nn.Module):
         embed = torch.cat([t.unsqueeze(0) for t in outputs.hidden_states[-4:]], dim=0)[:, :, 0: 1, :].permute(1, 2, 0, 3)
         embed = self.extractor(embed.reshape(embed.shape[0], -1))
         logits = self.classifier(embed).squeeze()
-        #logits = self.classifier(outputs.pooler_output).squeeze()
 
         return logits
