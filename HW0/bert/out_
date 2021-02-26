@@ -5,3 +5,11 @@ nohup: 忽略輸入
 Start training...
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 Epoch 01 / 03
+Train | Loss: 0.79009
+Train | Loss: 0.23581
+Train | Loss: 0.10597
+Train | Loss: 0.07358
+Valid | Acc: 0.90450
+Saving model to ckpt_/best.ckpt...
+Train | Loss: 0.05757
+Train | Loss: 0.04239
