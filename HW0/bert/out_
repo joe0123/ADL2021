@@ -13,3 +13,4 @@ Valid | Acc: 0.90450
 Saving model to ckpt_/best.ckpt...
 Train | Loss: 0.05757
 Train | Loss: 0.04239
+Train | Loss: 0.04003
