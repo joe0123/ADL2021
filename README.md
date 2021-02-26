@@ -7,5 +7,5 @@ https://docs.google.com/presentation/d/1CqYNZFZDhn-d5ZD30zjw_O36CQUwSOemwwXnTLG0
 ### Source Code
 https://github.com/joe0123/ADL2021/tree/master/HW0
 ### Inclass Competition
-* Public Leaderboard: Rank 1 / 76
+* Public Leaderboard: Rank /
 * Private Leaderboead: Rank /
