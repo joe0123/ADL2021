@@ -4,7 +4,7 @@ import pandas as pd
 import torch
 from torch.utils.data import Dataset
 
-def make_sequence(sequence, max_seq_len, cls_id, sep_id, dtype="int64", padding="post", truncating="post", value=0):
+def make_sequence(sequence, max_seq_len, cls_id, sep_id, dtype="int64", padding="post", truncating="post", pad_value=0):
     max_text_len = max_seq_len - 2
     if truncating == "prev":
         sequence = sequence[-max_text_len:]
@@ -14,8 +14,8 @@ def make_sequence(sequence, max_seq_len, cls_id, sep_id, dtype="int64", padding=
     sequence.insert(0, cls_id)
     sequence.append(sep_id)
 
-    text_ids = (np.ones(max_seq_len) * value).astype(dtype)
-    mask_ids = (np.ones(max_seq_len) * value).astype(dtype)
+    text_ids = (np.ones(max_seq_len) * pad_value).astype(dtype)
+    mask_ids = (np.ones(max_seq_len) * pad_value).astype(dtype)
     if padding == "post":
         text_ids[:len(sequence)] = sequence
         mask_ids[:len(sequence)] = 1
@@ -46,10 +46,10 @@ class SentimentDataset(Dataset):
         self.data = []
         for raw_data in zip(ids, x, y):
             identity = raw_data[0]
-            text = raw_data[1].strip().replace(' ', '')
+            texts = raw_data[1].strip().replace(' ', '')
             polarity = float(raw_data[2])
 
-            bert_text_ids, bert_mask_ids = tokenizer.texts_to_sequence(text)
+            bert_text_ids, bert_mask_ids = tokenizer.texts_to_sequence(texts)
             
             data = {
                 "id": identity, 

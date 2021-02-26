@@ -14,7 +14,8 @@ class BERT_based(nn.Module):
         
         self.classifier = nn.Sequential(
                 nn.Dropout(args.dropout),
-                nn.Linear(args.bert_dim, args.class_num)
+                nn.Linear(args.bert_dim, args.class_num),
+                nn.Sigmoid()
         )
 
     def forward(self, inputs):

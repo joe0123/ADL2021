@@ -55,6 +55,8 @@ def args_mapping(args):
     bert_ckpt = bert_ckpts[args.pretrained_bert]
     args.bert_tokenizer = BertTokenizer.from_pretrained(bert_ckpt)
     args.bert_model = bert_models[args.pretrained_bert].from_pretrained(bert_ckpt)
+    args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") \
+        if args.device is None else torch.device(args.device)
 
     return args
 
@@ -78,7 +80,7 @@ class Tester:
             for i, sample in tqdm(enumerate(dataloader)):
                 ids = sample["id"]
                 inputs = [sample[col].to(self.args.device) for col in self.args.input_cols]
-                outputs = torch.sigmoid(self.model(inputs))
+                outputs = self.model(inputs)
                 if all_outputs is None:
                     all_ids = ids
                     all_outputs = outputs
