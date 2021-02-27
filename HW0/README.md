@@ -10,11 +10,11 @@ https://docs.google.com/presentation/d/1CqYNZFZDhn-d5ZD30zjw_O36CQUwSOemwwXnTLG0
 * transformers == 4.3.2
 
 ## Usage for bert/
-To finetune BERT model:
+Finetune BERT model:
 ```
 python train.py
 ````
-To make inference with finetuned BERT model:
+Make inference with finetuned BERT model:
 ```
 python infer.py --ckpt_dir ckpt
 ```
