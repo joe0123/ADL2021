@@ -74,11 +74,11 @@ class Trainer:
     def __init__(self, args):
         self.args = args
         vocab = pickle.load(open(os.path.join(args.cache_dir, "vocab.pkl"), "rb"))
-        intent_idx = json.load(open(os.path.join(args.cache_dir, "intent2idx.json"), 'r'))
+        intent_label = json.load(open(os.path.join(args.cache_dir, "intent2idx.json"), 'r'))
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         
-        self.train_dataset = args.dataset(args, "train", vocab, intent_idx)
-        self.eval_dataset = args.dataset(args, "eval", vocab, intent_idx)
+        self.train_dataset = args.dataset(args, "train", vocab, intent_label)
+        self.eval_dataset = args.dataset(args, "eval", vocab, intent_label)
         self.model = args.model_class(embed_matrix, self.train_dataset.num_classes, args).to(args.device)
         
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
@@ -146,8 +146,8 @@ class Trainer:
                     all_outputs = torch.cat((all_outputs, outputs), dim=0)
 
         all_targets = all_targets.cpu()
-        all_outputs = torch.argmax(all_outputs, dim=-1).cpu()
-        acc = (all_outputs == all_targets).float().mean()
+        all_labels = torch.argmax(all_outputs, dim=-1).int().cpu()
+        acc = (all_labels == all_targets).float().mean()
         
         return acc
 
