@@ -1,5 +1,8 @@
-HW0/bert/__pycache__/*
+**.zip
+**/__pycache__/*
 HW0/bert/ckpt*
-HW0/lstm/__pycache__/*
 HW0/lstm/w2v.model
 HW0/lstm/ckpt*
+HW1/ckpt*
+HW1/**/glove*
+HW1/cache/*
