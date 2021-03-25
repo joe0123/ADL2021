@@ -13,9 +13,9 @@ sys.path.append("..")
 from data_utils import Vocab
 
 def build_vocab(
-    words: Counter, vocab_size: int, output_dir: Path, glove_path: Path
+    words: Counter, output_dir: Path, glove_path: Path
 ) -> None:
-    common_words = {w for w, _ in words.most_common(vocab_size)}
+    common_words = {w for w, count in words.most_common()}
     vocab = Vocab(common_words)
     vocab_path = output_dir / "vocab.pkl"
     with open(vocab_path, "wb") as f:
@@ -44,7 +44,6 @@ def build_vocab(
             glove_dim = len(vector)
 
     assert all(len(v) == glove_dim for v in glove.values())
-    assert len(glove) <= vocab_size
 
     num_matched = sum([token in glove for token in vocab.tokens])
     logging.info(

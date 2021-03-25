@@ -8,7 +8,7 @@ class Vocab:
         self.token2idx = {
             Vocab.PAD: 0,
             Vocab.UNK: 1,
-            **{token: i for i, token in enumerate(vocab, 2)},
+            **{token: i for i, token in enumerate(sorted(list(vocab)), 2)},
         }
 
     @property

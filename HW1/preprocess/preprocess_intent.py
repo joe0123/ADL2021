@@ -28,12 +28,12 @@ def main(args):
             [token for instance in dataset for token in instance["text"].split()]
         )
 
-    intent2idx = {tag: i for i, tag in enumerate(intents)}
+    intent2idx = {tag: i for i, tag in enumerate(sorted(list(intents)))}
     intent_tag_path = args.output_dir / "intent2idx.json"
     intent_tag_path.write_text(json.dumps(intent2idx, indent=2))
     logging.info(f"Intent 2 index saved at {str(intent_tag_path.resolve())}")
 
-    build_vocab(words, args.vocab_size, args.output_dir, args.glove_path)
+    build_vocab(words, args.output_dir, args.glove_path)
 
 
 def parse_args() -> Namespace:
@@ -56,12 +56,6 @@ def parse_args() -> Namespace:
         type=Path,
         help="Directory to save the processed file.",
         default="../cache/intent/",
-    )
-    parser.add_argument(
-        "--vocab_size",
-        type=int,
-        help="Number of token in the vocabulary",
-        default=10_000,
     )
     args = parser.parse_args()
     return args

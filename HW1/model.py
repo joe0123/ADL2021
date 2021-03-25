@@ -34,7 +34,7 @@ class IntentGRU(nn.Module):
         return self.classifier(torch.gather(features, dim=1, index=selected).reshape(features.shape[0], -1)).squeeze()
 
     def compute_loss(self, inputs, input_lens, targets):
-        return self.criterion(self.forward(inputs, input_lens), targets)
+        return self.criterion(self.forward(inputs, input_lens), targets) / inputs.shape[0]
 
     def predict(self, inputs, input_lens):
         return torch.argmax(self.forward(inputs, input_lens), dim=-1).int()
@@ -62,9 +62,10 @@ class SlotGRU(nn.Module):
          
         if hasattr(args, "criterion"):
             self.criterion = args.criterion
+        self.num_classes = num_classes
         self.pad_class = pad_class
     
-    def forward(self, inputs, input_lens, pad_label):
+    def forward(self, inputs, input_lens):
         packed_features, _ = self.gru(self.pack(self.embed(inputs).float(), input_lens.cpu()), None)
         features, input_lens_ = self.unpack(packed_features)
         assert torch.all(torch.eq(input_lens.cpu(), input_lens_.cpu()))
@@ -75,7 +76,8 @@ class SlotGRU(nn.Module):
         return outputs 
 
     def compute_loss(self, inputs, input_lens, targets):
-        return self.criterion(self.forward(inputs, input_lens), targets)
+        return self.criterion(self.forward(inputs, input_lens).reshape(-1, self.num_classes), targets.reshape(-1))  \
+                    / input_lens.sum()
 
     def predict(self, inputs, input_lens):
         return torch.argmax(self.forward(inputs, input_lens), dim=-1).int()

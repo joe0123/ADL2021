@@ -8,6 +8,7 @@ import json
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from time import strftime, localtime
 
 from data_utils import Vocab
 from dataset import IntentDataset, SlotDataset
@@ -24,7 +25,7 @@ def seed_config(args):
 def dir_mapping(args):
     args.data_dir = os.path.join(args.data_dir, args.task)
     args.cache_dir = os.path.join(args.cache_dir, args.task)
-    args.ckpt_dir = os.path.join(args.ckpt_dir, args.task)
+    args.ckpt_dir = os.path.join(args.ckpt_dir, args.task, strftime("%m%d-%H%M", localtime()))
     os.makedirs(args.ckpt_dir, exist_ok=True)
 
     return args
@@ -47,8 +48,8 @@ def class_mapping(args):
     }
 
     criterions = {
-        "intent": nn.CrossEntropyLoss(),
-        "slot": nn.CrossEntropyLoss(),
+        "intent": nn.CrossEntropyLoss(reduction="sum"),
+        "slot": nn.CrossEntropyLoss(reduction="sum"),
     }
 
     optimizers = {
@@ -142,7 +143,10 @@ class Trainer:
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
                 preds = self.model.predict(inputs, input_lens).cpu()
-                acc += (preds == targets).float().sum()
+                if len(preds.shape) == 1:
+                    acc += (preds == targets).float().sum()
+                else:
+                    acc += (preds == targets).all(dim=1).float().sum()
         acc /= len(dataloader.dataset)        
         return acc
 

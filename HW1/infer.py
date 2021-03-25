@@ -11,8 +11,8 @@ import torch
 from torch.utils.data import DataLoader
 
 from data_utils import Vocab
-from dataset import IntentDataset
-from model import IntentGRU
+from dataset import IntentDataset, SlotDataset
+from model import IntentGRU, SlotGRU
 
 def args_loading(test_args, ckpt_dir):
     args = argparse.Namespace()
@@ -27,19 +27,16 @@ def args_loading(test_args, ckpt_dir):
 
     return args
 
-def dir_mapping(args):
-    args.ckpt_dir = os.path.join(args.ckpt_dir, args.task)
-    os.makedirs(args.ckpt_dir, exist_ok=True)
-
-    return args
 
 def class_mapping(args):
     datasets = {
         "intent": IntentDataset,
+        "slot": SlotDataset
     }
     
     models = {
         "intent": IntentGRU,
+        "slot": SlotGRU
     }
         
     args.dataset = datasets[args.task]
@@ -52,12 +49,9 @@ def class_mapping(args):
 class Tester:
     def __init__(self, args):
         self.args = args
-        vocab = pickle.load(open(os.path.join(args.cache_dir, "vocab.pkl"), "rb"))
-        intent_label = json.load(open(os.path.join(args.cache_dir, "intent2idx.json"), 'r'))
-        embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
-        
-        self.test_dataset = args.dataset(args, ["test"], vocab, intent_label)
-        self.model = args.model_class(embed_matrix, self.test_dataset.num_classes, args).to(args.device)
+        self.test_dataset = args.dataset(args, ["test"])
+        self.model = args.model_class(self.test_dataset.num_classes, self.test_dataset.label2id.get("[PAD]", None) , args)
+        self.model.cuda()
         
         best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
         self.model.load_state_dict(torch.load(best_ckpt))
@@ -67,18 +61,23 @@ class Tester:
         all_ids, all_preds = None, None
         self.model.eval()
         with torch.no_grad():
-            for i, (ids, inputs, input_lens, _) in tqdm(enumerate(dataloader)):
+            for i, (ids, inputs, input_lens, _) in enumerate(dataloader):
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
-                preds = self.model.predict(inputs, input_lens).cpu()
+                preds = self.model.predict(inputs, input_lens).cpu().tolist()
                 if all_preds is None:
                     all_ids = ids
                     all_preds = preds
                 else:
                     all_ids += ids
-                    all_preds = torch.cat((all_preds, preds), dim=0)
+                    all_preds += preds
         
-        all_preds = [dataloader.dataset.label_intent[label.item()] for label in all_preds]
+        if self.args.task == "intent":
+            all_preds = [dataloader.dataset.id2label[label_id] for label_id in all_preds]
+        else:
+            filter_pad = lambda l: filter(lambda i: i != "[PAD]", l)
+            all_preds = [' '.join(filter_pad([dataloader.dataset.id2label[label_id] for label_id in preds])) \
+                            for preds in all_preds]
         
         return dict(zip(all_ids, all_preds))
     
@@ -93,8 +92,7 @@ class Tester:
 if __name__ == "__main__":
 # Read hyperparameters from CMD
     parser = argparse.ArgumentParser()
-    parser.add_argument("--task", choices=["intent", "slot"], required=True, type=str)
-    parser.add_argument("--ckpt_dir", default="./ckpt", type=str)
+    parser.add_argument("--ckpt_dir", required=True, type=str)
     parser.add_argument("--pred_file", default="./result.csv", type=str)
     parser.add_argument("--batch_size", default=256, type=int, help="test batch size")
     parser.add_argument("--device", default="cuda:0", type=str, help="e.g. cuda:0")
@@ -106,7 +104,6 @@ if __name__ == "__main__":
     logger.addHandler(logging.StreamHandler(sys.stdout))
 
 # Start making inference
-    test_args = dir_mapping(test_args)
     args = args_loading(test_args, test_args.ckpt_dir)    # Load args from the saved checkpoint
     args = class_mapping(args)
     tester = Tester(args)
@@ -114,7 +111,10 @@ if __name__ == "__main__":
 
 # Writing file
     with open(args.pred_file, 'w') as f:
-        f.write("id,intent\n")
-        for idx, intent in sorted(result.items()):
-            f.write("{},{}\n".format(idx, intent))
+        if args.task == "intent":
+            f.write("id,intent\n")
+        else:
+            f.write("id,tags\n")
+        for idx, label in sorted(result.items()):
+            f.write("{},{}\n".format(idx, label))
 

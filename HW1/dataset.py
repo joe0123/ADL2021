@@ -27,17 +27,17 @@ class IntentDataset(Dataset):
         return len(self.data)
 
     def collate_fn(self, samples):
-        ids, texts, text_lens, labels = [], [], [], []
+        ids, texts, text_lens, label_ids = [], [], [], []
         for sample in samples:
             ids.append(sample["id"])
             texts.append(sample["text"])
             text_lens.append(len(sample["text"]))
             if "label_id" in sample:
-                labels.append(sample["label_id"])
+                label_ids.append(sample["label_id"])
             else:
-                labels.append(-1)
+                label_ids.append(-1)
         return ids, torch.LongTensor(self.vocab.encode_batch(texts, self.max_seq_len)), torch.LongTensor(text_lens), \
-                torch.LongTensor(labels)
+                torch.LongTensor(label_ids)
 
     @property
     def num_classes(self):
@@ -71,13 +71,13 @@ class SlotDataset(Dataset):
             texts.append(sample["text"])
             text_lens.append(len(sample["text"]))
             if "label_id" in sample:
-                labels.append(sample["label_id"])
+                label_ids.append(sample["label_id"])
             else:
-                labels.append(-1)
+                label_ids.append([-1])
         text_ids = torch.LongTensor(self.vocab.encode_batch(texts, self.max_seq_len))
         text_lens = torch.LongTensor(text_lens)
-        labels = torch.LongTensor(pad_to_len(labels, texts.shape[0], self.label2id["[PAD]"]))
-        return ids, texts, text_lens, labels
+        label_ids = torch.LongTensor(pad_to_len(label_ids, text_ids.shape[1], self.label2id["[PAD]"]))
+        return ids, text_ids, text_lens, label_ids
 
     @property
     def num_classes(self):
