@@ -5,14 +5,13 @@ import logging
 import random
 import numpy as np
 import json
-import pickle
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from data_utils import Vocab
-from dataset import IntentDataset
-from model import IntentGRU
+from dataset import IntentDataset, SlotDataset
+from model import IntentGRU, SlotGRU
 
 def seed_config(args):
     random.seed(args.seed)
@@ -33,10 +32,12 @@ def dir_mapping(args):
 def class_mapping(args):
     datasets = {
         "intent": IntentDataset,
+        "slot": SlotDataset
     }
     
     models = {
         "intent": IntentGRU,
+        "slot": SlotGRU
     }
 
     initializers = {
@@ -47,6 +48,7 @@ def class_mapping(args):
 
     criterions = {
         "intent": nn.CrossEntropyLoss(),
+        "slot": nn.CrossEntropyLoss(),
     }
 
     optimizers = {
@@ -73,13 +75,14 @@ def class_mapping(args):
 class Trainer:
     def __init__(self, args):
         self.args = args
-        vocab = pickle.load(open(os.path.join(args.cache_dir, "vocab.pkl"), "rb"))
-        intent_label = json.load(open(os.path.join(args.cache_dir, "intent2idx.json"), 'r'))
-        embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         
-        self.train_dataset = args.dataset(args, "train", vocab, intent_label)
-        self.eval_dataset = args.dataset(args, "eval", vocab, intent_label)
-        self.model = args.model_class(embed_matrix, self.train_dataset.num_classes, args).to(args.device)
+        if args.no_eval:
+            self.train_dataset = args.dataset(args, ["train", "eval"])
+        else:
+            self.train_dataset = args.dataset(args, ["train"])
+            self.eval_dataset = args.dataset(args, ["eval"])
+        self.model = args.model_class(self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
+        self.model.to(args.device)
         
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
         logger.info('\n')
@@ -93,7 +96,7 @@ class Trainer:
                     stdv = 1. / np.sqrt(p.shape[0])
                     torch.nn.init.uniform_(p, a=-stdv, b=stdv)
     
-    def train(self, criterion, optimizer, train_dataloader, eval_dataloader):
+    def train(self, optimizer, train_dataloader, eval_dataloader):
         max_eval_acc = 0
         global_step = 0
         for epoch in range(self.args.epoch_num):
@@ -106,24 +109,26 @@ class Trainer:
                 global_step += 1
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
-                outputs = self.model(inputs, input_lens)
                 targets = targets.to(self.args.device)
                  
                 optimizer.zero_grad()
-                loss = criterion(outputs, targets)
+                loss = self.model.compute_loss(inputs, input_lens, targets)
                 loss.backward()
                 optimizer.step()
 
-                total_n += len(outputs)
-                train_loss += loss.item() * len(outputs)
+                total_n += targets.shape[0]
+                train_loss += loss.item() * targets.shape[0]
                 if global_step % self.args.log_step == 0 or i == len(train_dataloader):
                     train_loss = train_loss / total_n
                     logger.info("Train | Loss: {:.5f}".format(train_loss))
-
-            eval_acc = self.eval(eval_dataloader)
-            logger.info("Valid | Acc: {:.5f}".format(eval_acc))
-            if eval_acc > max_eval_acc:
-                max_eval_acc = eval_acc
+            if eval_dataloader:
+                eval_acc = self.eval(eval_dataloader)
+                logger.info("Valid | Acc: {:.5f}".format(eval_acc))
+                if eval_acc > max_eval_acc:
+                    max_eval_acc = eval_acc
+                    torch.save(self.model.state_dict(), self.best_ckpt)
+                    logger.info("Saving model to {}...".format(self.best_ckpt))
+            else:
                 torch.save(self.model.state_dict(), self.best_ckpt)
                 logger.info("Saving model to {}...".format(self.best_ckpt))
             global_step = 0
@@ -132,39 +137,32 @@ class Trainer:
         all_targets, all_outputs = None, None
         self.model.eval()
         with torch.no_grad():
+            acc = 0
             for i, (_, inputs, input_lens, targets) in enumerate(dataloader):
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
-                outputs = self.model(inputs, input_lens)
-                targets = targets.to(self.args.device)
-                
-                if all_targets is None:
-                    all_targets = targets
-                    all_outputs = outputs
-                else:
-                    all_targets = torch.cat((all_targets, targets), dim=0)
-                    all_outputs = torch.cat((all_outputs, outputs), dim=0)
-
-        all_targets = all_targets.cpu()
-        all_labels = torch.argmax(all_outputs, dim=-1).int().cpu()
-        acc = (all_labels == all_targets).float().mean()
-        
+                preds = self.model.predict(inputs, input_lens).cpu()
+                acc += (preds == targets).float().sum()
+        acc /= len(dataloader.dataset)        
         return acc
 
     def run(self):
         train_dataloader = DataLoader(dataset=self.train_dataset, batch_size=self.args.batch_size, \
                                 collate_fn=self.train_dataset.collate_fn, shuffle=True, num_workers=8)
-        eval_dataloader = DataLoader(dataset=self.eval_dataset, batch_size=self.args.batch_size, \
+        if not self.args.no_eval:
+            eval_dataloader = DataLoader(dataset=self.eval_dataset, batch_size=self.args.batch_size, \
                                 collate_fn=self.eval_dataset.collate_fn, shuffle=False, num_workers=8)
         
-        criterion = self.args.criterion
         params = filter(lambda p: p.requires_grad, self.model.parameters())
         optimizer = self.args.optimizer(params, lr=self.args.lr)#, weight_decay=self.args.l2reg)
         
         self._reset_params()
         logger.info('>' * 100)
         logger.info("Start training...")
-        self.train(criterion, optimizer, train_dataloader, eval_dataloader)
+        if self.args.no_eval:
+            self.train(optimizer, train_dataloader, None)
+        else:
+            self.train(optimizer, train_dataloader, eval_dataloader)
  
 if __name__ == "__main__":
 # Read hyperparameters from CMD
@@ -173,6 +171,7 @@ if __name__ == "__main__":
     parser.add_argument("--data_dir", default="./data", type=str)
     parser.add_argument("--cache_dir", default="./cache", type=str)
     parser.add_argument("--ckpt_dir", default="./ckpt", type=str)
+    parser.add_argument("--no_eval", action="store_true")
     parser.add_argument("--optimizer", default="adam", type=str)
     parser.add_argument("--initializer", default="orthogonal_", type=str)
     parser.add_argument("--epoch_num", default=100, type=int)

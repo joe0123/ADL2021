@@ -56,7 +56,7 @@ class Tester:
         intent_label = json.load(open(os.path.join(args.cache_dir, "intent2idx.json"), 'r'))
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         
-        self.test_dataset = args.dataset(args, "test", vocab, intent_label)
+        self.test_dataset = args.dataset(args, ["test"], vocab, intent_label)
         self.model = args.model_class(embed_matrix, self.test_dataset.num_classes, args).to(args.device)
         
         best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
@@ -64,24 +64,23 @@ class Tester:
         logger.info('\n')
 
     def infer(self, dataloader):
-        all_ids, all_outputs = None, None
+        all_ids, all_preds = None, None
         self.model.eval()
         with torch.no_grad():
             for i, (ids, inputs, input_lens, _) in tqdm(enumerate(dataloader)):
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
-                outputs = self.model(inputs, input_lens)
-                if all_outputs is None:
+                preds = self.model.predict(inputs, input_lens).cpu()
+                if all_preds is None:
                     all_ids = ids
-                    all_outputs = outputs
+                    all_preds = preds
                 else:
                     all_ids += ids
-                    all_outputs = torch.cat((all_outputs, outputs), dim=0)
+                    all_preds = torch.cat((all_preds, preds), dim=0)
         
-        all_labels = torch.argmax(all_outputs, dim=-1).int().cpu().tolist()
-        all_labels = [dataloader.dataset.label_intent[label] for label in all_labels]
+        all_preds = [dataloader.dataset.label_intent[label.item()] for label in all_preds]
         
-        return dict(zip(all_ids, all_labels))
+        return dict(zip(all_ids, all_preds))
     
     def run(self):
         test_dataloader = DataLoader(dataset=self.test_dataset, batch_size=self.args.batch_size, \
