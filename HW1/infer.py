@@ -55,7 +55,6 @@ class Tester:
         
         best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
         self.model.load_state_dict(torch.load(best_ckpt))
-        logger.info('\n')
 
     def infer(self, dataloader):
         all_ids, all_preds = None, None
@@ -65,19 +64,19 @@ class Tester:
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
                 preds = self.model.predict(inputs, input_lens).cpu().tolist()
+                if self.args.task == "slot":
+                    preds = [pred[:input_len] for pred, input_len in zip(preds, input_lens.cpu().tolist())]
                 if all_preds is None:
                     all_ids = ids
                     all_preds = preds
                 else:
                     all_ids += ids
                     all_preds += preds
-        
+ 
         if self.args.task == "intent":
             all_preds = [dataloader.dataset.id2label[label_id] for label_id in all_preds]
-        else:
-            filter_pad = lambda l: filter(lambda i: i != "[PAD]", l)
-            all_preds = [' '.join(filter_pad([dataloader.dataset.id2label[label_id] for label_id in preds])) \
-                            for preds in all_preds]
+        elif self.args.task == "slot":
+            all_preds = [' '.join([dataloader.dataset.id2label[label_id] for label_id in preds]) for preds in all_preds]
         
         return dict(zip(all_ids, all_preds))
     

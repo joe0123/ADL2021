@@ -86,7 +86,6 @@ class Trainer:
         self.model.to(args.device)
         
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
-        logger.info('\n')
     
     def _reset_params(self):
         for p in self.model.parameters():
