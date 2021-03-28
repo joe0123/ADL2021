@@ -7,7 +7,7 @@ from torch.utils.data import Dataset
 from data_utils import pad_to_len
 
 class IntentDataset(Dataset):
-    def __init__(self, args, cases):
+    def __init__(self, args, cases, label_type):
         self.data = []
         for case in cases:
             self.data += json.load(open(os.path.join(args.data_dir, "{}.json".format(case))))
@@ -19,6 +19,7 @@ class IntentDataset(Dataset):
             self.data[i]["text"] = data["text"].split()
             if "intent" in data:
                 self.data[i]["label_id"] = self.label2id[data["intent"]]
+        self.label_type = label_type
 
     def __getitem__(self, index):
         return self.data[index]
@@ -36,8 +37,12 @@ class IntentDataset(Dataset):
                 label_ids.append(sample["label_id"])
             else:
                 label_ids.append(-1)
-        return ids, torch.LongTensor(self.vocab.encode_batch(texts, self.max_seq_len)), torch.LongTensor(text_lens), \
-                torch.LongTensor(label_ids)
+        texts = torch.LongTensor(self.vocab.encode_batch(texts, self.max_seq_len))
+        text_lens = torch.LongTensor(text_lens)
+        if self.label_type == "tensor":
+            label_ids = torch.LongTensor(label_ids)
+        return ids, texts, text_lens, label_ids
+                
 
     @property
     def num_classes(self):
@@ -45,7 +50,7 @@ class IntentDataset(Dataset):
 
 
 class SlotDataset(Dataset):
-    def __init__(self, args, cases):
+    def __init__(self, args, cases, label_type):
         self.data = []
         for case in cases:
             self.data += json.load(open(os.path.join(args.data_dir, "{}.json".format(case))))
@@ -57,6 +62,7 @@ class SlotDataset(Dataset):
             self.data[i]["text"] = data["tokens"]
             if "tags" in data:
                 self.data[i]["label_id"] = [self.label2id[t] for t in data["tags"]]
+        self.label_type = label_type
 
     def __getitem__(self, index):
         return self.data[index]
@@ -76,7 +82,8 @@ class SlotDataset(Dataset):
                 label_ids.append([-1])
         text_ids = torch.LongTensor(self.vocab.encode_batch(texts, self.max_seq_len))
         text_lens = torch.LongTensor(text_lens)
-        label_ids = torch.LongTensor(pad_to_len(label_ids, text_ids.shape[1], self.label2id["[PAD]"]))
+        if self.label_type == "tensor":
+            label_ids = torch.LongTensor(pad_to_len(label_ids, text_ids.shape[1], self.label2id["[PAD]"]))
         return ids, text_ids, text_lens, label_ids
 
     @property

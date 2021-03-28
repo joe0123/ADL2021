@@ -6,7 +6,7 @@ from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
 class IntentGRU(nn.Module):
     def __init__(self, num_classes, pad_class, args):
         super(IntentGRU, self).__init__()
-        assert self.cri_name == "ce", "Criterion must be cross entropy loss in task intent!"
+        assert args.cri_name == "ce", "Criterion must be cross entropy loss in task intent!"
         self.criterion = args.criterion(reduction="sum")
 
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
@@ -37,10 +37,18 @@ class IntentGRU(nn.Module):
     def compute_loss(self, inputs, input_lens, targets):
         outputs = self.forward(inputs, input_lens)
         return self.criterion(outputs, targets) / inputs.shape[0]
+    
+    def score(self, inputs, input_lens, targets, reduction="sum"):
+        preds = self.predict(inputs, input_lens)
+        acc = sum([1 if pred == target else 0 for pred, target in zip(preds, targets)])
+        if reduction == "sum":
+            return acc
+        elif reduction == "mean":
+            return acc / len(preds)
 
     def predict(self, inputs, input_lens):
         outputs = self.forward(inputs, input_lens)
-        return torch.argmax(outputs, dim=-1).int()
+        return torch.argmax(outputs, dim=-1).int().tolist()
 
 
 class SlotGRU(nn.Module):
@@ -48,7 +56,7 @@ class SlotGRU(nn.Module):
         super(SlotGRU, self).__init__()
         self.args = args
         if args.cri_name == "crf":
-            self.critesion = args.criterion(num_classes, batch_first=True)
+            self.criterion = args.criterion(num_classes, batch_first=True)
         else:
             self.criterion = args.criterion(reduction="sum")
         self.num_classes = num_classes
@@ -80,21 +88,32 @@ class SlotGRU(nn.Module):
 
     def compute_loss(self, inputs, input_lens, targets):
         pad_mask = (torch.arange(0, inputs.shape[1]).repeat(inputs.shape[0], 1).to(input_lens.device) \
-                        >= input_lens.unsqueeze(1)).float()
+                        >= input_lens.unsqueeze(1))
         outputs = self.forward(inputs, input_lens)
         if self.args.cri_name == "crf":
-            return self.criterion(outputs, targets, 1 - pad_mask, reduction="sum") / input_lens.sum()
+            loss = -self.criterion(outputs, targets, torch.logical_not(pad_mask), reduction="sum") / input_lens.sum()
         else:
-            outputs[:, :, self.pad_class] += 1e+8 * pad_mask
-            return self.criterion(outputs.reshape(-1, self.num_classes), targets.reshape(-1)) / input_lens.sum()
+            outputs[:, :, self.pad_class] += 1e+8 * pad_mask.float()
+            loss = self.criterion(outputs.reshape(-1, self.num_classes), targets.reshape(-1)) / input_lens.sum()
+        return loss
+    
+    def score(self, inputs, input_lens, targets, reduction="sum"):
+        preds = self.predict(inputs, input_lens)
+        acc = sum([1 if pred == target else 0 for pred, target in zip(preds, targets)])
+        if reduction == "sum":
+            return acc
+        elif reduction == "mean":
+            return acc / len(preds)
+            
 
     def predict(self, inputs, input_lens):
         pad_mask = (torch.arange(0, inputs.shape[1]).repeat(inputs.shape[0], 1).to(input_lens.device) \
-                        >= input_lens.unsqueeze(1)).float()
+                        >= input_lens.unsqueeze(1))
         outputs = self.forward(inputs, input_lens)
         if self.args.cri_name == "crf":
-            return self.criterion.decode(outputs, 1 - pad_mask)
+            preds = self.criterion.decode(outputs, torch.logical_not(pad_mask))
         else:
-            outputs[:, :, self.pad_class] += 1e+8 * pad_mask
-            return torch.argmax(outputs, dim=-1).int()
-
+            outputs[:, :, self.pad_class] += 1e+8 * pad_mask.float()
+            preds = torch.argmax(outputs, dim=-1).int().cpu().tolist()
+            preds = [pred[:input_len] for pred, input_len in zip(preds, input_lens.cpu().tolist())]
+        return preds

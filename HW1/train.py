@@ -79,23 +79,25 @@ class Trainer:
         self.args = args
         
         if args.no_eval:
-            self.train_dataset = args.dataset(args, ["train", "eval"])
+            self.train_dataset = args.dataset(args, ["train", "eval"], label_type="tensor")
         else:
-            self.train_dataset = args.dataset(args, ["train"])
-            self.eval_dataset = args.dataset(args, ["eval"])
+            self.train_dataset = args.dataset(args, ["train"], label_type="tensor")
+            self.eval_dataset = args.dataset(args, ["eval"], label_type="list")
         self.model = args.model_class(self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
         self.model.to(args.device)
         
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
     
     def _reset_params(self):
-        for p in self.model.parameters():
-            if p.requires_grad:
-                if len(p.shape) > 1:
-                    self.args.initializer(p)
-                else:
-                    stdv = 1. / np.sqrt(p.shape[0])
-                    torch.nn.init.uniform_(p, a=-stdv, b=stdv)
+        for child in self.model.children():
+            if type(child) != self.args.criterion:
+                for p in child.parameters():
+                    if p.requires_grad:
+                        if len(p.shape) > 1:
+                            self.args.initializer(p)
+                        else:
+                            stdv = 1. / np.sqrt(p.shape[0])
+                            torch.nn.init.uniform_(p, a=-stdv, b=stdv)
     
     def train(self, optimizer, train_dataloader, eval_dataloader):
         max_eval_acc = 0
@@ -125,7 +127,7 @@ class Trainer:
             if eval_dataloader:
                 eval_acc = self.eval(eval_dataloader)
                 logger.info("Valid | Acc: {:.5f}".format(eval_acc))
-                if eval_acc > max_eval_acc:
+                if eval_acc >= max_eval_acc:
                     max_eval_acc = eval_acc
                     torch.save(self.model.state_dict(), self.best_ckpt)
                     logger.info("Saving model to {}...".format(self.best_ckpt))
@@ -137,16 +139,12 @@ class Trainer:
     def eval(self, dataloader):
         all_targets, all_outputs = None, None
         self.model.eval()
+        acc = 0
         with torch.no_grad():
-            acc = 0
             for i, (_, inputs, input_lens, targets) in enumerate(dataloader):
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
-                preds = self.model.predict(inputs, input_lens).cpu()
-                if len(preds.shape) == 1:
-                    acc += (preds == targets).float().sum()
-                else:
-                    acc += (preds == targets).all(dim=1).float().sum()
+                acc += self.model.score(inputs, input_lens, targets)
         acc /= len(dataloader.dataset)        
         return acc
 
