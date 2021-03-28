@@ -1,0 +1,803 @@
+nohup: 忽略輸入
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Start training...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 001 / 100
+Train | Loss: 0.69247
+Train | Loss: 0.16717
+Train | Loss: 0.07876
+Train | Loss: 0.05172
+Train | Loss: 0.03832
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 002 / 100
+Train | Loss: 0.15568
+Train | Loss: 0.08892
+Train | Loss: 0.04880
+Train | Loss: 0.03704
+Train | Loss: 0.02947
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 003 / 100
+Train | Loss: 0.12840
+Train | Loss: 0.06994
+Train | Loss: 0.04118
+Train | Loss: 0.02769
+Train | Loss: 0.02419
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 004 / 100
+Train | Loss: 0.11258
+Train | Loss: 0.05156
+Train | Loss: 0.03850
+Train | Loss: 0.02639
+Train | Loss: 0.02097
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 005 / 100
+Train | Loss: 0.09149
+Train | Loss: 0.04723
+Train | Loss: 0.03153
+Train | Loss: 0.02200
+Train | Loss: 0.01866
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 006 / 100
+Train | Loss: 0.08053
+Train | Loss: 0.03735
+Train | Loss: 0.02952
+Train | Loss: 0.02110
+Train | Loss: 0.01685
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 007 / 100
+Train | Loss: 0.07684
+Train | Loss: 0.03505
+Train | Loss: 0.02363
+Train | Loss: 0.01713
+Train | Loss: 0.01473
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 008 / 100
+Train | Loss: 0.06658
+Train | Loss: 0.03311
+Train | Loss: 0.01945
+Train | Loss: 0.01691
+Train | Loss: 0.01503
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 009 / 100
+Train | Loss: 0.05660
+Train | Loss: 0.03414
+Train | Loss: 0.01998
+Train | Loss: 0.01548
+Train | Loss: 0.01136
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 010 / 100
+Train | Loss: 0.05643
+Train | Loss: 0.02627
+Train | Loss: 0.01778
+Train | Loss: 0.01410
+Train | Loss: 0.01050
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 011 / 100
+Train | Loss: 0.04974
+Train | Loss: 0.02602
+Train | Loss: 0.01621
+Train | Loss: 0.01201
+Train | Loss: 0.01047
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 012 / 100
+Train | Loss: 0.04123
+Train | Loss: 0.01984
+Train | Loss: 0.01474
+Train | Loss: 0.01236
+Train | Loss: 0.00918
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 013 / 100
+Train | Loss: 0.03887
+Train | Loss: 0.01882
+Train | Loss: 0.01507
+Train | Loss: 0.00944
+Train | Loss: 0.00822
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 014 / 100
+Train | Loss: 0.03509
+Train | Loss: 0.01846
+Train | Loss: 0.01272
+Train | Loss: 0.00975
+Train | Loss: 0.00768
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 015 / 100
+Train | Loss: 0.02997
+Train | Loss: 0.01566
+Train | Loss: 0.01217
+Train | Loss: 0.00970
+Train | Loss: 0.00755
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 016 / 100
+Train | Loss: 0.03118
+Train | Loss: 0.01574
+Train | Loss: 0.01080
+Train | Loss: 0.00992
+Train | Loss: 0.00721
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 017 / 100
+Train | Loss: 0.02899
+Train | Loss: 0.01533
+Train | Loss: 0.01050
+Train | Loss: 0.00850
+Train | Loss: 0.00638
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 018 / 100
+Train | Loss: 0.02826
+Train | Loss: 0.01288
+Train | Loss: 0.01000
+Train | Loss: 0.00814
+Train | Loss: 0.00590
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 019 / 100
+Train | Loss: 0.02470
+Train | Loss: 0.01307
+Train | Loss: 0.00922
+Train | Loss: 0.00623
+Train | Loss: 0.00621
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 020 / 100
+Train | Loss: 0.02574
+Train | Loss: 0.01344
+Train | Loss: 0.00753
+Train | Loss: 0.00757
+Train | Loss: 0.00541
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 021 / 100
+Train | Loss: 0.02128
+Train | Loss: 0.01187
+Train | Loss: 0.00880
+Train | Loss: 0.00671
+Train | Loss: 0.00473
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 022 / 100
+Train | Loss: 0.01954
+Train | Loss: 0.01302
+Train | Loss: 0.00859
+Train | Loss: 0.00601
+Train | Loss: 0.00558
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 023 / 100
+Train | Loss: 0.02046
+Train | Loss: 0.00933
+Train | Loss: 0.00903
+Train | Loss: 0.00589
+Train | Loss: 0.00519
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 024 / 100
+Train | Loss: 0.01864
+Train | Loss: 0.00823
+Train | Loss: 0.00715
+Train | Loss: 0.00468
+Train | Loss: 0.00401
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 025 / 100
+Train | Loss: 0.01542
+Train | Loss: 0.01142
+Train | Loss: 0.00628
+Train | Loss: 0.00473
+Train | Loss: 0.00357
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 026 / 100
+Train | Loss: 0.01891
+Train | Loss: 0.00875
+Train | Loss: 0.00607
+Train | Loss: 0.00415
+Train | Loss: 0.00487
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 027 / 100
+Train | Loss: 0.02025
+Train | Loss: 0.00857
+Train | Loss: 0.00668
+Train | Loss: 0.00462
+Train | Loss: 0.00478
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 028 / 100
+Train | Loss: 0.01461
+Train | Loss: 0.00874
+Train | Loss: 0.00581
+Train | Loss: 0.00533
+Train | Loss: 0.00380
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 029 / 100
+Train | Loss: 0.01650
+Train | Loss: 0.00755
+Train | Loss: 0.00501
+Train | Loss: 0.00404
+Train | Loss: 0.00331
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 030 / 100
+Train | Loss: 0.01866
+Train | Loss: 0.00889
+Train | Loss: 0.00539
+Train | Loss: 0.00348
+Train | Loss: 0.00334
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 031 / 100
+Train | Loss: 0.01879
+Train | Loss: 0.00786
+Train | Loss: 0.00499
+Train | Loss: 0.00357
+Train | Loss: 0.00361
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 032 / 100
+Train | Loss: 0.01104
+Train | Loss: 0.01101
+Train | Loss: 0.00497
+Train | Loss: 0.00320
+Train | Loss: 0.00400
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 033 / 100
+Train | Loss: 0.01347
+Train | Loss: 0.00711
+Train | Loss: 0.00534
+Train | Loss: 0.00430
+Train | Loss: 0.00311
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 034 / 100
+Train | Loss: 0.01299
+Train | Loss: 0.00724
+Train | Loss: 0.00481
+Train | Loss: 0.00395
+Train | Loss: 0.00290
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 035 / 100
+Train | Loss: 0.01211
+Train | Loss: 0.00426
+Train | Loss: 0.00479
+Train | Loss: 0.00373
+Train | Loss: 0.00238
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 036 / 100
+Train | Loss: 0.01393
+Train | Loss: 0.00632
+Train | Loss: 0.00342
+Train | Loss: 0.00336
+Train | Loss: 0.00315
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 037 / 100
+Train | Loss: 0.01427
+Train | Loss: 0.00843
+Train | Loss: 0.00505
+Train | Loss: 0.00321
+Train | Loss: 0.00328
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 038 / 100
+Train | Loss: 0.01229
+Train | Loss: 0.00677
+Train | Loss: 0.00379
+Train | Loss: 0.00281
+Train | Loss: 0.00263
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 039 / 100
+Train | Loss: 0.01178
+Train | Loss: 0.00718
+Train | Loss: 0.00502
+Train | Loss: 0.00447
+Train | Loss: 0.00267
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 040 / 100
+Train | Loss: 0.01193
+Train | Loss: 0.00675
+Train | Loss: 0.00466
+Train | Loss: 0.00449
+Train | Loss: 0.00315
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 041 / 100
+Train | Loss: 0.01123
+Train | Loss: 0.00809
+Train | Loss: 0.00428
+Train | Loss: 0.00307
+Train | Loss: 0.00185
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 042 / 100
+Train | Loss: 0.01097
+Train | Loss: 0.00483
+Train | Loss: 0.00593
+Train | Loss: 0.00286
+Train | Loss: 0.00311
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 043 / 100
+Train | Loss: 0.01085
+Train | Loss: 0.00577
+Train | Loss: 0.00363
+Train | Loss: 0.00253
+Train | Loss: 0.00236
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 044 / 100
+Train | Loss: 0.00937
+Train | Loss: 0.00549
+Train | Loss: 0.00419
+Train | Loss: 0.00246
+Train | Loss: 0.00259
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 045 / 100
+Train | Loss: 0.00769
+Train | Loss: 0.00493
+Train | Loss: 0.00405
+Train | Loss: 0.00317
+Train | Loss: 0.00186
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 046 / 100
+Train | Loss: 0.00965
+Train | Loss: 0.00389
+Train | Loss: 0.00322
+Train | Loss: 0.00285
+Train | Loss: 0.00270
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 047 / 100
+Train | Loss: 0.01459
+Train | Loss: 0.00659
+Train | Loss: 0.00411
+Train | Loss: 0.00230
+Train | Loss: 0.00205
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 048 / 100
+Train | Loss: 0.00893
+Train | Loss: 0.00504
+Train | Loss: 0.00257
+Train | Loss: 0.00306
+Train | Loss: 0.00264
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 049 / 100
+Train | Loss: 0.01219
+Train | Loss: 0.00500
+Train | Loss: 0.00274
+Train | Loss: 0.00186
+Train | Loss: 0.00179
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 050 / 100
+Train | Loss: 0.00700
+Train | Loss: 0.00495
+Train | Loss: 0.00306
+Train | Loss: 0.00246
+Train | Loss: 0.00199
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 051 / 100
+Train | Loss: 0.00912
+Train | Loss: 0.00446
+Train | Loss: 0.00447
+Train | Loss: 0.00258
+Train | Loss: 0.00274
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 052 / 100
+Train | Loss: 0.00898
+Train | Loss: 0.00495
+Train | Loss: 0.00358
+Train | Loss: 0.00354
+Train | Loss: 0.00165
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 053 / 100
+Train | Loss: 0.00380
+Train | Loss: 0.00431
+Train | Loss: 0.00254
+Train | Loss: 0.00227
+Train | Loss: 0.00229
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 054 / 100
+Train | Loss: 0.00704
+Train | Loss: 0.00631
+Train | Loss: 0.00281
+Train | Loss: 0.00376
+Train | Loss: 0.00226
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 055 / 100
+Train | Loss: 0.00853
+Train | Loss: 0.00301
+Train | Loss: 0.00274
+Train | Loss: 0.00202
+Train | Loss: 0.00299
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 056 / 100
+Train | Loss: 0.01099
+Train | Loss: 0.00594
+Train | Loss: 0.00288
+Train | Loss: 0.00358
+Train | Loss: 0.00269
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 057 / 100
+Train | Loss: 0.00828
+Train | Loss: 0.00492
+Train | Loss: 0.00277
+Train | Loss: 0.00247
+Train | Loss: 0.00181
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 058 / 100
+Train | Loss: 0.00596
+Train | Loss: 0.00386
+Train | Loss: 0.00269
+Train | Loss: 0.00206
+Train | Loss: 0.00188
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 059 / 100
+Train | Loss: 0.01004
+Train | Loss: 0.00478
+Train | Loss: 0.00264
+Train | Loss: 0.00236
+Train | Loss: 0.00284
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 060 / 100
+Train | Loss: 0.00905
+Train | Loss: 0.00288
+Train | Loss: 0.00281
+Train | Loss: 0.00182
+Train | Loss: 0.00209
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 061 / 100
+Train | Loss: 0.00897
+Train | Loss: 0.00355
+Train | Loss: 0.00291
+Train | Loss: 0.00234
+Train | Loss: 0.00155
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 062 / 100
+Train | Loss: 0.01019
+Train | Loss: 0.00625
+Train | Loss: 0.00326
+Train | Loss: 0.00197
+Train | Loss: 0.00226
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 063 / 100
+Train | Loss: 0.00974
+Train | Loss: 0.00507
+Train | Loss: 0.00298
+Train | Loss: 0.00213
+Train | Loss: 0.00270
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 064 / 100
+Train | Loss: 0.01239
+Train | Loss: 0.00490
+Train | Loss: 0.00198
+Train | Loss: 0.00258
+Train | Loss: 0.00188
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 065 / 100
+Train | Loss: 0.00869
+Train | Loss: 0.00379
+Train | Loss: 0.00231
+Train | Loss: 0.00189
+Train | Loss: 0.00184
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 066 / 100
+Train | Loss: 0.00793
+Train | Loss: 0.00514
+Train | Loss: 0.00346
+Train | Loss: 0.00218
+Train | Loss: 0.00177
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 067 / 100
+Train | Loss: 0.00757
+Train | Loss: 0.00321
+Train | Loss: 0.00271
+Train | Loss: 0.00185
+Train | Loss: 0.00180
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 068 / 100
+Train | Loss: 0.00616
+Train | Loss: 0.00405
+Train | Loss: 0.00214
+Train | Loss: 0.00183
+Train | Loss: 0.00237
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 069 / 100
+Train | Loss: 0.00950
+Train | Loss: 0.00480
+Train | Loss: 0.00268
+Train | Loss: 0.00240
+Train | Loss: 0.00184
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 070 / 100
+Train | Loss: 0.00615
+Train | Loss: 0.00432
+Train | Loss: 0.00187
+Train | Loss: 0.00165
+Train | Loss: 0.00223
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 071 / 100
+Train | Loss: 0.00570
+Train | Loss: 0.00189
+Train | Loss: 0.00329
+Train | Loss: 0.00213
+Train | Loss: 0.00207
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 072 / 100
+Train | Loss: 0.00779
+Train | Loss: 0.00369
+Train | Loss: 0.00302
+Train | Loss: 0.00165
+Train | Loss: 0.00222
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 073 / 100
+Train | Loss: 0.00704
+Train | Loss: 0.00294
+Train | Loss: 0.00184
+Train | Loss: 0.00251
+Train | Loss: 0.00251
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 074 / 100
+Train | Loss: 0.00597
+Train | Loss: 0.00301
+Train | Loss: 0.00278
+Train | Loss: 0.00218
+Train | Loss: 0.00185
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 075 / 100
+Train | Loss: 0.00835
+Train | Loss: 0.00466
+Train | Loss: 0.00231
+Train | Loss: 0.00157
+Train | Loss: 0.00222
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 076 / 100
+Train | Loss: 0.00785
+Train | Loss: 0.00367
+Train | Loss: 0.00258
+Train | Loss: 0.00201
+Train | Loss: 0.00166
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 077 / 100
+Train | Loss: 0.01136
+Train | Loss: 0.00286
+Train | Loss: 0.00309
+Train | Loss: 0.00157
+Train | Loss: 0.00275
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 078 / 100
+Train | Loss: 0.00997
+Train | Loss: 0.00430
+Train | Loss: 0.00368
+Train | Loss: 0.00188
+Train | Loss: 0.00203
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 079 / 100
+Train | Loss: 0.00609
+Train | Loss: 0.00326
+Train | Loss: 0.00169
+Train | Loss: 0.00227
+Train | Loss: 0.00189
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 080 / 100
+Train | Loss: 0.00542
+Train | Loss: 0.00285
+Train | Loss: 0.00248
+Train | Loss: 0.00259
+Train | Loss: 0.00140
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 081 / 100
+Train | Loss: 0.00733
+Train | Loss: 0.00325
+Train | Loss: 0.00232
+Train | Loss: 0.00184
+Train | Loss: 0.00117
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 082 / 100
+Train | Loss: 0.00561
+Train | Loss: 0.00259
+Train | Loss: 0.00210
+Train | Loss: 0.00144
+Train | Loss: 0.00096
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 083 / 100
+Train | Loss: 0.01671
+Train | Loss: 0.00392
+Train | Loss: 0.00243
+Train | Loss: 0.00150
+Train | Loss: 0.00168
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 084 / 100
+Train | Loss: 0.00833
+Train | Loss: 0.00410
+Train | Loss: 0.00262
+Train | Loss: 0.00168
+Train | Loss: 0.00161
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 085 / 100
+Train | Loss: 0.00754
+Train | Loss: 0.00313
+Train | Loss: 0.00239
+Train | Loss: 0.00208
+Train | Loss: 0.00119
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 086 / 100
+Train | Loss: 0.00583
+Train | Loss: 0.00430
+Train | Loss: 0.00204
+Train | Loss: 0.00267
+Train | Loss: 0.00168
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 087 / 100
+Train | Loss: 0.00735
+Train | Loss: 0.00396
+Train | Loss: 0.00276
+Train | Loss: 0.00178
+Train | Loss: 0.00174
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 088 / 100
+Train | Loss: 0.00807
+Train | Loss: 0.00284
+Train | Loss: 0.00194
+Train | Loss: 0.00190
+Train | Loss: 0.00099
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 089 / 100
+Train | Loss: 0.00777
+Train | Loss: 0.00358
+Train | Loss: 0.00317
+Train | Loss: 0.00158
+Train | Loss: 0.00150
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 090 / 100
+Train | Loss: 0.00607
+Train | Loss: 0.00493
+Train | Loss: 0.00245
+Train | Loss: 0.00191
+Train | Loss: 0.00167
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 091 / 100
+Train | Loss: 0.00575
+Train | Loss: 0.00421
+Train | Loss: 0.00249
+Train | Loss: 0.00224
+Train | Loss: 0.00143
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 092 / 100
+Train | Loss: 0.00363
+Train | Loss: 0.00327
+Train | Loss: 0.00253
+Train | Loss: 0.00195
+Train | Loss: 0.00169
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 093 / 100
+Train | Loss: 0.00599
+Train | Loss: 0.00437
+Train | Loss: 0.00250
+Train | Loss: 0.00226
+Train | Loss: 0.00156
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 094 / 100
+Train | Loss: 0.00749
+Train | Loss: 0.00461
+Train | Loss: 0.00348
+Train | Loss: 0.00200
+Train | Loss: 0.00174
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 095 / 100
+Train | Loss: 0.00593
+Train | Loss: 0.00183
+Train | Loss: 0.00195
+Train | Loss: 0.00197
+Train | Loss: 0.00133
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 096 / 100
+Train | Loss: 0.00480
+Train | Loss: 0.00340
+Train | Loss: 0.00188
+Train | Loss: 0.00217
+Train | Loss: 0.00203
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 097 / 100
+Train | Loss: 0.01210
+Train | Loss: 0.00328
+Train | Loss: 0.00332
+Train | Loss: 0.00214
+Train | Loss: 0.00124
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 098 / 100
+Train | Loss: 0.00647
+Train | Loss: 0.00353
+Train | Loss: 0.00170
+Train | Loss: 0.00214
+Train | Loss: 0.00132
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 099 / 100
+Train | Loss: 0.00608
+Train | Loss: 0.00339
+Train | Loss: 0.00282
+Train | Loss: 0.00182
+Train | Loss: 0.00138
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+Epoch 100 / 100
+Train | Loss: 0.00869
+Train | Loss: 0.00344
+Train | Loss: 0.00151
+Train | Loss: 0.00135
+Train | Loss: 0.00141
+Saving model to ./ckpt/slot/0328-1629/best.ckpt...

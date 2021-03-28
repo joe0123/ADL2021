@@ -51,7 +51,7 @@ class Tester:
         self.args = args
         self.test_dataset = args.dataset(args, ["test"])
         self.model = args.model_class(self.test_dataset.num_classes, self.test_dataset.label2id.get("[PAD]", None) , args)
-        self.model.cuda()
+        self.model.to(args.device)
         
         best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
         self.model.load_state_dict(torch.load(best_ckpt))
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=256, type=int, help="test batch size")
     parser.add_argument("--device", default="cuda:0", type=str, help="e.g. cuda:0")
     test_args = parser.parse_args()
-    
+
 # Set logger
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)

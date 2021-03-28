@@ -13,6 +13,7 @@ from time import strftime, localtime
 from data_utils import Vocab
 from dataset import IntentDataset, SlotDataset
 from model import IntentGRU, SlotGRU
+from torchcrf import CRF
 
 def seed_config(args):
     random.seed(args.seed)
@@ -48,8 +49,8 @@ def class_mapping(args):
     }
 
     criterions = {
-        "intent": nn.CrossEntropyLoss(reduction="sum"),
-        "slot": nn.CrossEntropyLoss(reduction="sum"),
+        "ce": nn.CrossEntropyLoss,
+        "crf": CRF,
     }
 
     optimizers = {
@@ -64,9 +65,9 @@ def class_mapping(args):
     
     args.dataset = datasets[args.task]
     args.model_class = models[args.task]
-    args.initializer = initializers[args.initializer]
-    args.criterion = criterions[args.task]
-    args.optimizer = optimizers[args.optimizer]
+    args.initializer = initializers[args.init_name]
+    args.criterion = criterions[args.cri_name]
+    args.optimizer = optimizers[args.opt_name]
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") \
         if args.device is None else torch.device(args.device)
     
@@ -175,10 +176,11 @@ if __name__ == "__main__":
     parser.add_argument("--cache_dir", default="./cache", type=str)
     parser.add_argument("--ckpt_dir", default="./ckpt", type=str)
     parser.add_argument("--no_eval", action="store_true")
-    parser.add_argument("--optimizer", default="adam", type=str)
-    parser.add_argument("--initializer", default="orthogonal_", type=str)
+    parser.add_argument("--cri_name", default="ce", type=str)
+    parser.add_argument("--opt_name", default="adam", type=str)
+    parser.add_argument("--init_name", default="orthogonal_", type=str)
     parser.add_argument("--epoch_num", default=100, type=int)
-    parser.add_argument("--batch_size", default=64, type=int)
+    parser.add_argument("--batch_size", default=32, type=int)
     parser.add_argument("--lr", default=1e-3, type=float)
     parser.add_argument("--dropout", default=0.5, type=float)
     parser.add_argument("--l2reg", default=0, type=float, help="0 is recommended, or the training might fail")
