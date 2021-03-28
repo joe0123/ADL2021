@@ -8,11 +8,13 @@ import json
 import pickle
 from tqdm import tqdm
 import torch
+import torch.nn as nn
 from torch.utils.data import DataLoader
 
 from data_utils import Vocab
 from dataset import IntentDataset, SlotDataset
 from model import IntentGRU, SlotGRU
+from torchcrf import CRF
 
 def args_loading(test_args, ckpt_dir):
     args = argparse.Namespace()
@@ -38,18 +40,43 @@ def class_mapping(args):
         "intent": IntentGRU,
         "slot": SlotGRU
     }
-        
+
+    initializers = {
+        "xavier_uniform_": torch.nn.init.xavier_uniform_,
+        "xavier_normal_": torch.nn.init.xavier_normal,
+        "orthogonal_": torch.nn.init.orthogonal_,
+    }
+
+    criterions = {
+        "ce": nn.CrossEntropyLoss,
+        "crf": CRF,
+    }
+
+    optimizers = {
+        "adadelta": torch.optim.Adadelta,  # default lr=1.0
+        "adagrad": torch.optim.Adagrad,  # default lr=0.01
+        "adam": torch.optim.Adam,  # default lr=0.001
+        "adamax": torch.optim.Adamax,  # default lr=0.002
+        "asgd": torch.optim.ASGD,  # default lr=0.01
+        "rmsprop": torch.optim.RMSprop,  # default lr=0.01
+        "sgd": torch.optim.SGD,
+    }
+    
     args.dataset = datasets[args.task]
     args.model_class = models[args.task]
+    args.initializer = initializers[args.init_name]
+    args.criterion = criterions[args.cri_name]
+    args.optimizer = optimizers[args.opt_name]
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") \
         if args.device is None else torch.device(args.device)
     
     return args
 
+
 class Tester:
     def __init__(self, args):
         self.args = args
-        self.test_dataset = args.dataset(args, ["test"])
+        self.test_dataset = args.dataset(args, ["test"], label_type="list")
         self.model = args.model_class(self.test_dataset.num_classes, self.test_dataset.label2id.get("[PAD]", None) , args)
         self.model.to(args.device)
         
@@ -63,9 +90,7 @@ class Tester:
             for i, (ids, inputs, input_lens, _) in enumerate(dataloader):
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
-                preds = self.model.predict(inputs, input_lens).cpu().tolist()
-                if self.args.task == "slot":
-                    preds = [pred[:input_len] for pred, input_len in zip(preds, input_lens.cpu().tolist())]
+                preds = self.model.predict(inputs, input_lens)
                 if all_preds is None:
                     all_ids = ids
                     all_preds = preds

@@ -7,7 +7,8 @@ class IntentGRU(nn.Module):
     def __init__(self, num_classes, pad_class, args):
         super(IntentGRU, self).__init__()
         assert args.cri_name == "ce", "Criterion must be cross entropy loss in task intent!"
-        self.criterion = args.criterion(reduction="sum")
+        if hasattr(args, "criterion"):
+            self.criterion = args.criterion(reduction="sum")
 
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         self.embed = torch.nn.Embedding(embed_matrix.shape[0], embed_matrix.shape[1])
@@ -55,10 +56,11 @@ class SlotGRU(nn.Module):
     def __init__(self, num_classes, pad_class, args):
         super(SlotGRU, self).__init__()
         self.args = args
-        if args.cri_name == "crf":
-            self.criterion = args.criterion(num_classes, batch_first=True)
-        else:
-            self.criterion = args.criterion(reduction="sum")
+        if hasattr(args, "criterion"):
+            if args.cri_name == "crf":
+                self.criterion = args.criterion(num_classes, batch_first=True)
+            else:
+                self.criterion = args.criterion(reduction="sum")
         self.num_classes = num_classes
         self.pad_class = pad_class
 
