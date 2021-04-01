@@ -186,7 +186,6 @@ if __name__ == "__main__":
     parser.add_argument("--log_step", default=50, type=int, help="number of steps to print the loss during training")
     parser.add_argument("--hidden_dim", default=128, type=int)
     parser.add_argument("--max_seq_len", type=int)
-    parser.add_argument("--lm_ratio", default=0, type=float)
     parser.add_argument("--device", default="cuda:0", type=str, help="e.g. cuda:0")
     parser.add_argument("--seed", default=14, type=int, help="seed for reproducibility")
     args = parser.parse_args()

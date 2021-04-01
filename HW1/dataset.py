@@ -16,7 +16,7 @@ class IntentDataset(Dataset):
         self.id2label = {idx: intent for intent, idx in self.label2id.items()}
         self.max_seq_len = args.max_seq_len
         for i, data in enumerate(self.data):
-            self.data[i]["text"] = data["text"].split()
+            self.data[i]["text"] = [s.lower() for s in data["text"].split()]
             if "intent" in data:
                 self.data[i]["label_id"] = self.label2id[data["intent"]]
         self.label_type = label_type
@@ -59,8 +59,11 @@ class SlotDataset(Dataset):
         self.id2label = {idx: tag for tag, idx in self.label2id.items()}
         self.max_seq_len = args.max_seq_len
         for i, data in enumerate(self.data):
-            self.data[i]["text"] = data["tokens"]
+            #self.data[i]["text"] = ["[BOS]"] + [s.lower() for s in data["tokens"]] + ["EOS"]
+            self.data[i]["text"] = [s.lower() for s in data["tokens"]]
             if "tags" in data:
+                #self.data[i]["label_id"] = [self.label2id["[BOS]"]] + [self.label2id[t] for t in data["tags"]]  \
+                #                            + [self.label2id["[EOS]"]]
                 self.data[i]["label_id"] = [self.label2id[t] for t in data["tags"]]
         self.label_type = label_type
 
