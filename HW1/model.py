@@ -53,7 +53,7 @@ class IntentGRU(nn.Module):
 
 
 class SlotGRU(nn.Module):
-    def __init__(self, num_classes, pad_class, args):
+    def __init__(self, pad_id, num_classes, pad_class, args):
         super(SlotGRU, self).__init__()
         self.args = args
         if hasattr(args, "criterion"):
@@ -61,6 +61,9 @@ class SlotGRU(nn.Module):
                 self.criterion = args.criterion(num_classes, batch_first=True)
             else:
                 self.criterion = args.criterion(reduction="sum")
+        if args.lm_ratio > 0:
+            self.lm_criterion = nn.CrossEntropyLoss(reduction="sum")
+        self.pad_id = pad_id
         self.num_classes = num_classes
         self.pad_class = pad_class
 
@@ -68,8 +71,8 @@ class SlotGRU(nn.Module):
         self.embed = torch.nn.Embedding(embed_matrix.shape[0], embed_matrix.shape[1])
         self.embed.weight = torch.nn.Parameter(embed_matrix)
         self.embed.weight.requires_grad = False # Frozen embed layer when training
+        self.num_vocabs, self.embed_dim = embed_matrix.shape[0], embed_matrix.shape[1]
 
-        self.embed_dim = embed_matrix.shape[1]
         self.gru = nn.GRU(input_size=self.embed_dim, hidden_size=args.hidden_dim, num_layers=2, dropout=args.dropout,
                 batch_first=True, bidirectional=True)
         self.classifier = nn.Sequential(nn.Dropout(args.dropout),
@@ -77,26 +80,52 @@ class SlotGRU(nn.Module):
                                         nn.PReLU(),
                                         nn.Dropout(args.dropout),
                                         nn.Linear(in_features=args.hidden_dim * 2, out_features=num_classes))
+        
+        if args.lm_ratio > 0:
+            self.flm_classifier = nn.Sequential(nn.Dropout(args.dropout),   \
+                                        nn.Linear(in_features=args.hidden_dim, out_features=self.num_vocabs))
+            self.blm_classifier = nn.Sequential(nn.Dropout(args.dropout),   \
+                                        nn.Linear(in_features=args.hidden_dim, out_features=self.num_vocabs))
+
         self.pack = lambda inputs, input_lens: pack_padded_sequence(inputs, input_lens, \
                                                             batch_first=True, enforce_sorted=False)
-        self.unpack = lambda inputs: pad_packed_sequence(inputs, batch_first=True)
+        self.unpack = lambda inputs: pad_packed_sequence(inputs, batch_first=True, padding_value=self.pad_id)
          
-           
-    def forward(self, inputs, input_lens):
-        packed_features, _ = self.gru(self.pack(self.embed(inputs).float(), input_lens.cpu()), None)
+         
+    def get_emissions(self, inputs, input_lens):
+        embeds = self.embed(inputs).float()
+        packed_features, _ = self.gru(self.pack(embeds, input_lens.cpu()), None)
         features, input_lens_ = self.unpack(packed_features)
         assert torch.all(torch.eq(input_lens.cpu(), input_lens_.cpu()))
-        return self.classifier(features)
+        return features
 
     def compute_loss(self, inputs, input_lens, targets):
         pad_mask = (torch.arange(0, inputs.shape[1]).repeat(inputs.shape[0], 1).to(input_lens.device) \
                         >= input_lens.unsqueeze(1))
-        outputs = self.forward(inputs, input_lens)
+        features = self.get_emissions(inputs, input_lens)
+        outputs = self.classifier(features)
         if self.args.cri_name == "crf":
             loss = -self.criterion(outputs, targets, torch.logical_not(pad_mask), reduction="sum") / input_lens.sum()
         else:
             outputs[:, :, self.pad_class] += 1e+8 * pad_mask.float()
             loss = self.criterion(outputs.reshape(-1, self.num_classes), targets.reshape(-1)) / input_lens.sum()
+        if self.args.lm_ratio > 0:
+            lm_pad_mask = pad_mask[:, 1:]
+            flm_outputs = self.flm_classifier(features[:, :-1, :self.args.hidden_dim])
+            flm_outputs[:, :, self.pad_id] += 1e+8 * lm_pad_mask.float()
+            flm_targets = inputs[:, 1:]
+            loss += self.args.lm_ratio  \
+                            * self.lm_criterion(flm_outputs.reshape(-1, self.num_vocabs), flm_targets.reshape(-1)) \
+                            / lm_pad_mask.float().sum()
+            blm_outputs = self.blm_classifier(features[:, 1:, self.args.hidden_dim:])
+            blm_outputs[:, :, self.pad_id] += 1e+8 * lm_pad_mask.float()
+            blm_targets = torch.where(lm_pad_mask,  \
+                                    torch.ones(lm_pad_mask.shape).to(lm_pad_mask.device) * self.pad_id, \
+                                    inputs[:, :-1].float()).long()
+            loss += self.args.lm_ratio  \
+                            * self.lm_criterion(blm_outputs.reshape(-1, self.num_vocabs), blm_targets.reshape(-1)) \
+                            / lm_pad_mask.float().sum()
+
         return loss
     
     def score(self, inputs, input_lens, targets, reduction="sum"):
@@ -111,7 +140,7 @@ class SlotGRU(nn.Module):
     def predict(self, inputs, input_lens):
         pad_mask = (torch.arange(0, inputs.shape[1]).repeat(inputs.shape[0], 1).to(input_lens.device) \
                         >= input_lens.unsqueeze(1))
-        outputs = self.forward(inputs, input_lens)
+        outputs = self.classifier(self.get_emissions(inputs, input_lens))
         if self.args.cri_name == "crf":
             preds = self.criterion.decode(outputs, torch.logical_not(pad_mask))
         else:
