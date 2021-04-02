@@ -9,9 +9,7 @@ class Vocab:
     def __init__(self, vocab: Iterable[str]) -> None:
         self.token2idx = {
             Vocab.PAD: 0,
-            Vocab.BOS: 1,
-            Vocab.EOS: 2,
-            Vocab.UNK: 3,
+            Vocab.UNK: 1,
             **{token: i for i, token in enumerate(sorted(list(vocab)), 2)},
         }
 

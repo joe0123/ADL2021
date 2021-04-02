@@ -49,7 +49,6 @@ def parse_args() -> Namespace:
         type=Path,
         help="Path to Glove Embedding.",
         default="./glove.840B.300d.txt",
-        #default="./glove.42B.300d.txt",
     )
     parser.add_argument("--rand_seed", type=int, help="Random seed.", default=13)
     parser.add_argument(

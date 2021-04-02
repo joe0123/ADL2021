@@ -53,7 +53,7 @@ class IntentGRU(nn.Module):
 
 
 class SlotGRU(nn.Module):
-    def __init__(self, pad_id, num_classes, pad_class, args):
+    def __init__(self, num_classes, pad_class, args):
         super(SlotGRU, self).__init__()
         self.args = args
         if hasattr(args, "criterion"):
@@ -61,7 +61,6 @@ class SlotGRU(nn.Module):
                 self.criterion = args.criterion(num_classes, batch_first=True)
             else:
                 self.criterion = args.criterion(reduction="sum")
-        self.pad_id = pad_id
         self.num_classes = num_classes
         self.pad_class = pad_class
 
@@ -82,7 +81,7 @@ class SlotGRU(nn.Module):
         
         self.pack = lambda inputs, input_lens: pack_padded_sequence(inputs, input_lens, \
                                                             batch_first=True, enforce_sorted=False)
-        self.unpack = lambda inputs: pad_packed_sequence(inputs, batch_first=True), padding_value=self.pad_id)
+        self.unpack = lambda inputs: pad_packed_sequence(inputs, batch_first=True)
          
          
     def get_emissions(self, inputs, input_lens):

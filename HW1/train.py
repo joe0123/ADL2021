@@ -83,8 +83,7 @@ class Trainer:
         else:
             self.train_dataset = args.dataset(args, ["train"], label_type="tensor")
             self.eval_dataset = args.dataset(args, ["eval"], label_type="list")
-        self.model = args.model_class(self.train_dataset.vocab.pad_id, \
-                            self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
+        self.model = args.model_class(self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
         self.model.to(args.device)
         
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
@@ -104,6 +103,10 @@ class Trainer:
         max_eval_acc = 0
         global_step = 0
         for epoch in range(self.args.epoch_num):
+            if epoch < args.freeze_embed_epoch:
+                self.model.embed.weight.requires_grad = False
+            else:
+                self.model.embed.weight.requires_grad = True
             logger.info('>' * 100)
             logger.info("Epoch {:03d} / {:03d}".format(epoch + 1, self.args.epoch_num))
             correct_n, total_n, train_loss = 0, 0, 0
@@ -156,8 +159,9 @@ class Trainer:
             eval_dataloader = DataLoader(dataset=self.eval_dataset, batch_size=self.args.batch_size, \
                                 collate_fn=self.eval_dataset.collate_fn, shuffle=False, num_workers=8)
         
-        params = filter(lambda p: p.requires_grad, self.model.parameters())
-        optimizer = self.args.optimizer(params, lr=self.args.lr)#, weight_decay=self.args.l2reg)
+        #params = filter(lambda p: p.requires_grad, self.model.parameters())
+        #optimizer = self.args.optimizer(params, lr=self.args.lr, weight_decay=self.args.l2reg)
+        optimizer = self.args.optimizer(self.model.parameters(), lr=self.args.lr, weight_decay=self.args.l2reg)
         
         self._reset_params()
         logger.info('>' * 100)
@@ -182,7 +186,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=32, type=int)
     parser.add_argument("--lr", default=1e-3, type=float)
     parser.add_argument("--dropout", default=0.5, type=float)
-    parser.add_argument("--l2reg", default=0, type=float, help="0 is recommended, or the training might fail")
+    parser.add_argument("--l2reg", default=1e-5, type=float)
+    parser.add_argument("--freeze_embed_epoch", default=50, type=int)
     parser.add_argument("--log_step", default=50, type=int, help="number of steps to print the loss during training")
     parser.add_argument("--hidden_dim", default=128, type=int)
     parser.add_argument("--max_seq_len", type=int)
