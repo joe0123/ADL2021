@@ -82,7 +82,7 @@ class SlotGRU(nn.Module):
         
         self.pack = lambda inputs, input_lens: pack_padded_sequence(inputs, input_lens, \
                                                             batch_first=True, enforce_sorted=False)
-        self.unpack = lambda inputs: pad_packed_sequence(inputs, batch_first=True, padding_value=self.pad_id)
+        self.unpack = lambda inputs: pad_packed_sequence(inputs, batch_first=True), padding_value=self.pad_id)
          
          
     def get_emissions(self, inputs, input_lens):
@@ -112,7 +112,6 @@ class SlotGRU(nn.Module):
             return acc
         elif reduction == "mean":
             return acc / len(preds)
-            
 
     def predict(self, inputs, input_lens):
         pad_mask = (torch.arange(0, inputs.shape[1]).repeat(inputs.shape[0], 1).to(input_lens.device) \
