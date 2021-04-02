@@ -61,8 +61,6 @@ class SlotGRU(nn.Module):
                 self.criterion = args.criterion(num_classes, batch_first=True)
             else:
                 self.criterion = args.criterion(reduction="sum")
-        if args.lm_ratio > 0:
-            self.lm_criterion = nn.CrossEntropyLoss(reduction="sum")
         self.pad_id = pad_id
         self.num_classes = num_classes
         self.pad_class = pad_class
@@ -81,12 +79,7 @@ class SlotGRU(nn.Module):
                                         nn.Dropout(args.dropout),
                                         nn.Linear(in_features=args.hidden_dim * 2, out_features=num_classes))
         
-        if args.lm_ratio > 0:
-            self.flm_classifier = nn.Sequential(nn.Dropout(args.dropout),   \
-                                        nn.Linear(in_features=args.hidden_dim, out_features=self.num_vocabs))
-            self.blm_classifier = nn.Sequential(nn.Dropout(args.dropout),   \
-                                        nn.Linear(in_features=args.hidden_dim, out_features=self.num_vocabs))
-
+        
         self.pack = lambda inputs, input_lens: pack_padded_sequence(inputs, input_lens, \
                                                             batch_first=True, enforce_sorted=False)
         self.unpack = lambda inputs: pad_packed_sequence(inputs, batch_first=True, padding_value=self.pad_id)
@@ -109,23 +102,7 @@ class SlotGRU(nn.Module):
         else:
             outputs[:, :, self.pad_class] += 1e+8 * pad_mask.float()
             loss = self.criterion(outputs.reshape(-1, self.num_classes), targets.reshape(-1)) / input_lens.sum()
-        if self.args.lm_ratio > 0:
-            lm_pad_mask = pad_mask[:, 1:]
-            flm_outputs = self.flm_classifier(features[:, :-1, :self.args.hidden_dim])
-            flm_outputs[:, :, self.pad_id] += 1e+8 * lm_pad_mask.float()
-            flm_targets = inputs[:, 1:]
-            loss += self.args.lm_ratio  \
-                            * self.lm_criterion(flm_outputs.reshape(-1, self.num_vocabs), flm_targets.reshape(-1)) \
-                            / lm_pad_mask.float().sum()
-            blm_outputs = self.blm_classifier(features[:, 1:, self.args.hidden_dim:])
-            blm_outputs[:, :, self.pad_id] += 1e+8 * lm_pad_mask.float()
-            blm_targets = torch.where(lm_pad_mask,  \
-                                    torch.ones(lm_pad_mask.shape).to(lm_pad_mask.device) * self.pad_id, \
-                                    inputs[:, :-1].float()).long()
-            loss += self.args.lm_ratio  \
-                            * self.lm_criterion(blm_outputs.reshape(-1, self.num_vocabs), blm_targets.reshape(-1)) \
-                            / lm_pad_mask.float().sum()
-
+        
         return loss
     
     def score(self, inputs, input_lens, targets, reduction="sum"):

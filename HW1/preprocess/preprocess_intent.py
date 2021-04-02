@@ -25,7 +25,7 @@ def main(args):
 
         intents.update({instance["intent"] for instance in dataset})
         words.update(
-            [token for instance in dataset for token in instance["text"].split()]
+            [token.lower() for instance in dataset for token in instance["text"].split()]
         )
 
     intent2idx = {tag: i for i, tag in enumerate(sorted(list(intents)))}
@@ -49,6 +49,7 @@ def parse_args() -> Namespace:
         type=Path,
         help="Path to Glove Embedding.",
         default="./glove.840B.300d.txt",
+        #default="./glove.42B.300d.txt",
     )
     parser.add_argument("--rand_seed", type=int, help="Random seed.", default=13)
     parser.add_argument(
