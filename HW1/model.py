@@ -13,7 +13,7 @@ class IntentGRU(nn.Module):
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         self.embed = torch.nn.Embedding(embed_matrix.shape[0], embed_matrix.shape[1])
         self.embed.weight = torch.nn.Parameter(embed_matrix)
-        self.embed.weight.requires_grad = False # Frozen embed layer when training
+        #self.embed.weight.requires_grad = False # Frozen embed layer when training
 
         self.embed_dim = embed_matrix.shape[1]
         self.gru = nn.GRU(input_size=self.embed_dim, hidden_size=args.hidden_dim, num_layers=2, dropout=args.dropout,
@@ -67,7 +67,7 @@ class SlotGRU(nn.Module):
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         self.embed = torch.nn.Embedding(embed_matrix.shape[0], embed_matrix.shape[1])
         self.embed.weight = torch.nn.Parameter(embed_matrix)
-        self.embed.weight.requires_grad = False # Frozen embed layer when training
+        #self.embed.weight.requires_grad = False # Frozen embed layer when training
         self.num_vocabs, self.embed_dim = embed_matrix.shape[0], embed_matrix.shape[1]
 
         self.gru = nn.GRU(input_size=self.embed_dim, hidden_size=args.hidden_dim, num_layers=2, dropout=args.dropout,

@@ -14,6 +14,7 @@ from data_utils import Vocab
 from dataset import IntentDataset, SlotDataset
 from model import IntentGRU, SlotGRU
 from torchcrf import CRF
+from optim import *
 
 def seed_config(args):
     random.seed(args.seed)
@@ -62,12 +63,23 @@ def class_mapping(args):
         "rmsprop": torch.optim.RMSprop,  # default lr=0.01
         "sgd": torch.optim.SGD,
     }
+
+    schedulers = {
+        "constant": get_constant_schedule_with_warmup,
+        "linear": get_linear_schedule_with_warmup,
+        "half_linear": get_half_linear_schedule_with_warmup,
+        "cosine": get_cosine_schedule_with_warmup,
+        "invexp": get_invexp_schedule_with_warmup,
+    }
     
     args.dataset = datasets[args.task]
     args.model_class = models[args.task]
     args.initializer = initializers[args.init_name]
     args.criterion = criterions[args.cri_name]
     args.optimizer = optimizers[args.opt_name]
+    args.embed_optimizer = optimizers[args.embed_opt_name]
+    args.scheduler = schedulers[args.sched_name]
+    args.embed_scheduler = schedulers[args.embed_sched_name]
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") \
         if args.device is None else torch.device(args.device)
     
@@ -89,24 +101,18 @@ class Trainer:
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
     
     def _reset_params(self):
-        for child in self.model.children():
-            if type(child) != self.args.criterion:
-                for p in child.parameters():
-                    if p.requires_grad:
-                        if len(p.shape) > 1:
-                            self.args.initializer(p)
-                        else:
-                            stdv = 1. / np.sqrt(p.shape[0])
-                            torch.nn.init.uniform_(p, a=-stdv, b=stdv)
+        for n, p in self.model.named_parameters():
+            if ("criterion" not in n) and ("embed" not in n) and p.requires_grad:
+                if len(p.shape) > 1:
+                    self.args.initializer(p)
+                else:
+                    stdv = 1. / np.sqrt(p.shape[0])
+                    torch.nn.init.uniform_(p, a=-stdv, b=stdv)
     
-    def train(self, optimizer, train_dataloader, eval_dataloader):
+    def train(self, optimizers, schedulers, train_dataloader, eval_dataloader):
         max_eval_acc = 0
         global_step = 0
         for epoch in range(self.args.epoch_num):
-            if epoch < args.freeze_embed_epoch:
-                self.model.embed.weight.requires_grad = False
-            else:
-                self.model.embed.weight.requires_grad = True
             logger.info('>' * 100)
             logger.info("Epoch {:03d} / {:03d}".format(epoch + 1, self.args.epoch_num))
             correct_n, total_n, train_loss = 0, 0, 0
@@ -117,11 +123,13 @@ class Trainer:
                 inputs = inputs.to(self.args.device)
                 input_lens = input_lens.to(self.args.device)
                 targets = targets.to(self.args.device)
-                 
-                optimizer.zero_grad()
+                
+                for optimizer in optimizers:
+                    optimizer.zero_grad()
                 loss = self.model.compute_loss(inputs, input_lens, targets)
                 loss.backward()
-                optimizer.step()
+                for optimizer in optimizers:
+                    optimizer.step()
 
                 total_n += targets.shape[0]
                 train_loss += loss.item() * targets.shape[0]
@@ -139,6 +147,8 @@ class Trainer:
                 torch.save(self.model.state_dict(), self.best_ckpt)
                 logger.info("Saving model to {}...".format(self.best_ckpt))
             global_step = 0
+            for scheduler in schedulers:
+                scheduler.step()
 
     def eval(self, dataloader):
         all_targets, all_outputs = None, None
@@ -159,17 +169,27 @@ class Trainer:
             eval_dataloader = DataLoader(dataset=self.eval_dataset, batch_size=self.args.batch_size, \
                                 collate_fn=self.eval_dataset.collate_fn, shuffle=False, num_workers=8)
         
-        #params = filter(lambda p: p.requires_grad, self.model.parameters())
-        #optimizer = self.args.optimizer(params, lr=self.args.lr, weight_decay=self.args.l2reg)
-        optimizer = self.args.optimizer(self.model.parameters(), lr=self.args.lr, weight_decay=self.args.l2reg)
+        embed_params = [param for name, param in self.model.named_parameters() if "embed" in name]
+        embed_optimizer = self.args.embed_optimizer(embed_params, lr=self.args.embed_lr, weight_decay=self.args.l2reg)
+        other_params = [param for name, param in self.model.named_parameters() if "embed" not in name]
+        other_optimizer = self.args.optimizer(other_params, lr=self.args.lr, weight_decay=self.args.l2reg)
+        optimizers = [embed_optimizer, other_optimizer]
+        
+        embed_scheduler = self.args.embed_scheduler(embed_optimizer, \
+                            num_warmup_steps=self.args.embed_warmup_epoch,  \
+                            num_training_steps=self.args.epoch_num)
+        other_scheduler = self.args.scheduler(other_optimizer, \
+                            num_warmup_steps=self.args.warmup_epoch,  \
+                            num_training_steps=self.args.epoch_num)
+        schedulers = [embed_scheduler, other_scheduler]
         
         self._reset_params()
         logger.info('>' * 100)
         logger.info("Start training...")
         if self.args.no_eval:
-            self.train(optimizer, train_dataloader, None)
+            self.train(optimizers, schedulers, train_dataloader, None)
         else:
-            self.train(optimizer, train_dataloader, eval_dataloader)
+            self.train(optimizers, schedulers, train_dataloader, eval_dataloader)
  
 if __name__ == "__main__":
 # Read hyperparameters from CMD
@@ -181,13 +201,18 @@ if __name__ == "__main__":
     parser.add_argument("--no_eval", action="store_true")
     parser.add_argument("--cri_name", default="ce", type=str)
     parser.add_argument("--opt_name", default="adam", type=str)
+    parser.add_argument("--embed_opt_name", default="adam", type=str)
+    parser.add_argument("--sched_name", default="linear", type=str)
+    parser.add_argument("--embed_sched_name", default="cosine", type=str)
     parser.add_argument("--init_name", default="orthogonal_", type=str)
     parser.add_argument("--epoch_num", default=100, type=int)
     parser.add_argument("--batch_size", default=32, type=int)
     parser.add_argument("--lr", default=1e-3, type=float)
+    parser.add_argument("--embed_lr", default=5e-5, type=float)
+    parser.add_argument("--warmup_epoch", default=0, type=int)
+    parser.add_argument("--embed_warmup_epoch", default=50, type=int)
     parser.add_argument("--dropout", default=0.5, type=float)
     parser.add_argument("--l2reg", default=1e-5, type=float)
-    parser.add_argument("--freeze_embed_epoch", default=50, type=int)
     parser.add_argument("--log_step", default=50, type=int, help="number of steps to print the loss during training")
     parser.add_argument("--hidden_dim", default=128, type=int)
     parser.add_argument("--max_seq_len", type=int)
