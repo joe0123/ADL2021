@@ -13,7 +13,6 @@ class IntentGRU(nn.Module):
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         self.embed = torch.nn.Embedding(embed_matrix.shape[0], embed_matrix.shape[1])
         self.embed.weight = torch.nn.Parameter(embed_matrix)
-        #self.embed.weight.requires_grad = False # Frozen embed layer when training
 
         self.embed_dim = embed_matrix.shape[1]
         self.gru = nn.GRU(input_size=self.embed_dim, hidden_size=args.hidden_dim, num_layers=2, dropout=args.dropout,
@@ -32,8 +31,11 @@ class IntentGRU(nn.Module):
         packed_features, _ = self.gru(self.pack(self.embed(inputs).float(), input_lens.cpu()), None)
         features, input_lens_ = self.unpack(packed_features)
         assert torch.all(torch.eq(input_lens.cpu(), input_lens_.cpu()))
+        features = features.reshape(features.shape[0], features.shape[1], 2, -1)
         selected = (input_lens - 1).unsqueeze(-1).repeat(1, features.shape[-1]).unsqueeze(1)
-        return self.classifier(torch.gather(features, dim=1, index=selected).reshape(features.shape[0], -1)).squeeze()
+        features = torch.cat((torch.gather(features[:, :, 0, :], dim=1, index=selected).squeeze(1), \
+                            features[:, 0, 1, :]), dim=-1)
+        return self.classifier(features).squeeze()
 
     def compute_loss(self, inputs, input_lens, targets):
         outputs = self.forward(inputs, input_lens)
@@ -67,7 +69,6 @@ class SlotGRU(nn.Module):
         embed_matrix = torch.load(os.path.join(args.cache_dir, "embeddings.pt"))
         self.embed = torch.nn.Embedding(embed_matrix.shape[0], embed_matrix.shape[1])
         self.embed.weight = torch.nn.Parameter(embed_matrix)
-        #self.embed.weight.requires_grad = False # Frozen embed layer when training
         self.num_vocabs, self.embed_dim = embed_matrix.shape[0], embed_matrix.shape[1]
 
         self.gru = nn.GRU(input_size=self.embed_dim, hidden_size=args.hidden_dim, num_layers=2, dropout=args.dropout,

@@ -65,9 +65,8 @@ def class_mapping(args):
     }
 
     schedulers = {
-        "constant": get_constant_schedule_with_warmup,
+        "const": get_constant_schedule_with_warmup,
         "linear": get_linear_schedule_with_warmup,
-        "half_linear": get_half_linear_schedule_with_warmup,
         "cosine": get_cosine_schedule_with_warmup,
         "invexp": get_invexp_schedule_with_warmup,
     }
