@@ -81,7 +81,7 @@ class Tester:
         self.model.to(args.device)
         
         best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
-        self.model.load_state_dict(torch.load(best_ckpt))
+        self.model.load_state_dict(torch.load(best_ckpt, map_location=args.device))
 
     def infer(self, dataloader):
         all_ids, all_preds = None, None
