@@ -15,7 +15,7 @@ with open("data/context.json") as f:
     context = json.load(f)
 
 tokenizer = BertTokenizerFast.from_pretrained("bert-base-chinese")
-print(tokenizer(["1", "012345"], context[:2], return_offsets_mapping=True))
+print(tokenizer([list(i) for i in ["1", "012345"]], [list(i) for i in context[:2]], return_offsets_mapping=True, is_split_into_words=True))
 #print(np.max([len(tokenizer(d)["input_ids"]) for d in context]))
 #print(np.mean([len(tokenizer(d)["input_ids"]) for d in context]))
 #print(np.mean([len(tokenizer(st)["input_ids"]) for d in context for st in d.strip().split('。')]))
