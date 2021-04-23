@@ -68,7 +68,7 @@ def class_mapping(args):
     
     args.model_class = None #TODO
     bert_ckpt_name = bert_ckpt_names[args.pretrained_bert]
-    args.bert_tokenizer = bert_tokenizers[args.pretrained_bert].from_pretrained(bert_ckpt_name)
+    args.bert_tokenizer = bert_tokenizers[args.pretrained_bert].from_pretrained(bert_ckpt_name, do_lower_case=True)
     args.bert_model = bert_models[args.pretrained_bert].from_pretrained(bert_ckpt_name)
     args.initializer = initializers[args.init_name]
     args.optimizer = optimizers[args.opt_name]
@@ -85,13 +85,13 @@ class Trainer:
         if args.eval_ratio > 0:
             train_dataset, eval_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=1)
+                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=6)
             self.eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, \
-                                collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=1)
+                                collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=6)
         else:
             train_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=1)
+                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=6)
         for i, data in enumerate(self.train_dataloader):
             continue
         exit()
