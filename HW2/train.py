@@ -1,31 +1,39 @@
+import os
+import sys
+import argparse
+import logging
+import random
+import numpy as np
+import json
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader
+from time import strftime, localtime
+
+from dataset import QADataset
+from optims import *
+
+def seed_config(args):
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    torch.cuda.manual_seed(args.seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 
 def dir_mapping(args):
-    args.data_dir = os.path.join(args.data_dir, args.task)
-    args.ckpt_dir = os.path.join(args.ckpt_dir, args.task, strftime("%m%d-%H%M", localtime()))
+    args.ckpt_dir = os.path.join(args.ckpt_dir, strftime("%m%d-%H%M", localtime()))
     os.makedirs(args.ckpt_dir, exist_ok=True)
 
     return args
 
 def class_mapping(args):
-    datasets = {
-        "span": SpanDataset,
-    }
-
-    models = {
-        "span": SpanBert
-    }
-
     initializers = {
         "xavier_uniform_": torch.nn.init.xavier_uniform_,
         "xavier_normal_": torch.nn.init.xavier_normal,
         "orthogonal_": torch.nn.init.orthogonal_,
-    }
-
-    criterions = {
-        "ce": nn.CrossEntropyLoss,
-        "crf": CRF,
     }
 
     optimizers = {
@@ -44,11 +52,10 @@ def class_mapping(args):
         "cosine": get_cosine_schedule_with_warmup,
         "invexp": get_invexp_schedule_with_warmup,
     }
-
-    args.dataset = datasets[args.task]
-    args.model_class = models[args.task]
+    
+    args.dataset = QADataset
+    args.model_class = None #TODO
     args.initializer = initializers[args.init_name]
-    args.criterion = criterions[args.cri_name]
     args.optimizer = optimizers[args.opt_name]
     args.scheduler = schedulers[args.sched_name]
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") \
@@ -61,14 +68,14 @@ class Trainer:
     def __init__(self, args):
         self.args = args
         if args.eval_ratio > 0:
-            self.train_dataset = args.dataset(args, "train")
-            train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
+            train_dataset = args.dataset(args, "train")
+            self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
                                 collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
         else:
-            self.train_dataset, self.eval_dataset = args.dataset(args, "train")
-            train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
+            train_dataset, eval_dataset = args.dataset(args, "train")
+            self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
                                 collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
-            eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, \
+            self.eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, \
                                 collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=8)
         self.model = args.model_class(self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
         self.model.to(args.device)
@@ -110,7 +117,6 @@ class Trainer:
 if __name__ == "__main__":
 # Read hyperparameters from CMD
     parser = argparse.ArgumentParser()
-    parser.add_argument("--task", choices=["span"], required=True, type=str)
     parser.add_argument("--context_data", default="./data/context.json", type=str)
     parser.add_argument("--train_data", default="./data/train.json", type=str)
     parser.add_argument("--ckpt_dir", default="./ckpt", type=str)
