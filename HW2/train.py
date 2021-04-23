@@ -77,6 +77,9 @@ class Trainer:
                                 collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
             self.eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, \
                                 collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=8)
+        for i, data in enumerate(self.train_dataloader):
+            print(data)
+        exit()
         self.model = args.model_class(self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
         self.model.to(args.device)
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")

@@ -3,7 +3,9 @@ import json
 import numpy as np
 import torch
 from torch.utils.data import Dataset
-import re
+
+def build_dataset():
+
 
 class QADataset(Dataset):
     def __init__(self, args, case):
@@ -32,11 +34,25 @@ class QADataset(Dataset):
                         
     
     def collate_fn(self, samples):
-        text_ids, rel_labels, start_labels, end_labels = [], [], [], []
+        all_questions, all_paragraphs, all_rel_labels, all_start_labels, all_end_labels = [], [], [], [], []
         for sample in samples:
-            question = samples["question"]
-            for 
+            for paragraph, rel_label, start_labels, end_labels in zip(sample["paragraphs"], sample["rel_labels"], sample["start_labels", sample["end_labels"]]):
+                for start, end in zip(start_labels, end_labels):
+                    all_questions.append(sample["question"])
+                    all_paragraphs.append(sample["paragraphs"])
+                    all_rel_labels.append(sample["rel_labels"])
+                    all_start_labels.append(sample["start_labels"])
+                    all_end_labels.append(sample["end_labels"])
+        
+        batch_encodings = self.tokenizer(all_questions, all_paragraphs, padding=True, truncation=True, \
+                        max_length=self.args.max_seq_len, return_offsets_mapping=True)
+        all_text_ids = batch_encodings["input_ids"]
+        all_type_ids = batch_encodings["token_type_ids"]
+        all_mask_ids = batch_encodings["attention_masks"]
+        all_offset_mappings = batch_encodings["offset_mapping"]
 
+        for type_ids, mask_ids, offset_mappings, start_labels, end_labels
+        
 
     def __getitem__(self, index):
         return self.ques_data[index]
