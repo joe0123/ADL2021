@@ -8,6 +8,7 @@ import json
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from transformers import BertTokenizerFast, BertModel
 from time import strftime, localtime
 
 from dataset import build_datasets
@@ -30,6 +31,18 @@ def dir_mapping(args):
     return args
 
 def class_mapping(args):
+    bert_ckpt_names = {
+        "bert_base": "bert-base-chinese",
+    }
+
+    bert_tokenizers = {
+        "bert_base": BertTokenizerFast,
+    }
+
+    bert_models = {
+        "bert_base": BertModel,
+    }
+
     initializers = {
         "xavier_uniform_": torch.nn.init.xavier_uniform_,
         "xavier_normal_": torch.nn.init.xavier_normal,
@@ -54,6 +67,9 @@ def class_mapping(args):
     }
     
     args.model_class = None #TODO
+    bert_ckpt_name = bert_ckpt_names[args.pretrained_bert]
+    args.bert_tokenizer = bert_tokenizers[args.pretrained_bert].from_pretrained(bert_ckpt_name)
+    args.bert_model = bert_models[args.pretrained_bert].from_pretrained(bert_ckpt_name)
     args.initializer = initializers[args.init_name]
     args.optimizer = optimizers[args.opt_name]
     args.scheduler = schedulers[args.sched_name]
@@ -69,15 +85,15 @@ class Trainer:
         if args.eval_ratio > 0:
             train_dataset, eval_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
+                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=1)
             self.eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, \
-                                collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=8)
+                                collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=1)
         else:
             train_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
+                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=1)
         for i, data in enumerate(self.train_dataloader):
-            print(data)
+            continue
         exit()
         self.model = args.model_class(self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
         self.model.to(args.device)
