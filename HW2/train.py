@@ -10,7 +10,7 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from time import strftime, localtime
 
-from dataset import QADataset
+from dataset import build_datasets
 from optims import *
 
 def seed_config(args):
@@ -53,7 +53,6 @@ def class_mapping(args):
         "invexp": get_invexp_schedule_with_warmup,
     }
     
-    args.dataset = QADataset
     args.model_class = None #TODO
     args.initializer = initializers[args.init_name]
     args.optimizer = optimizers[args.opt_name]
@@ -68,15 +67,15 @@ class Trainer:
     def __init__(self, args):
         self.args = args
         if args.eval_ratio > 0:
-            train_dataset = args.dataset(args, "train")
-            self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
-        else:
-            train_dataset, eval_dataset = args.dataset(args, "train")
+            train_dataset, eval_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
                                 collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
             self.eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, \
                                 collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=8)
+        else:
+            train_dataset = build_datasets(args, "train")
+            self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
+                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
         for i, data in enumerate(self.train_dataloader):
             print(data)
         exit()

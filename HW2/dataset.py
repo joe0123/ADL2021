@@ -4,16 +4,25 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 
-def build_dataset():
+def build_datasets(args, case):
+    context_data = json.load(open(args.context_data, 'r'))
+    ques_data = json.load(open(getattr(args, "{}_data".format(case)), 'r'))
+    if case == "train" and args.eval_ratio > 0:
+        ques_data = np.array(ques_data)
+        ids = np.random.permutation(ques_data.shape[0])
+        cut = int(ques_data.shape[0] * args.eval_ratio)
+        train_ques_data = ques_data[ids[cut:]].tolist()
+        eval_ques_data = ques_data[ids[:cut]].tolist()
+        return QADataset(args, context_data, train_ques_data), QADataset(args, context_data, eval_ques_data)
+    else:
+        return QADataset(args, context_data, ques_data)
+
 
 
 class QADataset(Dataset):
-    def __init__(self, args, case):
+    def __init__(self, args, context_data, ques_data):
         #self.tokenizer = args.tokenizer
-
-        context_data = json.load(open(args.context_data, 'r'))
-        self.ques_data = json.load(open(getattr(args, "{}_data".format(case)), 'r'))
-        
+        self.ques_data = ques_data
         for qi, q_data in enumerate(self.ques_data):
             self.ques_data[qi]["rel_labels"] = [1 if id_ == q_data["relevant"] else 0 for id_ in q_data["paragraphs"]]
             self.ques_data[qi]["paragraphs"] = [context_data[id_] for id_ in q_data["paragraphs"]]
@@ -36,7 +45,8 @@ class QADataset(Dataset):
     def collate_fn(self, samples):
         all_questions, all_paragraphs, all_rel_labels, all_start_labels, all_end_labels = [], [], [], [], []
         for sample in samples:
-            for paragraph, rel_label, start_labels, end_labels in zip(sample["paragraphs"], sample["rel_labels"], sample["start_labels", sample["end_labels"]]):
+            for paragraph, rel_label, start_labels, end_labels in zip(sample["paragraphs"], sample["rel_labels"], \
+                                                                    sample["start_labels"], sample["end_labels"]):
                 for start, end in zip(start_labels, end_labels):
                     all_questions.append(sample["question"])
                     all_paragraphs.append(sample["paragraphs"])
@@ -51,7 +61,7 @@ class QADataset(Dataset):
         all_mask_ids = batch_encodings["attention_masks"]
         all_offset_mappings = batch_encodings["offset_mapping"]
 
-        for type_ids, mask_ids, offset_mappings, start_labels, end_labels
+        #for type_ids, mask_ids, offset_mappings, start_labels, end_labels
         
 
     def __getitem__(self, index):
