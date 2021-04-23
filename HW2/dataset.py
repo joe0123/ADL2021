@@ -64,8 +64,8 @@ class QADataset(Dataset):
         all_mask_ids = batch_encodings["attention_mask"]
         all_offset_mappings = batch_encodings["offset_mapping"].tolist()
 
-        for q, text_ids, p, type_ids, mask_ids, offset_mappings, start_label, end_label \
-                in zip(all_questions, all_text_ids, all_paragraphs, all_type_ids, all_mask_ids, all_offset_mappings, all_start_labels, all_end_labels):
+        for type_ids, mask_ids, offset_mappings, start_label, end_label \
+                in zip(all_type_ids, all_mask_ids, all_offset_mappings, all_start_labels, all_end_labels):
             low = torch.sum((1 - type_ids) * mask_ids).item()
             high = torch.sum(mask_ids).item() - 1
             if start_label != -1:
