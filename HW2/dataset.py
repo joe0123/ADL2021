@@ -82,7 +82,7 @@ class QADataset(Dataset):
         return len(self.ques_data)
 
 
-def prevent_clean_text(text):
+def prevent_clean_text(text, sub_char='_'):
     """Prevent invalid character removal and whitespace cleanup in tokenizer."""
     
     def _is_control(char):
@@ -107,9 +107,9 @@ def prevent_clean_text(text):
     for char in text:
         cp = ord(char)
         if cp == 0 or cp == 0xfffd or _is_control(char):
-            output.append('|')
+            output.append(sub_char)
         if _is_whitespace(char):
-            output.append('|')
+            output.append(sub_char)
         else:
             output.append(char)
     return ''.join(output)
