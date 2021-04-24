@@ -14,57 +14,80 @@ def build_datasets(args, case):
         cut = int(ques_data.shape[0] * args.eval_ratio)
         train_ques_data = ques_data[ids[cut:]].tolist()
         eval_ques_data = ques_data[ids[:cut]].tolist()
-        return QADataset(args, context_data, train_ques_data), QADataset(args, context_data, eval_ques_data)
+        return QADataset(args, context_data, train_ques_data, case), QADataset(args, context_data, eval_ques_data, case)
     else:
-        return QADataset(args, context_data, ques_data)
+        return QADataset(args, context_data, ques_data, case)
 
 class QADataset(Dataset):
-    def __init__(self, args, context_data, ques_data):
+    def __init__(self, args, context_data, ques_data, case):
         self.args = args
+        self.case = case
         self.tokenizer = args.bert_tokenizer
-        self.ques_data = ques_data
         
         # TODO 改在這打散句子
+        context_data_ = [prevent_clean_text(context) for context in context_data]
+        self.ques_data = []
+        for qi, q_data in enumerate(ques_data):
+            d = dict()
+            d["q_id"] = q_data["id"]
+            d["question"] = q_data["question"]
+            if case == "train":
+                d["rel"], d["irrel"] = [], []
+                for p_id in q_data["paragraphs"]:
+                    p, p_ = context_data[p_id], context_data_[p_id]
+                    if p_id == q_data["relevant"]:
+                        for a in q_data["answers"]:
+                            d["rel"].append({"paragraph": p, "paragraph_": p_, \
+                                    "answer": a["text"], "start": a["start"], "end": a["start"] + len(a["text"]) - 1})
+                    else:
+                        d["irrel"].append({"paragraph": p, "paragraph_": p_})
+            else:
+                d["unknown"] = [{"paragraph": context_data[p_id], "paragraph_": context_data_[p_id]} \
+                                        for p_id in q_data["paragraphs"]]
+            self.ques_data.append(d)
+
+        self.data = self.sample_data()
+
+    def sample_data(self, irrel_ratio=None):    #TODO implement with irrel_ratio ratio
+        data = []
         for qi, q_data in enumerate(self.ques_data):
-            self.ques_data[qi]["rel_labels"] = [1 if id_ == q_data["relevant"] else 0 for id_ in q_data["paragraphs"]]
-            self.ques_data[qi]["paragraphs"] = [context_data[id_] for id_ in q_data["paragraphs"]]
-            self.ques_data[qi]["start_labels"] = [[a["start"] for a in q_data["answers"]] if rel == 1 \
-                                                else [-1] for rel in q_data["rel_labels"]]
-            self.ques_data[qi]["end_labels"] = [[a["start"] + len(a["text"]) - 1 for a in q_data["answers"]] if rel == 1 \
-                                                else [-1] for rel in q_data["rel_labels"]]
-            
-            #found = False
-            #for starts, ends, paragraph in zip(q_data["start_labels"], q_data["end_labels"], q_data["paragraphs"]):
-            #    if starts == [-1] and ends == [-1]:
-            #        continue
-            #    for start, end, a in zip(starts, ends, q_data["answers"]):
-            #        print(a["text"], paragraph[start: end + 1])
-            #        assert a["text"] == paragraph[start: end + 1]
-            #        found = True
-            #assert found
-   
+            if self.case == "train":
+                for r in q_data["rel"]:
+                    data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
+                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], \
+                                "rel_label": 1, "start_label": r["start"], "end_label": r["end"]})
+                for ir in q_data["irrel"]:
+                    data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
+                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], \
+                                "rel_label": 0, "start_label": -1, "end_label": -1})
+            else:
+                for u in q_data["unknown"]:
+                    data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
+                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"]})
+
+        return data
 
     def collate_fn(self, samples):
-        all_ids, all_questions, all_paragraphs, all_rel_labels, all_start_labels, all_end_labels = [], [], [], [], [], []
+        all_q_ids, all_questions, all_paragraphs, all_paragraphs_ = [], [], [], []
+        all_rel_labels, all_start_labels, all_end_labels = [], [], []
         for sample in samples:
-            for paragraph, rel_label, start_labels, end_labels in zip(sample["paragraphs"], sample["rel_labels"], \
-                                                                    sample["start_labels"], sample["end_labels"]):
-                for start_label, end_label in zip(start_labels, end_labels):
-                    all_ids.append(sample["id"])
-                    all_questions.append(list(sample["question"]))
-                    all_paragraphs.append(list(paragraph))
-                    all_rel_labels.append(rel_label)
-                    all_start_labels.append(start_label)
-                    all_end_labels.append(end_label)
+            all_q_ids.append(sample["q_id"])
+            all_questions.append(list(sample["question"]))
+            all_paragraphs.append(list(sample["paragraph"]))
+            all_paragraphs_.append(list(sample["paragraph_"]))
+            if self.case == "train":
+                all_rel_labels.append(sample["rel_label"])
+                all_start_labels.append(sample["start_label"])
+                all_end_labels.append(sample["end_label"])
         
-        batch_encodings = self.tokenizer(all_questions, all_paragraphs, padding=True, truncation=True, \
+        batch_encodings = self.tokenizer(all_questions, all_paragraphs_, padding=True, truncation=True, \
                             is_split_into_words=True, max_length=self.args.max_seq_len, return_tensors="pt")
         all_text_ids = batch_encodings["input_ids"]
         all_type_ids = batch_encodings["token_type_ids"]
         all_mask_ids = batch_encodings["attention_mask"]
 
-        for id_, p, q, text_ids, type_ids, mask_ids, start_label, end_label \
-                in zip(all_ids, all_paragraphs, all_questions, all_text_ids, all_type_ids, all_mask_ids, all_start_labels, all_end_labels):
+        for type_ids, mask_ids, start_label, end_label \
+                    in zip(all_type_ids, all_mask_ids, all_start_labels, all_end_labels):
             base = ((1 - type_ids) * mask_ids).sum().item()
             start_label += (base if start_label != -1 else 0)
             end_label += (base if end_label != -1 else 0)
@@ -73,16 +96,16 @@ class QADataset(Dataset):
             if end_label == -1 or end_label >= all_text_ids.shape[1]:
                 end_label = mask_ids.sum() - 1
             
-            print(id_, ''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
+            #print(q_id, ''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
 
     def __getitem__(self, index):
-        return self.ques_data[index]
+        return self.data[index]
 
     def __len__(self):
-        return len(self.ques_data)
+        return len(self.data)
 
 
-def prevent_clean_text(text, sub_char='_'):
+def prevent_clean_text(text):
     """Prevent invalid character removal and whitespace cleanup in tokenizer."""
     
     def _is_control(char):
@@ -107,9 +130,9 @@ def prevent_clean_text(text, sub_char='_'):
     for char in text:
         cp = ord(char)
         if cp == 0 or cp == 0xfffd or _is_control(char):
-            output.append(sub_char)
+            output.append('_')
         if _is_whitespace(char):
-            output.append(sub_char)
+            output.append('_')
         else:
             output.append(char)
     return ''.join(output)
