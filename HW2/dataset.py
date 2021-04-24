@@ -24,7 +24,7 @@ class QADataset(Dataset):
         self.case = case
         self.tokenizer = args.bert_tokenizer
         
-        # TODO 改在這打散句子
+        # TODO remove punc
         context_data_ = [prevent_clean_text(context) for context in context_data]
         self.ques_data = []
         for qi, q_data in enumerate(ques_data):
