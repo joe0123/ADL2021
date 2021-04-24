@@ -8,10 +8,11 @@ import json
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from transformers import BertTokenizerFast, BertModel
+from transformers import BertTokenizerFast#, BertForQuestionAnswering
 from time import strftime, localtime
 
 from dataset import build_datasets
+from model import QABert
 from optims import *
 
 def seed_config(args):
@@ -21,7 +22,6 @@ def seed_config(args):
     torch.cuda.manual_seed(args.seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
-
 
 
 def dir_mapping(args):
@@ -40,7 +40,8 @@ def class_mapping(args):
     }
 
     bert_models = {
-        "bert_base": BertModel,
+        "bert_base": QABert,
+        #"bert_base": BertForQuestionAnswering,
     }
 
     initializers = {
@@ -66,7 +67,6 @@ def class_mapping(args):
         "invexp": get_invexp_schedule_with_warmup,
     }
     
-    args.model_class = None #TODO
     bert_ckpt_name = bert_ckpt_names[args.pretrained_bert]
     args.bert_tokenizer = bert_tokenizers[args.pretrained_bert].from_pretrained(bert_ckpt_name, do_lower_case=True)
     args.bert_model = bert_models[args.pretrained_bert].from_pretrained(bert_ckpt_name)
@@ -85,52 +85,90 @@ class Trainer:
         if args.eval_ratio > 0:
             train_dataset, eval_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=6)
+                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
             self.eval_dataloader = DataLoader(dataset=eval_dataset, batch_size=args.batch_size, \
-                                collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=6)
+                                collate_fn=eval_dataset.collate_fn, shuffle=False, num_workers=8)
         else:
             train_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=6)
-        for i, data in enumerate(self.train_dataloader):
-            continue
-        exit()
-        self.model = args.model_class(self.train_dataset.num_classes, self.train_dataset.label2id.get("[PAD]", None) , args)
+                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
+        
+        self.model = args.bert_model
         self.model.to(args.device)
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
-        # TODO mv other configuration from run to here
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = self.args.optimizer(self.model.parameters(), lr=self.args.lr, weight_decay=self.args.l2reg) 
+        #TODO add scheduler
     
-    def _reset_params(self):
-        for n, p in self.model.named_parameters():
-            if ("criterion" not in n) and ("embed" not in n) and p.requires_grad:
-                if len(p.shape) > 1:
-                    self.args.initializer(p)
+    def train(self):
+        max_valid_acc = 0
+        global_step = 0
+        for epoch in range(self.args.epoch_num):
+            logger.info('>' * 100)
+            logger.info("Epoch {:02d} / {:02d}".format(epoch + 1, self.args.epoch_num))
+            total_n, train_loss = 0, 0
+            
+            self.optimizer.zero_grad()
+            for i, samples in enumerate(self.train_dataloader):
+                self.model.train()
+                global_step += 1
+                
+                text_ids = samples["text_ids"].to(args.device)
+                type_ids = samples["type_ids"].to(args.device)
+                mask_ids = samples["mask_ids"].to(args.device)
+                start_labels = samples["start_labels"].to(args.device)
+                end_labels = samples["end_labels"].to(args.device)
+                outputs = self.model(text_ids, token_type_ids=type_ids, attention_mask=mask_ids, \
+                                    start_positions=start_labels, end_positions=end_labels)
+                loss = outputs["loss"]
+                loss.backward()
+                
+                if global_step % self.args.update_step == 0 or i == len(self.train_dataloader) - 1:
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
+                
+                total_n += len(outputs)
+                train_loss += loss.item()
+                if global_step % self.args.log_step == 0 or i == len(self.train_dataloader) - 1:
+                    train_loss = train_loss / total_n
+                    logger.info("Train | Loss: {:.5f}".format(train_loss))
+                
+                # TODO Write eval
+                if global_step % self.args.eval_step == 0 or i == len(train_dataloader) - 1:
+                    valid_acc = self.eval(valid_dataloader)
+                    logger.info("Valid | Acc: {:.5f}".format(valid_acc))
+                    if valid_acc > max_valid_acc:
+                        max_valid_acc = valid_acc
+                        torch.save(self.model.state_dict(), self.best_ckpt)
+                        logger.info("Saving model to {}...".format(self.best_ckpt))
+            global_step = 0
+
+    def eval(self, dataloader):
+        all_targets, all_outputs = None, None
+        self.model.eval()
+        with torch.no_grad():
+            for i, sample in enumerate(dataloader):
+                inputs = [sample[col].to(self.args.device) for col in self.args.input_cols]
+                targets = sample["polarity"].to(self.args.device)
+                outputs = self.model(inputs)
+
+                if all_targets is None:
+                    all_targets = targets
+                    all_outputs = outputs
                 else:
-                    stdv = 1. / np.sqrt(p.shape[0])
-                    torch.nn.init.uniform_(p, a=-stdv, b=stdv)
-    
+                    all_targets = torch.cat((all_targets, targets), dim=0)
+                    all_outputs = torch.cat((all_outputs, outputs), dim=0)
+
+        all_targets = all_targets.cpu()
+        all_outputs = torch.round(all_outputs).cpu()
+        acc = (all_outputs == all_targets).float().mean()
+        return acc
+
     def run(self):
-        embed_params = [param for name, param in self.model.named_parameters() if "embed" in name]
-        embed_optimizer = self.args.embed_optimizer(embed_params, lr=self.args.embed_lr, weight_decay=self.args.l2reg)
-        other_params = [param for name, param in self.model.named_parameters() if "embed" not in name]
-        other_optimizer = self.args.optimizer(other_params, lr=self.args.lr, weight_decay=self.args.l2reg)
-        optimizers = [embed_optimizer, other_optimizer]
-
-        embed_scheduler = self.args.embed_scheduler(embed_optimizer, \
-                            num_warmup_steps=self.args.embed_warmup_epoch,  \
-                            num_training_steps=self.args.epoch_num)
-        other_scheduler = self.args.scheduler(other_optimizer, \
-                            num_warmup_steps=self.args.warmup_epoch,  \
-                            num_training_steps=self.args.epoch_num)
-        schedulers = [embed_scheduler, other_scheduler]
-
-        self._reset_params()
         logger.info('>' * 100)
         logger.info("Start training...")
-        if self.args.no_eval:
-            self.train(optimizers, schedulers, train_dataloader, None)
-        else:
-            self.train(optimizers, schedulers, train_dataloader, eval_dataloader)
+        self.train()
+
 
 if __name__ == "__main__":
 # Read hyperparameters from CMD
@@ -139,7 +177,7 @@ if __name__ == "__main__":
     parser.add_argument("--train_data", default="./data/train.json", type=str)
     parser.add_argument("--ckpt_dir", default="./ckpt", type=str)
     parser.add_argument("--eval_ratio", default=0.2, type=float)
-    parser.add_argument("--batch_size", default=16, type=int, help="try 16, 32, 64")
+    parser.add_argument("--batch_size", default=4, type=int)
     parser.add_argument("--epoch_num", default=5, type=int)
     parser.add_argument("--lr", default=3e-5, type=float, help="*e-5 are recommended")
     parser.add_argument("--dropout", default=0.5, type=float)
@@ -147,7 +185,7 @@ if __name__ == "__main__":
     parser.add_argument("--opt_name", default="adam", type=str)
     parser.add_argument("--init_name", default="xavier_uniform_", type=str)
     parser.add_argument("--sched_name", default="linear", type=str)
-    parser.add_argument("--update_step", default=8, type=int, help="number of steps to accum gradients before update")
+    parser.add_argument("--update_step", default=32, type=int, help="number of steps to accum gradients before update")
     parser.add_argument("--log_step", default=500, type=int, help="number of steps to print the loss during training")
     parser.add_argument("--eval_step", default=1000, type=int, help="number of steps to evaluate the model during training")
     parser.add_argument("--warmup_ratio", default=0.1, type=float, help="ratio between 0 and 1 for warmup scheduling")

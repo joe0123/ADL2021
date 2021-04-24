@@ -68,35 +68,46 @@ class QADataset(Dataset):
         return data
 
     def collate_fn(self, samples):
-        all_q_ids, all_questions, all_paragraphs, all_paragraphs_ = [], [], [], []
-        all_rel_labels, all_start_labels, all_end_labels = [], [], []
+        merged_samples = {"q_ids": [], "questions": [], "paragraphs": [], "paragraphs_": [], \
+                        "rel_labels": [], "start_labels": [], "end_labels": []}
         for sample in samples:
-            all_q_ids.append(sample["q_id"])
-            all_questions.append(list(sample["question"]))
-            all_paragraphs.append(list(sample["paragraph"]))
-            all_paragraphs_.append(list(sample["paragraph_"]))
+            merged_samples["q_ids"].append(sample["q_id"])
+            merged_samples["questions"].append(list(sample["question"]))
+            merged_samples["paragraphs"].append(list(sample["paragraph"]))
+            merged_samples["paragraphs_"].append(list(sample["paragraph_"]))
             if self.case == "train":
-                all_rel_labels.append(sample["rel_label"])
-                all_start_labels.append(sample["start_label"])
-                all_end_labels.append(sample["end_label"])
+                merged_samples["rel_labels"].append(sample["rel_label"])
+                merged_samples["start_labels"].append(sample["start_label"])
+                merged_samples["end_labels"].append(sample["end_label"])
         
-        batch_encodings = self.tokenizer(all_questions, all_paragraphs_, padding=True, truncation=True, \
-                            is_split_into_words=True, max_length=self.args.max_seq_len, return_tensors="pt")
-        all_text_ids = batch_encodings["input_ids"]
-        all_type_ids = batch_encodings["token_type_ids"]
-        all_mask_ids = batch_encodings["attention_mask"]
+        batch_encodings = self.tokenizer(merged_samples["questions"], merged_samples["paragraphs_"],    \
+                            padding=True, truncation=True, max_length=self.args.max_seq_len,  \
+                            is_split_into_words=True, return_tensors="pt")
+        merged_samples["text_ids"] = batch_encodings["input_ids"]
+        merged_samples["type_ids"] = batch_encodings["token_type_ids"]
+        merged_samples["mask_ids"] = batch_encodings["attention_mask"]
 
-        for type_ids, mask_ids, start_label, end_label \
-                    in zip(all_type_ids, all_mask_ids, all_start_labels, all_end_labels):
+        for i, (type_ids, mask_ids, start_label, end_label) \
+                    in enumerate(zip(merged_samples["type_ids"], merged_samples["mask_ids"], \
+                                merged_samples["start_labels"], merged_samples["end_labels"])):
             base = ((1 - type_ids) * mask_ids).sum().item()
             start_label += (base if start_label != -1 else 0)
             end_label += (base if end_label != -1 else 0)
-            if start_label == -1 or start_label >= all_text_ids.shape[1]:
+            # TODO ignored in model or [SEP] here 
+            if start_label == -1 or start_label >= merged_samples["text_ids"].shape[1]:
                 start_label = mask_ids.sum() - 1
-            if end_label == -1 or end_label >= all_text_ids.shape[1]:
+            if end_label == -1 or end_label >= merged_samples["text_ids"].shape[1]:
                 end_label = mask_ids.sum() - 1
             
-            #print(q_id, ''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
+            merged_samples["start_labels"][i] = start_label
+            merged_samples["end_labels"][i] = end_label
+            #print(''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
+        
+        merged_samples["rel_labels"] = torch.LongTensor(merged_samples["rel_labels"])
+        merged_samples["start_labels"] = torch.LongTensor(merged_samples["start_labels"])
+        merged_samples["end_labels"] = torch.LongTensor(merged_samples["end_labels"])
+        
+        return merged_samples
 
     def __getitem__(self, index):
         return self.data[index]

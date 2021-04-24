@@ -10,6 +10,9 @@ from transformers import BertForQuestionAnswering
 #print(np.percentile([len(q["question"]) for q in questions], 99))
 #print(np.mean([q["answers"][0]["start"] for q in questions]))
 
+from transformers import BertForQuestionAnswering
+model = BertForQuestionAnswering.from_pretrained("bert-base-chinese")
+exit()
 
 with open("data/context.json") as f:
     context = json.load(f)
