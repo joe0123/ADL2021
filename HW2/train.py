@@ -95,6 +95,9 @@ class Trainer:
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.batch_size, \
                                 collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
         
+        for i, samples in enumerate(self.train_dataloader):
+            continue
+        exit()
         self.model = args.bert_model
         self.model.to(args.device)
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")

@@ -4,9 +4,35 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 import unicodedata
+import spacy
+import bisect
 
 def build_datasets(args, case):
-    context_data = [prevent_clean_text(d) for d in json.load(open(args.context_data, 'r'))]
+    raw_context_data = [prevent_clean_text(d) for d in json.load(open(args.context_data, 'r'))]
+    # TODO mv context_ to here
+    nlp = spacy.load("zh_core_web_md", disable=["ner", "parser", "tagger"])
+    matcher = spacy.matcher.Matcher(nlp.vocab)
+    matcher.add("PUNCT", [[{"IS_PUNCT": True}]])
+    context_data = []
+    for i, raw_context in enumerate(raw_context_data):
+        doc = spacy.tokens.Doc(nlp.vocab, words=list(raw_context))
+        matches = matcher(doc)
+        context, raw_punc_ids = '', []
+        last_end = 0
+        for _, start, end in matches:
+            context += raw_context[last_end: start]
+            last_end = end
+            raw_punc_ids += list(range(start, end))
+        #context, raw_punc_ids = '', []
+        #for ci, c in enumerate(raw_context):
+        #    nlp_c = spacy.tokens.Doc(nlp.vocab, words=[c], spaces=[False])
+        #    assert len(nlp_c) == 1
+        #    if nlp_c[0].is_punct:
+        #        raw_punc_ids.append(ci)
+        #    else:
+        #        context += c
+        context_data.append({"context": context, "raw_punc_ids": raw_punc_ids})
+    
     ques_data = json.load(open(getattr(args, "{}_data".format(case)), 'r'))
     if case == "train" and args.eval_ratio > 0:
         ques_data = np.array(ques_data)
@@ -24,8 +50,8 @@ class QADataset(Dataset):
         self.case = case
         self.tokenizer = args.bert_tokenizer
         
-        # TODO remove punc
-        context_data_ = [prevent_clean_text(context) for context in context_data]
+        context_ = [prevent_clean_text(data["context"]) for data in context_data]
+
         self.ques_data = []
         for qi, q_data in enumerate(ques_data):
             d = dict()
@@ -34,11 +60,15 @@ class QADataset(Dataset):
             if case == "train":
                 d["rel"], d["irrel"] = [], []
                 for p_id in q_data["paragraphs"]:
-                    p, p_ = context_data[p_id], context_data_[p_id]
+                    p, raw_punc_ids, p_ = context_data[p_id]["context"], context_data[p_id]["raw_punc_ids"], context_[p_id]
                     if p_id == q_data["relevant"]:
                         for a in q_data["answers"]:
+                            start = a["start"]
+                            start = start - bisect.bisect_left(raw_punc_ids, start)
+                            end = a["start"] + len(a["text"]) - 1
+                            end = end - bisect.bisect_left(raw_punc_ids, end)
                             d["rel"].append({"paragraph": p, "paragraph_": p_, \
-                                    "answer": a["text"], "start": a["start"], "end": a["start"] + len(a["text"]) - 1})
+                                    "answer": a["text"], "start": start, "end": end})
                     else:
                         d["irrel"].append({"paragraph": p, "paragraph_": p_})
             else:
@@ -87,8 +117,8 @@ class QADataset(Dataset):
         merged_samples["type_ids"] = batch_encodings["token_type_ids"]
         merged_samples["mask_ids"] = batch_encodings["attention_mask"]
 
-        for i, (type_ids, mask_ids, start_label, end_label) \
-                    in enumerate(zip(merged_samples["type_ids"], merged_samples["mask_ids"], \
+        for i, (text_ids, type_ids, mask_ids, start_label, end_label) \
+                    in enumerate(zip(merged_samples["text_ids"], merged_samples["type_ids"], merged_samples["mask_ids"], \
                                 merged_samples["start_labels"], merged_samples["end_labels"])):
             base = ((1 - type_ids) * mask_ids).sum().item()
             start_label += (base if start_label != -1 else 0)
@@ -101,7 +131,7 @@ class QADataset(Dataset):
             
             merged_samples["start_labels"][i] = start_label
             merged_samples["end_labels"][i] = end_label
-            #print(''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
+            print(''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
         
         merged_samples["rel_labels"] = torch.LongTensor(merged_samples["rel_labels"])
         merged_samples["start_labels"] = torch.LongTensor(merged_samples["start_labels"])

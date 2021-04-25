@@ -6,19 +6,15 @@ from transformers import BertForQuestionAnswering
 
 import spacy
 from spacy.matcher import Matcher
+from spacy.symbols import IS_PUNCT
 
-nlp = spacy.load("en_core_web_sm")
-matcher = Matcher(nlp.vocab)
-# Add match ID "HelloWorld" with no callback and one pattern
-pattern = [{"IS_PUNCT": True}]
-matcher.add("punc", [pattern])
-
-doc = nlp("Hello, world! Hello world!")
-matches = matcher(doc)
-for match_id, start, end in matches:
-    string_id = nlp.vocab.strings[match_id]  # Get string representation
-    span = doc[start:end]  # The matched span
-    print(match_id, string_id, start, end, span.text)
+nlp = spacy.load("zh_core_web_sm")
+tokens = list("我愛你，你呢？")
+for t in tokens:
+    t = nlp(t)
+    assert len(t) == 1
+    if t[0].is_punct:
+        print(t)
 exit()
 
 #with open("data/public.json") as f:
