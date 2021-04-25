@@ -8,36 +8,19 @@ import spacy
 import bisect
 
 def build_datasets(args, case):
-    raw_context_data = [prevent_clean_text(d) for d in json.load(open(args.context_data, 'r'))]
-    # TODO mv context_ to here
-    nlp = spacy.load("zh_core_web_md", disable=["ner", "parser", "tagger"])
-    matcher = spacy.matcher.Matcher(nlp.vocab)
-    matcher.add("PUNCT", [[{"IS_PUNCT": True}]])
+    raw_context_data = json.load(open(args.context_data, 'r'))
     context_data = []
-    for i, raw_context in enumerate(raw_context_data):
-        doc = spacy.tokens.Doc(nlp.vocab, words=list(raw_context))
-        matches = matcher(doc)
-        context, raw_punc_ids = '', []
-        last_end = 0
-        for _, start, end in matches:
-            context += raw_context[last_end: start]
-            last_end = end
-            raw_punc_ids += list(range(start, end))
-        #context, raw_punc_ids = '', []
-        #for ci, c in enumerate(raw_context):
-        #    nlp_c = spacy.tokens.Doc(nlp.vocab, words=[c], spaces=[False])
-        #    assert len(nlp_c) == 1
-        #    if nlp_c[0].is_punct:
-        #        raw_punc_ids.append(ci)
-        #    else:
-        #        context += c
-        context_data.append({"context": context, "raw_punc_ids": raw_punc_ids})
+    for raw_context in raw_context_data:
+        context, raw_punct_ids = remove_spacy_punct(raw_context)
+        context_data.append({"context": context, \
+                            "context_": prevent_bert_clean_text(context), \
+                            "raw_punct_ids": raw_punct_ids})
     
     ques_data = json.load(open(getattr(args, "{}_data".format(case)), 'r'))
-    if case == "train" and args.eval_ratio > 0:
+    if case == "train" and args.valid_ratio > 0:
         ques_data = np.array(ques_data)
         ids = np.random.permutation(ques_data.shape[0])
-        cut = int(ques_data.shape[0] * args.eval_ratio)
+        cut = int(ques_data.shape[0] * args.valid_ratio)
         train_ques_data = ques_data[ids[cut:]].tolist()
         eval_ques_data = ques_data[ids[:cut]].tolist()
         return QADataset(args, context_data, train_ques_data, case), QADataset(args, context_data, eval_ques_data, case)
@@ -49,8 +32,6 @@ class QADataset(Dataset):
         self.args = args
         self.case = case
         self.tokenizer = args.bert_tokenizer
-        
-        context_ = [prevent_clean_text(data["context"]) for data in context_data]
 
         self.ques_data = []
         for qi, q_data in enumerate(ques_data):
@@ -60,13 +41,16 @@ class QADataset(Dataset):
             if case == "train":
                 d["rel"], d["irrel"] = [], []
                 for p_id in q_data["paragraphs"]:
-                    p, raw_punc_ids, p_ = context_data[p_id]["context"], context_data[p_id]["raw_punc_ids"], context_[p_id]
+                    p = context_data[p_id]["context"]
+                    p_ = context_data[p_id]["context_"]
+                    raw_punct_ids = context_data[p_id]["raw_punct_ids"]
                     if p_id == q_data["relevant"]:
                         for a in q_data["answers"]:
                             start = a["start"]
-                            start = start - bisect.bisect_left(raw_punc_ids, start)
-                            end = a["start"] + len(a["text"]) - 1
-                            end = end - bisect.bisect_left(raw_punc_ids, end)
+                            end = start + len(a["text"]) - 1
+                            start -= bisect.bisect_left(raw_punct_ids, start)
+                            end -= bisect.bisect_right(raw_punct_ids, end)
+                            assert remove_spacy_punct(a["text"])[0] == p[start: end + 1]
                             d["rel"].append({"paragraph": p, "paragraph_": p_, \
                                     "answer": a["text"], "start": start, "end": end})
                     else:
@@ -84,12 +68,12 @@ class QADataset(Dataset):
             if self.case == "train":
                 for r in q_data["rel"]:
                     data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
-                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], \
-                                "rel_label": 1, "start_label": r["start"], "end_label": r["end"]})
+                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], "rel_label": 1, \
+                                "answer": r["answer"], "start_label": r["start"], "end_label": r["end"]})
                 for ir in q_data["irrel"]:
                     data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
-                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], \
-                                "rel_label": 0, "start_label": -1, "end_label": -1})
+                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], "rel_label": 0, \
+                                "answer": '', "start_label": -1, "end_label": -1})
             else:
                 for u in q_data["unknown"]:
                     data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
@@ -99,31 +83,34 @@ class QADataset(Dataset):
 
     def collate_fn(self, samples):
         merged_samples = {"q_ids": [], "questions": [], "paragraphs": [], "paragraphs_": [], \
-                        "rel_labels": [], "start_labels": [], "end_labels": []}
+                "rel_labels": [], "answers": [], "start_labels": [], "end_labels": []}
         for sample in samples:
             merged_samples["q_ids"].append(sample["q_id"])
-            merged_samples["questions"].append(list(sample["question"]))
-            merged_samples["paragraphs"].append(list(sample["paragraph"]))
-            merged_samples["paragraphs_"].append(list(sample["paragraph_"]))
+            merged_samples["questions"].append(sample["question"])
+            merged_samples["paragraphs"].append(sample["paragraph"])
+            merged_samples["paragraphs_"].append(sample["paragraph_"])
+            merged_samples["answers"].append(sample["answer"])
             if self.case == "train":
                 merged_samples["rel_labels"].append(sample["rel_label"])
                 merged_samples["start_labels"].append(sample["start_label"])
                 merged_samples["end_labels"].append(sample["end_label"])
         
-        batch_encodings = self.tokenizer(merged_samples["questions"], merged_samples["paragraphs_"],    \
+        questions = [list(s) for s in merged_samples["questions"]]
+        paragraphs_ = [list(s) for s in merged_samples["paragraphs_"]]
+        batch_encodings = self.tokenizer(questions, paragraphs_,    \
                             padding=True, truncation=True, max_length=self.args.max_seq_len,  \
                             is_split_into_words=True, return_tensors="pt")
         merged_samples["text_ids"] = batch_encodings["input_ids"]
         merged_samples["type_ids"] = batch_encodings["token_type_ids"]
         merged_samples["mask_ids"] = batch_encodings["attention_mask"]
 
-        for i, (text_ids, type_ids, mask_ids, start_label, end_label) \
-                    in enumerate(zip(merged_samples["text_ids"], merged_samples["type_ids"], merged_samples["mask_ids"], \
+        for i, (type_ids, mask_ids, start_label, end_label) \
+                    in enumerate(zip(merged_samples["type_ids"], merged_samples["mask_ids"], \
                                 merged_samples["start_labels"], merged_samples["end_labels"])):
             base = ((1 - type_ids) * mask_ids).sum().item()
             start_label += (base if start_label != -1 else 0)
             end_label += (base if end_label != -1 else 0)
-            # TODO ignored in model or [SEP] here 
+            # TODO ignored out of sentence in criterion or [SEP] here 
             if start_label == -1 or start_label >= merged_samples["text_ids"].shape[1]:
                 start_label = mask_ids.sum() - 1
             if end_label == -1 or end_label >= merged_samples["text_ids"].shape[1]:
@@ -131,9 +118,9 @@ class QADataset(Dataset):
             
             merged_samples["start_labels"][i] = start_label
             merged_samples["end_labels"][i] = end_label
-            print(''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
+            #print(''.join(self.tokenizer.convert_ids_to_tokens(text_ids[start_label: end_label + 1])))
         
-        merged_samples["rel_labels"] = torch.LongTensor(merged_samples["rel_labels"])
+        merged_samples["rel_labels"] = torch.FloatTensor(merged_samples["rel_labels"])
         merged_samples["start_labels"] = torch.LongTensor(merged_samples["start_labels"])
         merged_samples["end_labels"] = torch.LongTensor(merged_samples["end_labels"])
         
@@ -146,7 +133,23 @@ class QADataset(Dataset):
         return len(self.data)
 
 
-def prevent_clean_text(text):
+nlp = spacy.load("zh_core_web_md", disable=["ner", "parser", "tagger"])
+matcher = spacy.matcher.Matcher(nlp.vocab)
+matcher.add("PUNCT", [[{"IS_PUNCT": True}]])
+def remove_spacy_punct(raw_text):
+    doc = spacy.tokens.Doc(nlp.vocab, words=list(raw_text))
+    matches = matcher(doc)
+    text, raw_punct_ids = '', []
+    last_end = 0
+    for _, start, end in matches:
+        text += raw_text[last_end: start]
+        last_end = end
+        raw_punct_ids += list(range(start, end))
+    text += raw_text[last_end:]
+    return text, raw_punct_ids
+
+
+def prevent_bert_clean_text(text):
     """Prevent invalid character removal and whitespace cleanup in tokenizer."""
     
     def _is_control(char):
