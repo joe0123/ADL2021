@@ -8,7 +8,7 @@ import json
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from transformers import BertTokenizerFast, BertModel
+from transformers import BertTokenizerFast
 from time import strftime, localtime
 
 from dataset import build_datasets
@@ -45,16 +45,6 @@ def class_mapping(args):
         #"bert_base": BertForQuestionAnswering,
     }
 
-    optimizers = {
-        "adadelta": torch.optim.Adadelta,  # default lr=1.0
-        "adagrad": torch.optim.Adagrad,  # default lr=0.01
-        "adam": torch.optim.Adam,  # default lr=0.001
-        "adamax": torch.optim.Adamax,  # default lr=0.002
-        "asgd": torch.optim.ASGD,  # default lr=0.01
-        "rmsprop": torch.optim.RMSprop,  # default lr=0.01
-        "sgd": torch.optim.SGD,
-    }
-
     schedulers = {
         "const": get_constant_schedule_with_warmup,
         "linear": get_linear_schedule_with_warmup,
@@ -65,7 +55,6 @@ def class_mapping(args):
     bert_ckpt_name = bert_ckpt_names[args.pretrained_bert]
     args.bert_tokenizer = bert_tokenizers[args.pretrained_bert].from_pretrained(bert_ckpt_name, do_lower_case=True)
     args.bert_model = bert_models[args.pretrained_bert].from_pretrained(bert_ckpt_name)
-    args.optimizer = optimizers[args.opt_name]
     args.scheduler = schedulers[args.sched_name]
     args.device = torch.device("cuda" if torch.cuda.is_available() else "cpu") \
         if args.device is None else torch.device(args.device)
@@ -91,9 +80,10 @@ class Trainer:
         self.model = args.bert_model
         self.model.to(args.device)
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
-        self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = self.args.optimizer(self.model.parameters(), lr=self.args.lr, weight_decay=self.args.l2reg) 
-        #TODO add scheduler
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=self.args.lr, \
+                                            eps=1e-6, weight_decay=self.args.l2reg)
+        total_update_steps = np.ceil(len(self.train_dataloader) / args.update_step) * args.epoch_num
+        self.scheduler = args.scheduler(self.optimizer, total_update_steps * args.warmup_ratio, total_update_steps)
     
     def train(self):
         max_valid_em = 0
@@ -116,8 +106,8 @@ class Trainer:
                                     rel_labels=rel_labels, start_labels=start_labels, end_labels=end_labels)
                 
                 rel_loss = outputs["rel_loss"]
-                qa_loss = outputs["start_loss"] + outputs["end_loss"]
-                loss = (rel_loss + qa_loss) / 3
+                qa_loss = (outputs["start_loss"] + outputs["end_loss"]) / 2
+                loss = (rel_loss + qa_loss) / 2
                 total_rel_loss += rel_loss.item()
                 total_qa_loss += qa_loss.item()
                 total_loss += loss.item()
@@ -131,6 +121,7 @@ class Trainer:
                 if step % self.args.update_step == 0 or step == len(self.train_dataloader):
                     self.optimizer.step()
                     self.optimizer.zero_grad()
+                    self.scheduler.step()
                 
                 if step % self.args.log_step == 0 or step == len(self.train_dataloader):
                     total_loss /= step
@@ -203,16 +194,14 @@ if __name__ == "__main__":
     parser.add_argument("--train_batch_size", default=4, type=int)
     parser.add_argument("--valid_batch_size", default=48, type=int)
     parser.add_argument("--epoch_num", default=5, type=int)
-    parser.add_argument("--lr", default=3e-5, type=float, help="*e-5 are recommended")
+    parser.add_argument("--lr", default=5e-5, type=float, help="*e-5 are recommended")
     parser.add_argument("--dropout", default=0.5, type=float)
     parser.add_argument("--l2reg", default=0.01, type=float)
-    parser.add_argument("--opt_name", default="adam", type=str)
     parser.add_argument("--sched_name", default="linear", type=str)
     parser.add_argument("--update_step", default=32, type=int, help="number of steps to accum gradients before update")
     parser.add_argument("--log_step", default=1000, type=int, help="number of steps to print the loss during training")
-    parser.add_argument("--eval_step", default=10000, type=int, help="number of steps to evaluate the model during training")
+    parser.add_argument("--eval_step", default=6000, type=int, help="number of steps to evaluate the model during training")
     parser.add_argument("--warmup_ratio", default=0.1, type=float, help="ratio between 0 and 1 for warmup scheduling")
-    parser.add_argument("--bert_dim", default=768, type=int)
     parser.add_argument("--pretrained_bert", default="bert_base", choices=["bert_base"], type=str)
     parser.add_argument("--max_seq_len", default=512, type=int)
     parser.add_argument("--device", default="cuda:0", type=str, help="e.g. cuda:0")
