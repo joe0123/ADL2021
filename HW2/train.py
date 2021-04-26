@@ -68,15 +68,18 @@ class Trainer:
         if args.valid_ratio > 0:
             train_dataset, valid_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.train_batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
+                                                shuffle=True, num_workers=4)
             self.valid_dataloader = DataLoader(dataset=valid_dataset, batch_size=args.valid_batch_size, \
-                                collate_fn=valid_dataset.collate_fn, shuffle=False, num_workers=8)
+                                                shuffle=False, num_workers=4)
             self.eval_tokenizer = ev.Tokenizer()
         else:
             train_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.train_batch_size, \
-                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
-        
+                                                shuffle=True, num_workers=4)
+        for data in self.train_dataloader:
+            print(data)
+            continue
+        exit()
         self.model = args.bert_model
         self.model.to(args.device)
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
