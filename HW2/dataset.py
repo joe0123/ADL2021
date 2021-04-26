@@ -65,12 +65,12 @@ class QADataset(Dataset):
             if self.case == "train":
                 for r in q_data["rel"]:
                     data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
-                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], \
-                                "rel_label": 1, "answer": r["answer"], "start_label": r["start"], "end_label": r["end"]})
+                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], "rel_label": 1, \
+                                "answer": r["answer"], "start_label": r["start"], "end_label": r["end"]})
                 for ir in q_data["irrel"]:
                     data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
-                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], \
-                                "rel_label": 0, "answer": '', "start_label": -1, "end_label": -1})
+                                "paragraph": r["paragraph"], "paragraph_": r["paragraph_"], "rel_label": 0, \
+                                "answer": '', "start_label": self.args.max_seq_len, "end_label": self.args.max_seq_len})
             else:
                 for u in q_data["unknown"]:
                     data.append({"q_id": q_data["q_id"], "question": q_data["question"], \
@@ -105,13 +105,13 @@ class QADataset(Dataset):
                     in enumerate(zip(merged_samples["type_ids"], merged_samples["mask_ids"], \
                                 merged_samples["start_labels"], merged_samples["end_labels"])):
             base = ((1 - type_ids) * mask_ids).sum().item()
-            start_label += (base if start_label != -1 else 0)
-            end_label += (base if end_label != -1 else 0)
+            start_label += base
+            end_label += base
             # TODO ignored out of sentence in criterion or [SEP] here 
-            if start_label == -1 or start_label >= merged_samples["text_ids"].shape[1]:
-                start_label = mask_ids.sum() - 1
-            if end_label == -1 or end_label >= merged_samples["text_ids"].shape[1]:
-                end_label = mask_ids.sum() - 1
+            #if start_label == -1 or start_label >= merged_samples["text_ids"].shape[1]:
+            #    start_label = mask_ids.sum() - 1
+            #if end_label == -1 or end_label >= merged_samples["text_ids"].shape[1]:
+            #    end_label = mask_ids.sum() - 1
             merged_samples["start_labels"][i] = start_label
             merged_samples["end_labels"][i] = end_label
 

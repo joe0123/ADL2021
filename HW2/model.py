@@ -67,7 +67,7 @@ class QABert(BertPreTrainedModel):
         if rel_labels is not None:
             if len(rel_labels.shape) > 1:
                 rel_labels = rel_labels.squeeze(-1)
-            rel_criterion = nn.BCEWithLogitsLoss(reduction="sum")
+            rel_criterion = nn.BCEWithLogitsLoss()
             rel_loss = rel_criterion(rel_logits, rel_labels)
 
         qa_loss = None
@@ -82,19 +82,20 @@ class QABert(BertPreTrainedModel):
             start_labels.clamp_(0, ignored_index)
             end_labels.clamp_(0, ignored_index)
 
-            qa_criterion = nn.CrossEntropyLoss(ignore_index=ignored_index, reduction="sum")
+            qa_criterion = nn.CrossEntropyLoss(ignore_index=ignored_index)
             start_loss = qa_criterion(start_logits, start_labels)
             end_loss = qa_criterion(end_logits, end_labels)
-            qa_loss = (start_loss + end_loss) / 2
 
         if not return_dict:
             outputs = (rel_logits, start_logits, end_logits)
             return ((rel_loss, qa_loss,) + outputs) if rel_loss is not None and qa_loss is not None else outputs
         else:
-            outputs = {"rel_loss": rel_loss,
-                        "qa_loss": qa_loss,
-                        "rel_logits": rel_logits,
-                        "start_logits": start_logits,
-                        "end_logits": end_logits
+            outputs = {
+                "rel_loss": rel_loss,
+                "start_loss": start_loss,
+                "end_loss": end_loss,
+                "rel_logits": rel_logits,
+                "start_logits": start_logits,
+                "end_logits": end_logits
             }
             return outputs

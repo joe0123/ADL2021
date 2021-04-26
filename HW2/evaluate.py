@@ -98,8 +98,8 @@ def compute_metrics(answers, predictions, tokenizer):
         prediction = predictions[id_]
         metric = compute_metric(answers[id_]['answers'], prediction, tokenizer)
         metrics.append(metric)
-        if metric["em"] < 1 or metric["f1"] < 1:
-            print(id_, answers[id_]['answers'], prediction, metric["em"], metric["f1"])
+        #if metric["em"] < 1 or metric["f1"] < 1:
+            #print(id_, answers[id_]['answers'], prediction, metric["em"], metric["f1"])
 
     n_total = len(metrics)
     result = {

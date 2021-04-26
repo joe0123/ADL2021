@@ -8,7 +8,7 @@ import json
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
-from transformers import BertTokenizerFast
+from transformers import BertTokenizerFast, BertModel
 from time import strftime, localtime
 
 from dataset import build_datasets
@@ -97,17 +97,62 @@ class Trainer:
     
     def train(self):
         max_valid_em = 0
-        global_step = 0
         for epoch in range(self.args.epoch_num):
             logger.info('>' * 100)
             logger.info("Epoch {:02d} / {:02d}".format(epoch + 1, self.args.epoch_num))
             
-            total_n, train_rel_loss, train_qa_loss, train_loss = 0, 0, 0, 0
+            total_rel_loss, total_qa_loss, total_loss = 0, 0, 0
             self.optimizer.zero_grad()
-            for i, samples in enumerate(self.train_dataloader):
+            for step, samples in enumerate(self.train_dataloader, 1):
                 self.model.train()
-                global_step += 1
                 
+                text_ids = samples["text_ids"].to(self.args.device)
+                type_ids = samples["type_ids"].to(self.args.device)
+                mask_ids = samples["mask_ids"].to(self.args.device)
+                rel_labels = samples["rel_labels"].to(self.args.device)
+                start_labels = samples["start_labels"].to(self.args.device)
+                end_labels = samples["end_labels"].to(self.args.device)
+                outputs = self.model(text_ids, token_type_ids=type_ids, attention_mask=mask_ids, \
+                                    rel_labels=rel_labels, start_labels=start_labels, end_labels=end_labels)
+                
+                rel_loss = outputs["rel_loss"]
+                qa_loss = outputs["start_loss"] + outputs["end_loss"]
+                loss = (rel_loss + qa_loss) / 3
+                total_rel_loss += rel_loss.item()
+                total_qa_loss += qa_loss.item()
+                total_loss += loss.item()
+
+                if len(self.train_dataloader) - step + 1 < self.args.update_step:
+                    loss = loss / (len(self.train_dataloader) % self.args.update_step)
+                else:
+                    loss = loss / self.args.update_step
+                loss.backward()
+                
+                if step % self.args.update_step == 0 or step == len(self.train_dataloader):
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
+                
+                if step % self.args.log_step == 0 or step == len(self.train_dataloader):
+                    total_loss /= step
+                    total_rel_loss /= step
+                    total_qa_loss /= step
+                    logger.info("Train | Loss: {:.5f} (Rel: {:.5f}, QA: {:.5f})".format(total_loss, 
+                                                                                        total_rel_loss,
+                                                                                        total_qa_loss))
+                if step % self.args.eval_step == 0 or step == len(self.train_dataloader):
+                    valid_scores = self.eval(self.valid_dataloader)
+                    valid_em, valid_f1 = valid_scores["em"], valid_scores["f1"]
+                    logger.info("Valid | EM: {:.5f}, F1: {:.5f}".format(valid_em, valid_f1))
+                    if valid_em > max_valid_em:
+                        max_valid_em = valid_em
+                        torch.save(self.model.state_dict(), self.best_ckpt)
+                        logger.info("Saving model to {}...".format(self.best_ckpt))
+
+    def eval(self, dataloader):
+        all_targets, all_outputs = dict(), dict()
+        self.model.eval()
+        with torch.no_grad():
+            for samples in dataloader:
                 text_ids = samples["text_ids"].to(args.device)
                 type_ids = samples["type_ids"].to(args.device)
                 mask_ids = samples["mask_ids"].to(args.device)
@@ -116,56 +161,14 @@ class Trainer:
                 end_labels = samples["end_labels"].to(args.device)
                 outputs = self.model(text_ids, token_type_ids=type_ids, attention_mask=mask_ids, \
                                     rel_labels=rel_labels, start_labels=start_labels, end_labels=end_labels)
-                rel_loss, qa_loss = outputs["rel_loss"], outputs["qa_loss"]
-                loss = (rel_loss + qa_loss) / 2
-                loss.backward()
                 
-                if global_step % self.args.update_step == 0 or i == len(self.train_dataloader) - 1:
-                    self.optimizer.step()
-                    self.optimizer.zero_grad()
-                
-                total_n += len(outputs)
-                train_rel_loss += rel_loss.item()
-                train_qa_loss += qa_loss.item()
-                train_loss += loss.item()
-                if global_step % self.args.log_step == 0 or i == len(self.train_dataloader) - 1:
-                    train_rel_loss /= total_n
-                    train_qa_loss /= total_n
-                    train_loss /= total_n
-                    logger.info("Train | Loss: {:.5f} (Rel: {:.5f}, QA: {:.5f})".format(train_loss, 
-                                                                                        train_rel_loss, 
-                                                                                        train_qa_loss))
-                if global_step % self.args.eval_step == 0 or i == len(self.train_dataloader) - 1:
-                    valid_scores = self.eval(self.valid_dataloader)
-                    valid_em, valid_f1 = valid_scores["em"], valid_scores["f1"]
-                    logger.info("Valid | EM: {:.5f}, F1: {:.5f}".format(valid_em, valid_f1))
-                    if valid_em > max_valid_em:
-                        max_valid_em = valid_em
-                        torch.save(self.model.state_dict(), self.best_ckpt)
-                        logger.info("Saving model to {}...".format(self.best_ckpt))
-            global_step = 0
-
-    def eval(self, dataloader):
-        all_targets, all_outputs = dict(), dict()
-        self.model.eval()
-        with torch.no_grad():
-            for i, samples in enumerate(dataloader):
-                text_ids = samples["text_ids"].to(args.device)
-                type_ids = samples["type_ids"].to(args.device)
-                mask_ids = samples["mask_ids"].to(args.device)
-                rel_labels = samples["rel_labels"].to(args.device)
-                start_labels = samples["start_labels"].to(args.device)
-                end_labels = samples["end_labels"].to(args.device)
-                #outputs = self.model(text_ids, token_type_ids=type_ids, attention_mask=mask_ids, \
-                #                    rel_labels=rel_labels, start_labels=start_labels, end_labels=end_labels)
-                
-                #rels = torch.sigmoid(outputs["rel_logits"]).cpu().tolist()
-                rels = rel_labels.cpu().tolist()
+                rels = outputs["rel_logits"].cpu().tolist()
                 bases = ((1 - type_ids) * mask_ids).sum(dim=-1)
-                #starts = (torch.argmax(outputs["start_logits"], dim=-1) - bases).cpu().tolist()
-                starts = (start_labels - bases).cpu().tolist()
-                #ends = (torch.argmax(outputs["end_logits"], dim=-1) - bases).cpu().tolist()
-                ends = (end_labels - bases).cpu().tolist()
+                starts = (torch.argmax(outputs["start_logits"], dim=-1) - bases).cpu().tolist()
+                ends = (torch.argmax(outputs["end_logits"], dim=-1) - bases).cpu().tolist()
+                #rels = rel_labels.cpu().tolist()
+                #starts = (start_labels - bases).cpu().tolist()
+                #ends = (end_labels - bases).cpu().tolist()
                 # TODO ensure start - end < 30
                 for q_id, p, ans, rel, start, end \
                         in zip(samples["q_ids"], samples["paragraphs"], samples["answers"], rels, starts, ends):
@@ -177,6 +180,7 @@ class Trainer:
                             all_targets[q_id]["answers"].append(ans)
                         if rel > all_outputs[q_id][0]:
                             all_outputs[q_id] = (rel, p[start: end + 1])
+        
         for k in all_outputs:
             all_outputs[k] = all_outputs[k][1]
         scores = ev.compute_metrics(all_targets, all_outputs, self.eval_tokenizer)
@@ -206,8 +210,7 @@ if __name__ == "__main__":
     parser.add_argument("--sched_name", default="linear", type=str)
     parser.add_argument("--update_step", default=32, type=int, help="number of steps to accum gradients before update")
     parser.add_argument("--log_step", default=1000, type=int, help="number of steps to print the loss during training")
-    parser.add_argument("--eval_step", default=1, type=int, help="number of steps to evaluate the model during training")
-    #parser.add_argument("--eval_step", default=5000, type=int, help="number of steps to evaluate the model during training")
+    parser.add_argument("--eval_step", default=10000, type=int, help="number of steps to evaluate the model during training")
     parser.add_argument("--warmup_ratio", default=0.1, type=float, help="ratio between 0 and 1 for warmup scheduling")
     parser.add_argument("--bert_dim", default=768, type=int)
     parser.add_argument("--pretrained_bert", default="bert_base", choices=["bert_base"], type=str)
