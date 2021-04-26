@@ -30,7 +30,7 @@ class QADataset(Dataset):
         self.context_data = context_data
         self.case = case
 
-        self.ques_data = Parallel(n_jobs=4)(delayed(self.make_ques_data)(q_data) for q_data in ques_data)
+        self.ques_data = Parallel(n_jobs=2)(delayed(self.make_ques_data)(q_data) for q_data in ques_data)
         
         self.data = self.sample_data()
     
@@ -65,8 +65,8 @@ class QADataset(Dataset):
                                 while offset_map[end_label][1] - 1 >= end:
                                     end_label -= 1
                                 end_label += 1
-                                if a["text"] != p[offset_map[start_label][0]: offset_map[end_label][1]]:
-                                    print(a["text"], p[offset_map[start_label][0]: offset_map[end_label][1]])
+                                #if a["text"] != p[offset_map[start_label][0]: offset_map[end_label][1]]:
+                                print(a["text"], p[offset_map[start_label][0]: offset_map[end_label][1]], flush=True)
                                 d["rel"].append({"paragraph": p, "text_ids": text_ids, \
                                     "type_ids": type_ids, "mask_ids": mask_ids, "offset_map": offset_map, \
                                     "answer": a["text"], "start_label": start_label, "end_label": end_label})
