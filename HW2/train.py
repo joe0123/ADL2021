@@ -88,6 +88,9 @@ class Trainer:
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.train_batch_size, \
                                 collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=8)
         
+        for i, samples in enumerate(self.train_dataloader):
+            continue
+        exit()
         self.model = args.bert_model
         self.model.to(args.device)
         self.best_ckpt = os.path.join(args.ckpt_dir, "best.ckpt")
@@ -156,13 +159,16 @@ class Trainer:
                 rel_labels = samples["rel_labels"].to(args.device)
                 start_labels = samples["start_labels"].to(args.device)
                 end_labels = samples["end_labels"].to(args.device)
-                outputs = self.model(text_ids, token_type_ids=type_ids, attention_mask=mask_ids, \
-                                    rel_labels=rel_labels, start_labels=start_labels, end_labels=end_labels)
+                #outputs = self.model(text_ids, token_type_ids=type_ids, attention_mask=mask_ids, \
+                #                    rel_labels=rel_labels, start_labels=start_labels, end_labels=end_labels)
                 
-                rels = torch.sigmoid(outputs["rel_logits"]).cpu().tolist()
+                #rels = torch.sigmoid(outputs["rel_logits"]).cpu().tolist()
+                rels = rel_labels.cpu().tolist()
                 bases = ((1 - type_ids) * mask_ids).sum(dim=-1)
-                starts = (torch.argmax(outputs["start_logits"], dim=-1) - bases).cpu().tolist()
-                ends = (torch.argmax(outputs["end_logits"], dim=-1) - bases).cpu().tolist()
+                #starts = (torch.argmax(outputs["start_logits"], dim=-1) - bases).cpu().tolist()
+                starts = (start_labels - bases).cpu().tolist()
+                #ends = (torch.argmax(outputs["end_logits"], dim=-1) - bases).cpu().tolist()
+                ends = (end_labels - bases).cpu().tolist()
                 # TODO ensure start - end < 30
                 for q_id, p, ans, rel, start, end \
                         in zip(samples["q_ids"], samples["paragraphs"], samples["answers"], rels, starts, ends):
@@ -203,7 +209,8 @@ if __name__ == "__main__":
     parser.add_argument("--sched_name", default="linear", type=str)
     parser.add_argument("--update_step", default=32, type=int, help="number of steps to accum gradients before update")
     parser.add_argument("--log_step", default=1000, type=int, help="number of steps to print the loss during training")
-    parser.add_argument("--eval_step", default=5000, type=int, help="number of steps to evaluate the model during training")
+    parser.add_argument("--eval_step", default=1, type=int, help="number of steps to evaluate the model during training")
+    #parser.add_argument("--eval_step", default=5000, type=int, help="number of steps to evaluate the model during training")
     parser.add_argument("--warmup_ratio", default=0.1, type=float, help="ratio between 0 and 1 for warmup scheduling")
     parser.add_argument("--bert_dim", default=768, type=int)
     parser.add_argument("--pretrained_bert", default="bert_base", choices=["bert_base"], type=str)

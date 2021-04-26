@@ -57,7 +57,7 @@ class QABert(BertPreTrainedModel):
         rel_embed = torch.cat([t.unsqueeze(0) for t in outputs["hidden_states"][-4:]], dim=0)[:, :, 0: 1, :]
         rel_embed = rel_embed.permute(1, 2, 0, 3)
         rel_embed = self.rel_extractor(rel_embed.reshape(rel_embed.shape[0], -1))
-        rel_logits = self.rel_classifier(rel_embed).squeeze()
+        rel_logits = self.rel_classifier(rel_embed).squeeze(-1)
 
         qa_logits = self.qa_classifier(outputs["last_hidden_state"])
         start_logits, end_logits = qa_logits[:, :, 0], qa_logits[:, :, 1]
