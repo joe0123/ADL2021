@@ -9,10 +9,11 @@ with open("data/context.json") as f:
 tokenizer = BertTokenizerFast.from_pretrained("bert-base-chinese")
 start = time.time()
 for i in range(5000):
-    output = tokenizer(["1"], [context[i]], padding="max_length", max_length=512, return_overflowing_tokens=True, truncation="only_second", return_offsets_mapping=True, stride=128)
+    output = tokenizer(["1"], [context[i]], padding="max_length", max_length=512, return_overflowing_tokens=True, truncation="only_second", return_offsets_mapping=True, stride=128, return_tensors="pt")
+print(output)
 print(time.time() - start)
 start = time.time()
-output = tokenizer(["1" for i in range(5000)], context[:5000], padding="max_length", max_length=512, return_overflowing_tokens=True, truncation="only_second", return_offsets_mapping=True, stride=128)
+output = tokenizer(["1" for i in range(5000)], context[:5000], padding="max_length", max_length=512, return_overflowing_tokens=True, truncation="only_second", return_offsets_mapping=True, stride=128, return_tensors="pt")
 print(time.time() - start)
 #print(output)
 #print(np.max([len(tokenizer(d)["input_ids"]) for d in context]))

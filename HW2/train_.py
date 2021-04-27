@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from transformers import BertTokenizerFast
 from time import strftime, localtime
 
-from dataset import build_datasets
+from dataset_ import build_datasets
 from model import QABert
 from optims import *
 import evaluate as ev
@@ -68,14 +68,14 @@ class Trainer:
         if args.valid_ratio > 0:
             train_dataset, valid_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.train_batch_size, \
-                                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=4)
+                                                collate_fn=train_dataset.collate_fn, shuffle=True)
             self.valid_dataloader = DataLoader(dataset=valid_dataset, batch_size=args.valid_batch_size, \
-                                                collate_fn=valid_dataset.collate_fn, shuffle=False, num_workers=4)
+                                                collate_fn=valid_dataset.collate_fn, shuffle=False)
             self.eval_tokenizer = ev.Tokenizer()
         else:
             train_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.train_batch_size, \
-                                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=4)
+                                                collate_fn=train_dataset.collate_fn, shuffle=True)
         
         self.model = args.model
         self.model.to(args.device)
@@ -153,23 +153,23 @@ class Trainer:
                                     rel_labels=rel_labels, start_labels=start_labels, end_labels=end_labels)
                 
                 rels = outputs["rel_logits"].cpu().tolist()
-                bases = ((1 - type_ids) * mask_ids).sum(dim=-1)
-                starts = (torch.argmax(outputs["start_logits"], dim=-1) - bases).cpu().tolist()
-                ends = (torch.argmax(outputs["end_logits"], dim=-1) - bases).cpu().tolist()
+                starts = (torch.argmax(outputs["start_logits"], dim=-1)).cpu().tolist()
+                ends = (torch.argmax(outputs["end_logits"], dim=-1)).cpu().tolist()
                 #rels = rel_labels.cpu().tolist()
-                #starts = (start_labels - bases).cpu().tolist()
-                #ends = (end_labels - bases).cpu().tolist()
+                #starts = start_labels.cpu().tolist()
+                #ends = end_labels.cpu().tolist()
                 # TODO ensure start - end < 30
-                for q_id, p, ans, rel, start, end \
-                        in zip(samples["q_ids"], samples["paragraphs"], samples["answers"], rels, starts, ends):
+                for q_id, p, offset_map, ans, rel, start, end \
+                        in zip(samples["q_ids"], samples["paragraphs"], samples["offset_maps"], samples["answers"], \
+                                rels, starts, ends):
                     if q_id not in all_targets:
                         all_targets[q_id] = {"answers": [ans] if len(ans) > 0 else []}
-                        all_outputs[q_id] = (rel, p[start: end + 1])
+                        all_outputs[q_id] = (rel, p[offset_map[start][0]: offset_map[end][1]])
                     else:
                         if len(ans) > 0:
                             all_targets[q_id]["answers"].append(ans)
                         if rel > all_outputs[q_id][0]:
-                            all_outputs[q_id] = (rel, p[start: end + 1])
+                            all_outputs[q_id] = (rel, p[offset_map[start][0]: offset_map[end][1]])
         
         for k in all_outputs:
             all_outputs[k] = all_outputs[k][1]
@@ -199,7 +199,8 @@ if __name__ == "__main__":
     parser.add_argument("--sched_name", default="linear", type=str)
     parser.add_argument("--update_step", default=32, type=int, help="number of steps to accum gradients before update")
     parser.add_argument("--log_step", default=1000, type=int, help="number of steps to print the loss during training")
-    parser.add_argument("--eval_step", default=6000, type=int, help="number of steps to evaluate the model during training")
+    parser.add_argument("--eval_step", default=1, type=int, help="number of steps to evaluate the model during training")
+    #parser.add_argument("--eval_step", default=6000, type=int, help="number of steps to evaluate the model during training")
     parser.add_argument("--warmup_ratio", default=0.1, type=float, help="ratio between 0 and 1 for warmup scheduling")
     parser.add_argument("--irrel_ratio", default=5, type=float, help="num of irrel: num of rel")
     parser.add_argument("--pretrained_model", default="bert_base", choices=["bert_base"], type=str)
