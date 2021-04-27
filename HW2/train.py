@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 from transformers import BertTokenizerFast
 from time import strftime, localtime
 
-from dataset import build_datasets
+from dataset_ import build_datasets
 from model import QABert
 from optims import *
 import evaluate as ev
@@ -68,17 +68,14 @@ class Trainer:
         if args.valid_ratio > 0:
             train_dataset, valid_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.train_batch_size, \
-                                                shuffle=True, num_workers=4)
+                                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=4)
             self.valid_dataloader = DataLoader(dataset=valid_dataset, batch_size=args.valid_batch_size, \
-                                                shuffle=False, num_workers=4)
+                                                collate_fn=train_dataset.collate_fn, shuffle=False, num_workers=4)
             self.eval_tokenizer = ev.Tokenizer()
         else:
             train_dataset = build_datasets(args, "train")
             self.train_dataloader = DataLoader(dataset=train_dataset, batch_size=args.train_batch_size, \
-                                                shuffle=True, num_workers=4)
-        for data in self.train_dataloader:
-            print(data)
-            continue
+                                                collate_fn=train_dataset.collate_fn, shuffle=True, num_workers=4)
         exit()
         self.model = args.bert_model
         self.model.to(args.device)
@@ -196,7 +193,7 @@ if __name__ == "__main__":
     parser.add_argument("--valid_ratio", default=0.2, type=float)
     parser.add_argument("--train_batch_size", default=4, type=int)
     parser.add_argument("--valid_batch_size", default=48, type=int)
-    parser.add_argument("--epoch_num", default=5, type=int)
+    parser.add_argument("--epoch_num", default=10, type=int)
     parser.add_argument("--lr", default=5e-5, type=float, help="*e-5 are recommended")
     parser.add_argument("--dropout", default=0.5, type=float)
     parser.add_argument("--l2reg", default=0.01, type=float)
@@ -206,7 +203,8 @@ if __name__ == "__main__":
     parser.add_argument("--eval_step", default=6000, type=int, help="number of steps to evaluate the model during training")
     parser.add_argument("--warmup_ratio", default=0.1, type=float, help="ratio between 0 and 1 for warmup scheduling")
     parser.add_argument("--pretrained_bert", default="bert_base", choices=["bert_base"], type=str)
-    parser.add_argument("--max_seq_len", default=512, type=int)
+    parser.add_argument("--max_seq_len", default=384, type=int)
+    parser.add_argument("--stride", default=128, type=int)
     parser.add_argument("--device", default="cuda:0", type=str, help="e.g. cuda:0")
     parser.add_argument("--seed", default=14, type=int, help="seed for reproducibility")
     args = parser.parse_args()
