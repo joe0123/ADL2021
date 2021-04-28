@@ -193,49 +193,43 @@ if __name__ == "__main__":
                 break
     
         # intialize all lists to collect the batches
-        all_start_top_log_probs = []
-        all_start_top_index = []
-        all_end_top_log_probs = []
-        all_end_top_index = []
-        all_cls_logits = []
+        if args.beam:
+            all_start_top_log_probs = []
+            all_start_top_index = []
+            all_end_top_log_probs = []
+            all_end_top_index = []
+            all_cls_logits = []
         for step, data in enumerate(valid_dataloader):
             with torch.no_grad():
                 outputs = model(**data)
-                start_top_log_probs = outputs.start_top_log_probs
-                start_top_index = outputs.start_top_index
-                end_top_log_probs = outputs.end_top_log_probs
-                end_top_index = outputs.end_top_index
-                cls_logits = outputs.cls_logits
+                if args.beam:
+                    start_top_log_probs = outputs.start_top_log_probs
+                    start_top_index = outputs.start_top_index
+                    end_top_log_probs = outputs.end_top_log_probs
+                    end_top_index = outputs.end_top_index
+                    cls_logits = outputs.cls_logits
+                    all_start_top_log_probs.append(accelerator.gather(start_top_log_probs).cpu().numpy())
+                    all_start_top_index.append(accelerator.gather(start_top_index).cpu().numpy())
+                    all_end_top_log_probs.append(accelerator.gather(end_top_log_probs).cpu().numpy())
+                    all_end_top_index.append(accelerator.gather(end_top_index).cpu().numpy())
+                    all_cls_logits.append(accelerator.gather(cls_logits).cpu().numpy())
 
-                all_start_top_log_probs.append(accelerator.gather(start_top_log_probs).cpu().numpy())
-                all_start_top_index.append(accelerator.gather(start_top_index).cpu().numpy())
-                all_end_top_log_probs.append(accelerator.gather(end_top_log_probs).cpu().numpy())
-                all_end_top_index.append(accelerator.gather(end_top_index).cpu().numpy())
-                all_cls_logits.append(accelerator.gather(cls_logits).cpu().numpy())
+        if args.beam:
+            max_len = max([x.shape[1] for x in all_end_top_log_probs])  # Get the max_length of the tensor
+            start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, valid_dataset, max_len)
+            start_top_index_concat = create_and_fill_np_array(all_start_top_index, valid_dataset, max_len)
+            end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, valid_dataset, max_len)
+            end_top_index_concat = create_and_fill_np_array(all_end_top_index, valid_dataset, max_len)
+            all_cls_logits = np.concatenate(all_cls_logits, axis=0)
 
-        max_len = max([x.shape[1] for x in all_end_top_log_probs])  # Get the max_length of the tensor
-
-        # concatenate all numpy arrays collected above
-        start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, valid_dataset, max_len)
-        start_top_index_concat = create_and_fill_np_array(all_start_top_index, valid_dataset, max_len)
-        end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, valid_dataset, max_len)
-        end_top_index_concat = create_and_fill_np_array(all_end_top_index, valid_dataset, max_len)
-        all_cls_logits = np.concatenate(all_cls_logits, axis=0)
-
-        # delete the list of numpy arrays
-        del start_top_log_probs
-        del start_top_index
-        del end_top_log_probs
-        del end_top_index
-
+            outputs_numpy = (
+                start_top_log_probs_concat,
+                start_top_index_concat,
+                end_top_log_probs_concat,
+                end_top_index_concat,
+                all_cls_logits,
+            )
         valid_dataset.set_format(type=None, columns=list(valid_dataset.features.keys()))
-        outputs_numpy = (
-            start_top_log_probs_concat,
-            start_top_index_concat,
-            end_top_log_probs_concat,
-            end_top_index_concat,
-            all_cls_logits,
-        )
         prediction = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)
         eval_metric = metrics.compute(predictions=prediction.predictions, references=prediction.label_ids)
         logger.info(f"Evaluation metrics: {eval_metric}")
