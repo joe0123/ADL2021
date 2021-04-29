@@ -22,6 +22,15 @@ def post_processing_function(examples, features, predictions, args, model):
             start_n_top=model.config.start_n_top,
             end_n_top=model.config.end_n_top,
         )
+    else:
+        predictions = postprocess_qa_predictions(
+            examples=examples,
+            features=features,
+            predictions=predictions,
+            n_best=args.n_best,
+            max_ans_len=args.max_ans_len,
+        )
+
     formatted_predictions = [{"id": k, "pred": v} for k, v in predictions.items()]
     references = [{"id": ex["id"], "answers": ex[args.ans_col]} for ex in examples]
 
@@ -38,7 +47,8 @@ def postprocess_qa_predictions(
     assert len(predictions) == 2, "`predictions` should be a tuple with two elements (start_logits, end_logits)."
     all_start_logits, all_end_logits = predictions
 
-    assert len(predictions[0]) == len(features), f"Got {len(predictions[0])} predictions and {len(features)} features."
+    assert predictions[0].shape[0] == features.shape[0], \
+            f"Got {len(predictions[0])} predictions and {len(features)} features."
 
     example_id_to_index = {k: i for i, k in enumerate(examples["id"])}
     features_per_example = collections.defaultdict(list)
@@ -51,7 +61,7 @@ def postprocess_qa_predictions(
     logger.setLevel(logging.INFO if is_world_process_zero else logging.WARN)
     logger.info(f"Post-processing {len(examples)} example predictions split into {len(features)} features.")
     
-    # TODO: More robust: add null score ?
+    # TODO: More robust: add null score?
     for example_index, example in enumerate(tqdm(examples)):
         feature_indices = features_per_example[example_index]
 
@@ -62,8 +72,8 @@ def postprocess_qa_predictions(
             offset_mapping = features[feature_index]["offset_mapping"]
             token_is_max_context = features[feature_index].get("token_is_max_context", None)
 
-            start_indexes = np.argsort(start_logits)[-1 : -n_best - 1 : -1].tolist()
-            end_indexes = np.argsort(end_logits)[-1 : -n_best - 1 : -1].tolist()
+            start_indexes = np.argsort(start_logits)[-1: -n_best - 1: -1].tolist()
+            end_indexes = np.argsort(end_logits)[-1: -n_best - 1: -1].tolist()
             for start_index in start_indexes:
                 for end_index in end_indexes:
                     if (start_index >= len(offset_mapping) or end_index >= len(offset_mapping)
@@ -81,15 +91,14 @@ def postprocess_qa_predictions(
                             "end_logit": end_logits[end_index],
                         }
                     )
-
+        
         predictions = sorted(prelim_predictions, key=lambda x: x["score"], reverse=True)[:n_best]
-
         context = example["context"]
         for pred in predictions:
             offsets = pred.pop("offsets")
-            pred["text"] = context[offsets[0] : offsets[1]]
-
-        if len(predictions) == 0 or (len(predictions) == 1 and predictions[0]["text"] == ""):
+            pred["text"] = context[offsets[0]: offsets[1]]
+        
+        if len(predictions) == 0 or (len(predictions) == 1 and predictions[0]["text"] == ''):
             predictions.insert(0, {"text": "empty", "start_logit": 0.0, "end_logit": 0.0, "score": 0.0})
 
         scores = np.array([pred.pop("score") for pred in predictions])
@@ -169,6 +178,7 @@ def postprocess_qa_predictions_with_beam_search(
                     )
 
         predictions = sorted(prelim_predictions, key=lambda x: x["score"], reverse=True)[:n_best]
+        context = example["context"]
         for pred in predictions:
             offsets = pred.pop("offsets")
             pred["text"] = context[offsets[0]: offsets[1]]

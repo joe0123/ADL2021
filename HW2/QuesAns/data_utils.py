@@ -1,4 +1,3 @@
-
 def prepare_train_features(examples, args, tokenizer):
     pad_on_right = (tokenizer.padding_side == "right")
     max_seq_len = min(args.max_seq_len, tokenizer.model_max_length)
@@ -30,11 +29,11 @@ def prepare_train_features(examples, args, tokenizer):
         if args.beam:
             tokenized_examples["cls_index"].append(cls_index)
 
-        sequence_ids = tokenized_examples["token_type_ids"][i]
-        if args.beam:
-            for k, s in enumerate(special_tokens[i]):
-                if s:
-                    sequence_ids[k] = 3
+        sequence_ids = tokenized_examples.sequence_ids(i)
+        #if args.beam:
+        #    for k, s in enumerate(special_tokens[i]):
+        #        if s:
+        #            sequence_ids[k] = 3
         context_idx = 1 if pad_on_right else 0
 
         if args.beam:
@@ -80,7 +79,7 @@ def prepare_train_features(examples, args, tokenizer):
                     tokenized_examples["is_impossible"].append(0.0)
                 
                 #if offsets[token_start_index][0] != char_start_index or offsets[token_end_index][1] != char_end_index:
-                #    print(sample_index, offsets[token_start_index], offsets[token_end_index], examples[args.context_col][sample_index][offsets[token_start_index][0]: offsets[token_end_index][1]], answers[0]["text"])
+                    #print("OhOhOh", sample_index, offsets[token_start_index], offsets[token_end_index], examples[args.context_col][sample_index][offsets[token_start_index][0]: offsets[token_end_index][1]], answers[0]["text"])
 
     return tokenized_examples
 
@@ -111,11 +110,11 @@ def prepare_pred_features(examples, args, tokenizer):
         if args.beam:
             tokenized_examples["cls_index"].append(cls_index)
 
-        sequence_ids = tokenized_examples["token_type_ids"][i]
-        if args.beam:
-            for k, s in enumerate(special_tokens[i]):
-                if s:
-                    sequence_ids[k] = 3
+        sequence_ids = tokenized_examples.sequence_ids(i)
+        #if args.beam:
+        #    for k, s in enumerate(special_tokens[i]):
+        #        if s:
+        #            sequence_ids[k] = 3
         context_idx = 1 if pad_on_right else 0
 
         if args.beam:
