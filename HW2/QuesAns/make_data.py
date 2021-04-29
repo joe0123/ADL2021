@@ -36,5 +36,5 @@ if __name__ == "__main__":
                 data = {"id": q_data["id"],
                         "question": q_data["question"],
                         "context": context_data[q_data["relevant"]], 
-                        "answers": q_data["answers"]}
+                        "answers": q_data.get("answers", [])}
                 print(json.dumps(data, ensure_ascii=False), file=f)

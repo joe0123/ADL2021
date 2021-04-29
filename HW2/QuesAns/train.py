@@ -17,7 +17,6 @@ from transformers import (
     MODEL_MAPPING,
     AdamW,
     DataCollatorWithPadding,
-    SchedulerType,
     AutoConfig,
     AutoModelForQuestionAnswering,
     AutoTokenizer,
@@ -46,24 +45,28 @@ def parse_args():
     parser.add_argument("--weight_decay", type=float, default=1e-2)
     parser.add_argument("--epoch_num", type=int, default=10)
     parser.add_argument("--grad_accum_steps", type=int, default=16)
-    parser.add_argument("--sched_type", type=SchedulerType, default="linear", choices=["linear", "cosine", "constant"])
+    parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
     parser.add_argument("--log_steps", type=int, default=300)
     parser.add_argument("--eval_steps", type=int, default=1500)
-    parser.add_argument("--ckpt_dir", type=str, default="./ckpt")
+    parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
     parser.add_argument("--stride", type=int, default=128)
     parser.add_argument("--n_best", type=int, default=20)
     parser.add_argument("--max_ans_len", type=int, default=30)
     args = parser.parse_args()
     
-    args.ckpt_dir = os.path.join(args.ckpt_dir, strftime("%m%d-%H%M", localtime()))
-    os.makedirs(args.ckpt_dir, exist_ok=True)
+    args.saved_dir = os.path.join(args.saved_dir, strftime("%m%d-%H%M", localtime()))
+    os.makedirs(args.saved_dir, exist_ok=True)
     
     return args
 
 if __name__ == "__main__":
+# Parse arguments and save them.
     args = parse_args()
+    logger.info("Saving args to {}...".format(os.path.join(args.saved_dir, "args.json")))
+    with open(os.path.join(args.saved_dir, "args.json"), 'w') as f:
+        json.dump(vars(args), f, indent=4)
 
 # Initialize the accelerator. We will let the accelerator handle device placement for us in this example.
     accelerator = Accelerator()
@@ -90,13 +93,7 @@ if __name__ == "__main__":
     if args.seed is not None:
         set_seed(args.seed)
     
-# Load datasets
-    if args.valid_file:
-        raw_datasets = load_dataset("json", data_files={"train": args.train_file, "valid": args.valid_file})
-    else:
-        raw_datasets = load_dataset("json", data_files={"train": args.train_file})
-    
-# Load pretrained model and tokenizer
+# Load pretrained tokenizer and model. Also, save tokenizer.
     if args.config_name:
         config = AutoConfig.from_pretrained(args.config_name)
     elif args.model_name:
@@ -115,16 +112,24 @@ if __name__ == "__main__":
             "You can do it from another script, save it, and load it from here, using --tokenizer_name."
         )
 
+    logger.info("Saving tokenizer to {}...".format(os.path.join(args.saved_dir, "tokenizer")))
+    tokenizer.save_pretrained(args.saved_dir)
+
     if args.model_name:
         model = AutoModelForQuestionAnswering.from_pretrained(args.model_name, config=config)
     else:
         logger.info("Training new model from scratch")
         model = AutoModelForQuestionAnswering.from_config(config)
 
-# Preprocessing the datasets
+
+# Load and preprocess the datasets
+    if args.valid_file:
+        raw_datasets = load_dataset("json", data_files={"train": args.train_file, "valid": args.valid_file})
+    else:
+        raw_datasets = load_dataset("json", data_files={"train": args.train_file})
     cols = raw_datasets["train"].column_names
     args.ques_col, args.context_col, args.ans_col = "question", "context", "answers"
-# Create Training Features
+    
     train_examples = raw_datasets["train"]
     #train_examples = train_examples.select(range(10))
     prepare_train_features = partial(prepare_train_features, args=args, tokenizer=tokenizer)
@@ -135,7 +140,6 @@ if __name__ == "__main__":
         remove_columns=cols,
     )
 
-# Create Valid Features
     if args.valid_file:
         valid_examples = raw_datasets["valid"]
         #valid_examples = valid_examples.select(range(10))
@@ -191,15 +195,17 @@ if __name__ == "__main__":
 # Metrics for evaluation
     metrics = load_metric("./metrics.py")
 
+
 # Train!
     total_train_batch_size = args.train_batch_size * accelerator.num_processes * args.grad_accum_steps
     logger.info("\n******** Running training ********")
-    logger.info(f"Num examples = {len(train_dataset)}")
+    logger.info(f"Num train examples = {len(train_dataset)}")
     logger.info(f"Num Epochs = {args.epoch_num}")
     logger.info(f"Instantaneous batch size per device = {args.train_batch_size}")
     logger.info(f"Total train batch size (w/ parallel, distributed & accumulation) = {total_train_batch_size}")
-    logger.info(f"Gradient Accumulation steps = {args.grad_accum_steps}")
-    logger.info(f"Total optimization steps = {args.max_update_steps}")
+    logger.info(f"Instantaneous steps per epoch = {len(train_dataloader)}")
+    logger.info(f"Update steps per epoch = {update_steps_per_epoch}")
+    logger.info(f"Total update steps = {args.max_update_steps}")
     
     max_valid_em = 0
     for epoch in range(args.epoch_num):
@@ -226,6 +232,8 @@ if __name__ == "__main__":
                 logger.info("Train | Loss: {:.5f}".format(total_loss / step))
         # Evaluate!
             if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
+                valid_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
+                model.eval()
                 if args.beam:
                     all_start_top_log_probs = []
                     all_start_top_index = []
@@ -235,8 +243,6 @@ if __name__ == "__main__":
                 else:
                     all_start_logits = []
                     all_end_logits = []
-                valid_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
-                model.eval()
                 for step, data in enumerate(valid_dataloader):
                     with torch.no_grad():
                         outputs = model(**data)
@@ -278,13 +284,14 @@ if __name__ == "__main__":
                     outputs_numpy = (start_logits_concat, end_logits_concat)
 
                 valid_dataset.set_format(type=None, columns=list(valid_dataset.features.keys()))
-                prediction = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)
-                eval_result = metrics.compute(predictions=prediction.predictions, references=prediction.label_ids)
+                predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)
+                eval_result = metrics.compute(predictions=predictions.predictions, references=predictions.label_ids)
                 valid_em, valid_f1 = eval_result["em"], eval_result["f1"]
                 logger.info("Valid | EM: {:.5f}, F1: {:.5f}".format(valid_em, valid_f1))
                 if valid_em >= max_valid_em:
                     max_valid_em = valid_em
                     accelerator.wait_for_everyone()
                     unwrapped_model = accelerator.unwrap_model(model)
-                    unwrapped_model.save_pretrained(args.ckpt_dir, save_function=accelerator.save)
-                    logger.info("Saving config and model to {}...".format(args.ckpt_dir))
+                    unwrapped_model.save_pretrained(os.path.join(args.saved_dir, "model"), \
+                                                    save_function=accelerator.save)
+                    logger.info("Saving config and model to {}...".format(args.saved_dir))
