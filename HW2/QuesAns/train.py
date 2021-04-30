@@ -34,21 +34,21 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_file", type=str, required=True)
     parser.add_argument("--valid_file", type=str)
-    parser.add_argument("--max_seq_len", type=int, default=384)
+    parser.add_argument("--max_seq_len", type=int, default=512)
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str, required=True)
     parser.add_argument("--beam", action="store_true")
-    parser.add_argument("--train_batch_size", type=int, default=8)
-    parser.add_argument("--valid_batch_size", type=int, default=32)
-    parser.add_argument("--lr", type=float, default=5e-5)
+    parser.add_argument("--train_batch_size", type=int, default=4)
+    parser.add_argument("--valid_batch_size", type=int, default=16)
+    parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
-    parser.add_argument("--epoch_num", type=int, default=10)
+    parser.add_argument("--epoch_num", type=int, default=5)
     parser.add_argument("--grad_accum_steps", type=int, default=16)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
-    parser.add_argument("--log_steps", type=int, default=300)
-    parser.add_argument("--eval_steps", type=int, default=1500)
+    parser.add_argument("--log_steps", type=int, default=500)
+    parser.add_argument("--eval_steps", type=int, default=2000)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
     parser.add_argument("--stride", type=int, default=128)
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         datefmt="%m/%d/%Y %H:%M:%S",
         level=logging.INFO,
     )
-    logger.addHandler(logging.FileHandler(os.path.join(args.ckpt_dir, "log")))
+    logger.addHandler(logging.FileHandler(os.path.join(args.saved_dir, "log")))
     logger.info(accelerator.state)
     
 # Setup logging, we only want one process per machine to log things on the screen.
@@ -103,9 +103,9 @@ if __name__ == "__main__":
         logger.warning("You are instantiating a new config instance from scratch.")
     
     if args.tokenizer_name:
-        tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name, use_fast=True)
+        tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_name, use_fast=True, do_lower_case=True)
     elif args.model_name:
-        tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=True)
+        tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=True, do_lower_case=True)
     else:
         raise ValueError(
             "You are instantiating a new tokenizer from scratch. This is not supported by this script."
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     logger.info(f"Update steps per epoch = {update_steps_per_epoch}")
     logger.info(f"Total update steps = {args.max_update_steps}")
     
-    max_valid_em = 0
+    max_valid_score = 0
     for epoch in range(args.epoch_num):
         logger.info("\nEpoch {:02d} / {:02d}".format(epoch + 1, args.epoch_num))
         total_loss = 0
@@ -216,7 +216,8 @@ if __name__ == "__main__":
             outputs = model(**data)
             loss = outputs.loss
             total_loss += loss.item()
-            if len(train_dataloader) - step + 1 < args.grad_accum_steps:
+            if len(train_dataloader) % args.grad_accum_steps != 0 \
+                    and len(train_dataloader) - step < args.grad_accum_steps:
                 loss = loss / (len(train_dataloader) % args.grad_accum_steps)
             else:
                 loss = loss / args.grad_accum_steps
@@ -288,10 +289,16 @@ if __name__ == "__main__":
                 eval_result = metrics.compute(predictions=predictions.predictions, references=predictions.label_ids)
                 valid_em, valid_f1 = eval_result["em"], eval_result["f1"]
                 logger.info("Valid | EM: {:.5f}, F1: {:.5f}".format(valid_em, valid_f1))
-                if valid_em >= max_valid_em:
-                    max_valid_em = valid_em
+                valid_score = valid_em + valid_f1
+                if valid_score >= max_valid_score:
+                    max_valid_score = valid_score
                     accelerator.wait_for_everyone()
                     unwrapped_model = accelerator.unwrap_model(model)
-                    unwrapped_model.save_pretrained(os.path.join(args.saved_dir, "model"), \
-                                                    save_function=accelerator.save)
+                    unwrapped_model.save_pretrained(args.saved_dir, save_function=accelerator.save)
                     logger.info("Saving config and model to {}...".format(args.saved_dir))
+    if not args.valid_file:
+        accelerator.wait_for_everyone()
+        unwrapped_model = accelerator.unwrap_model(model)
+        unwrapped_model.save_pretrained(args.saved_dir, save_function=accelerator.save)
+        logger.info("Saving config and model to {}...".format(args.saved_dir))
+

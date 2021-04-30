@@ -35,7 +35,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_file", type=str, required=True)
     parser.add_argument("--target_dir", type=str, required=True)
-    parser.add_argument("--test_batch_size", type=int, default=32)
+    parser.add_argument("--test_batch_size", type=int, default=64)
     parser.add_argument("--out_file", type=str, default="./results.json")
     parser.add_argument("--n_best", type=int, default=20)
     parser.add_argument("--max_ans_len", type=int, default=30)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
 # Load and preprocess the dataset
     raw_datasets = load_dataset("json", data_files={"test": args.test_file})
     cols = raw_datasets["test"].column_names
-    args.ques_col, args.context_col = "question", "context"
+    args.ques_col, args.context_col, args.ans_col = "question", "context", "answers"
     
     test_examples = raw_datasets["test"]
     prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
 # Create DataLoaders
     data_collator = default_data_collator
-    test_dataloader = DataLoader(test_dataset, shuffle=True, collate_fn=data_collator, batch_size=args.test_batch_size)
+    test_dataloader = DataLoader(test_dataset, shuffle=False, collate_fn=data_collator, batch_size=args.test_batch_size)
     
 # Prepare everything with our accelerator.
     model, test_dataloader = accelerator.prepare(
@@ -107,9 +107,7 @@ if __name__ == "__main__":
 
 # Test!
     logger.info("\n******** Running predicting ********")
-    logger.info(f"Num examples = {len(test_dataset)}")
-    logger.info(f"Instantaneous batch size per device = {args.train_batch_size}")
-    logger.info(f"Total train batch size (w/ parallel, distributed & accumulation) = {total_train_batch_size}")
+    logger.info(f"Num test examples = {len(test_dataset)}")
     
     test_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
     model.eval()
@@ -144,10 +142,10 @@ if __name__ == "__main__":
 
     if args.beam:
         max_len = max([x.shape[1] for x in all_end_top_log_probs])  # Get the max_length of the tensor
-        start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, valid_dataset, max_len)
-        start_top_index_concat = create_and_fill_np_array(all_start_top_index, valid_dataset, max_len)
-        end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, valid_dataset, max_len)
-        end_top_index_concat = create_and_fill_np_array(all_end_top_index, valid_dataset, max_len)
+        start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, test_dataset, max_len)
+        start_top_index_concat = create_and_fill_np_array(all_start_top_index, test_dataset, max_len)
+        end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, test_dataset, max_len)
+        end_top_index_concat = create_and_fill_np_array(all_end_top_index, test_dataset, max_len)
         all_cls_logits = np.concatenate(all_cls_logits, axis=0)
         outputs_numpy = (
             start_top_log_probs_concat,
@@ -158,12 +156,12 @@ if __name__ == "__main__":
         )
     else:
         max_len = max([x.shape[1] for x in all_start_logits])
-        start_logits_concat = create_and_fill_np_array(all_start_logits, valid_dataset, max_len)
-        end_logits_concat = create_and_fill_np_array(all_end_logits, valid_dataset, max_len)
+        start_logits_concat = create_and_fill_np_array(all_start_logits, test_dataset, max_len)
+        end_logits_concat = create_and_fill_np_array(all_end_logits, test_dataset, max_len)
         outputs_numpy = (start_logits_concat, end_logits_concat)
 
-    test_dataset.set_format(type=None, columns=list(valid_dataset.features.keys()))
-    predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)
-    results = {v["id"]: v["pred"] for v in predictions.predictions.values()}
+    test_dataset.set_format(type=None, columns=list(test_dataset.features.keys()))
+    predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args, model)
+    results = {d["id"]: d["pred"] for d in predictions.predictions}
     with open(args.out_file, 'w') as f:
-        json.dump(f, results, ensure_ascii=False, indent=4)
+        json.dump(results, f, ensure_ascii=False, indent=4)
