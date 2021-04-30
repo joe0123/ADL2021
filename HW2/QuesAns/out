@@ -1,6 +1,6 @@
 nohup: ignoring input
-2021-04-30 01:05:51.272701: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
-04/30/2021 01:05:52 - INFO - __main__ -    Distributed environment: NO
+2021-04-30 22:07:46.477360: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
+04/30/2021 22:07:47 - INFO - __main__ -    Distributed environment: NO
 Num processes: 1
 Process index: 0
 Local process index: 0
@@ -74,283 +74,73 @@ loading file https://huggingface.co/bert-base-chinese/resolve/main/tokenizer.jso
 loading file https://huggingface.co/bert-base-chinese/resolve/main/added_tokens.json from cache at None
 loading file https://huggingface.co/bert-base-chinese/resolve/main/special_tokens_map.json from cache at None
 loading file https://huggingface.co/bert-base-chinese/resolve/main/tokenizer_config.json from cache at /home/boewoei0123/.cache/huggingface/transformers/2dc6085404c55008ba7fc09ab7483ef3f0a4ca2496ccee0cdbf51c2b5d529dff.ec5c189f89475aac7d8cbd243960a0655cfadc3d0474da8ff2ed0bf1699c2a5f
-04/30/2021 01:05:57 - INFO - __main__ -    Saving tokenizer to ./saved/0430-0105/tokenizer...
-tokenizer config file saved in ./saved/0430-0105/tokenizer_config.json
-Special tokens file saved in ./saved/0430-0105/special_tokens_map.json
+04/30/2021 22:07:52 - INFO - __main__ -    Saving tokenizer to ./saved/0430-2207/tokenizer...
+tokenizer config file saved in ./saved/0430-2207/tokenizer_config.json
+Special tokens file saved in ./saved/0430-2207/special_tokens_map.json
 loading weights file https://huggingface.co/bert-base-chinese/resolve/main/pytorch_model.bin from cache at /home/boewoei0123/.cache/huggingface/transformers/58592490276d9ed1e8e33f3c12caf23000c22973cb2b3218c641bd74547a1889.fabda197bfe5d6a318c2833172d6757ccc7e49f692cb949a6fabf560cee81508
 Some weights of the model checkpoint at bert-base-chinese were not used when initializing BertForQuestionAnswering: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
 - This IS expected if you are initializing BertForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
 - This IS NOT expected if you are initializing BertForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
 Some weights of BertForQuestionAnswering were not initialized from the model checkpoint at bert-base-chinese and are newly initialized: ['qa_outputs.weight', 'qa_outputs.bias']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-04/30/2021 01:06:00 - WARNING - datasets.builder -    Using custom data configuration default-6dee1644b5ce9828
-0 tables [00:00, ? tables/s]                            Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /home/boewoei0123/.cache/huggingface/datasets/json/default-6dee1644b5ce9828/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
-Dataset json downloaded and prepared to /home/boewoei0123/.cache/huggingface/datasets/json/default-6dee1644b5ce9828/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
+04/30/2021 22:07:55 - WARNING - datasets.builder -    Using custom data configuration default-26b3b54ea6f652f3
+0 tables [00:00, ? tables/s]                            Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /home/boewoei0123/.cache/huggingface/datasets/json/default-26b3b54ea6f652f3/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
+Dataset json downloaded and prepared to /home/boewoei0123/.cache/huggingface/datasets/json/default-26b3b54ea6f652f3/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
 #0:   0%|          | 0/7 [00:00<?, ?ba/s]
 #1:   0%|          | 0/7 [00:00<?, ?ba/s][A
 
 #2:   0%|          | 0/7 [00:00<?, ?ba/s][A[A
 
 
-#3:   0%|          | 0/7 [00:00<?, ?ba/s][A[A[A#0:  14%|█▍        | 1/7 [00:00<00:05,  1.17ba/s]
-#1:  14%|█▍        | 1/7 [00:00<00:05,  1.17ba/s][A
+#3:   0%|          | 0/7 [00:00<?, ?ba/s][A[A[A#0:  14%|█▍        | 1/7 [00:01<00:06,  1.02s/ba]
+#1:  14%|█▍        | 1/7 [00:00<00:05,  1.05ba/s][A
 
-#2:  14%|█▍        | 1/7 [00:00<00:05,  1.15ba/s][A[A
-
-
-#3:  14%|█▍        | 1/7 [00:00<00:05,  1.19ba/s][A[A[A#0:  29%|██▊       | 2/7 [00:01<00:04,  1.23ba/s]
-#1:  29%|██▊       | 2/7 [00:01<00:04,  1.23ba/s][A
-
-#2:  29%|██▊       | 2/7 [00:01<00:04,  1.22ba/s][A[A
+#2:  14%|█▍        | 1/7 [00:00<00:05,  1.03ba/s][A[A
 
 
-#3:  29%|██▊       | 2/7 [00:01<00:04,  1.25ba/s][A[A[A#0:  43%|████▎     | 3/7 [00:02<00:03,  1.27ba/s]
-#1:  43%|████▎     | 3/7 [00:02<00:03,  1.28ba/s][A
+#3:  14%|█▍        | 1/7 [00:00<00:05,  1.06ba/s][A[A[A#0:  29%|██▊       | 2/7 [00:01<00:04,  1.03ba/s]
+#1:  29%|██▊       | 2/7 [00:01<00:04,  1.09ba/s][A
 
-#2:  43%|████▎     | 3/7 [00:02<00:03,  1.26ba/s][A[A
-
-
-#3:  43%|████▎     | 3/7 [00:02<00:03,  1.29ba/s][A[A[A#0:  57%|█████▋    | 4/7 [00:03<00:02,  1.27ba/s]
-#1:  57%|█████▋    | 4/7 [00:03<00:02,  1.28ba/s][A
-
-#2:  57%|█████▋    | 4/7 [00:03<00:02,  1.25ba/s][A[A
+#2:  29%|██▊       | 2/7 [00:01<00:04,  1.08ba/s][A[A
 
 
-#3:  57%|█████▋    | 4/7 [00:03<00:02,  1.27ba/s][A[A[A#0:  71%|███████▏  | 5/7 [00:03<00:01,  1.30ba/s]
-#1:  71%|███████▏  | 5/7 [00:03<00:01,  1.30ba/s][A
+#3:  29%|██▊       | 2/7 [00:01<00:04,  1.09ba/s][A[A[A#0:  43%|████▎     | 3/7 [00:02<00:03,  1.08ba/s]
+#1:  43%|████▎     | 3/7 [00:02<00:03,  1.13ba/s][A
 
-#2:  71%|███████▏  | 5/7 [00:03<00:01,  1.29ba/s][A[A
-
-
-#3:  71%|███████▏  | 5/7 [00:03<00:01,  1.30ba/s][A[A[A#0:  86%|████████▌ | 6/7 [00:04<00:00,  1.32ba/s]#0: 100%|██████████| 7/7 [00:04<00:00,  1.52ba/s]
-#1:  86%|████████▌ | 6/7 [00:04<00:00,  1.32ba/s][A#1: 100%|██████████| 7/7 [00:04<00:00,  1.52ba/s]
-
-#2:  86%|████████▌ | 6/7 [00:04<00:00,  1.31ba/s][A[A
+#2:  43%|████▎     | 3/7 [00:02<00:03,  1.11ba/s][A[A
 
 
-#3:  86%|████████▌ | 6/7 [00:04<00:00,  1.31ba/s][A[A[A#2: 100%|██████████| 7/7 [00:04<00:00,  1.50ba/s]#3: 100%|██████████| 7/7 [00:04<00:00,  1.51ba/s]
+#3:  43%|████▎     | 3/7 [00:02<00:03,  1.12ba/s][A[A[A#0:  57%|█████▋    | 4/7 [00:03<00:02,  1.09ba/s]
+#1:  57%|█████▋    | 4/7 [00:03<00:02,  1.12ba/s][A
+
+#2:  57%|█████▋    | 4/7 [00:03<00:02,  1.11ba/s][A[A
+
+
+#3:  57%|█████▋    | 4/7 [00:03<00:02,  1.12ba/s][A[A[A#0:  71%|███████▏  | 5/7 [00:04<00:01,  1.12ba/s]
+#1:  71%|███████▏  | 5/7 [00:04<00:01,  1.14ba/s][A
+
+#2:  71%|███████▏  | 5/7 [00:04<00:01,  1.13ba/s][A[A
+
+
+#3:  71%|███████▏  | 5/7 [00:04<00:01,  1.15ba/s][A[A[A#0:  86%|████████▌ | 6/7 [00:05<00:00,  1.14ba/s]#0: 100%|██████████| 7/7 [00:05<00:00,  1.30ba/s]
+#1:  86%|████████▌ | 6/7 [00:05<00:00,  1.15ba/s][A#1: 100%|██████████| 7/7 [00:05<00:00,  1.32ba/s]
+
+#2:  86%|████████▌ | 6/7 [00:05<00:00,  1.15ba/s][A[A#2: 100%|██████████| 7/7 [00:05<00:00,  1.32ba/s]
+
+
+#3:  86%|████████▌ | 6/7 [00:05<00:00,  1.15ba/s][A[A[A#3: 100%|██████████| 7/7 [00:05<00:00,  1.32ba/s]
 
 
 
-04/30/2021 01:06:08 - INFO - __main__ -    
+04/30/2021 22:08:03 - INFO - __main__ -    
 ******** Running training ********
-04/30/2021 01:06:08 - INFO - __main__ -    Num train examples = 43283
-04/30/2021 01:06:08 - INFO - __main__ -    Num Epochs = 10
-04/30/2021 01:06:08 - INFO - __main__ -    Instantaneous batch size per device = 8
-04/30/2021 01:06:08 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 128
-04/30/2021 01:06:08 - INFO - __main__ -    Instantaneous steps per epoch = 5411
-04/30/2021 01:06:08 - INFO - __main__ -    Update steps per epoch = 339
-04/30/2021 01:06:08 - INFO - __main__ -    Total update steps = 3390
-04/30/2021 01:06:08 - INFO - __main__ -    
+04/30/2021 22:08:03 - INFO - __main__ -    Num train examples = 43387
+04/30/2021 22:08:03 - INFO - __main__ -    Num Epochs = 10
+04/30/2021 22:08:03 - INFO - __main__ -    Instantaneous batch size per device = 8
+04/30/2021 22:08:03 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 128
+04/30/2021 22:08:03 - INFO - __main__ -    Instantaneous steps per epoch = 5424
+04/30/2021 22:08:03 - INFO - __main__ -    Update steps per epoch = 339
+04/30/2021 22:08:03 - INFO - __main__ -    Total update steps = 3390
+04/30/2021 22:08:03 - INFO - __main__ -    
 Epoch 01 / 10
-04/30/2021 01:06:43 - INFO - __main__ -    Train | Loss: 5.99319
-04/30/2021 01:07:19 - INFO - __main__ -    Train | Loss: 5.69450
-04/30/2021 01:07:55 - INFO - __main__ -    Train | Loss: 5.21335
-04/30/2021 01:08:31 - INFO - __main__ -    Train | Loss: 4.76921
-04/30/2021 01:09:08 - INFO - __main__ -    Train | Loss: 4.29683
-04/30/2021 01:09:44 - INFO - __main__ -    Train | Loss: 3.85879
-04/30/2021 01:10:20 - INFO - __main__ -    Train | Loss: 3.52164
-04/30/2021 01:10:56 - INFO - __main__ -    Train | Loss: 3.24227
-04/30/2021 01:11:33 - INFO - __main__ -    Train | Loss: 3.00772
-04/30/2021 01:12:09 - INFO - __main__ -    Train | Loss: 2.80329
-04/30/2021 01:12:45 - INFO - __main__ -    Train | Loss: 2.62925
-04/30/2021 01:13:21 - INFO - __main__ -    Train | Loss: 2.48001
-04/30/2021 01:13:58 - INFO - __main__ -    Train | Loss: 2.35092
-04/30/2021 01:14:34 - INFO - __main__ -    Train | Loss: 2.23711
-04/30/2021 01:15:10 - INFO - __main__ -    Train | Loss: 2.13611
-04/30/2021 01:15:47 - INFO - __main__ -    Train | Loss: 2.04811
-04/30/2021 01:16:23 - INFO - __main__ -    Train | Loss: 1.96758
-04/30/2021 01:16:59 - INFO - __main__ -    Train | Loss: 1.89598
-04/30/2021 01:17:00 - INFO - __main__ -    Train | Loss: 1.89369
-04/30/2021 01:17:00 - INFO - __main__ -    
-Epoch 02 / 10
-04/30/2021 01:17:37 - INFO - __main__ -    Train | Loss: 0.63385
-04/30/2021 01:18:13 - INFO - __main__ -    Train | Loss: 0.59835
-04/30/2021 01:18:49 - INFO - __main__ -    Train | Loss: 0.58186
-04/30/2021 01:19:26 - INFO - __main__ -    Train | Loss: 0.57159
-04/30/2021 01:20:02 - INFO - __main__ -    Train | Loss: 0.55656
-04/30/2021 01:20:38 - INFO - __main__ -    Train | Loss: 0.54259
-04/30/2021 01:21:14 - INFO - __main__ -    Train | Loss: 0.53820
-04/30/2021 01:21:51 - INFO - __main__ -    Train | Loss: 0.52670
-04/30/2021 01:22:27 - INFO - __main__ -    Train | Loss: 0.51974
-04/30/2021 01:23:03 - INFO - __main__ -    Train | Loss: 0.51342
-04/30/2021 01:23:40 - INFO - __main__ -    Train | Loss: 0.50879
-04/30/2021 01:24:16 - INFO - __main__ -    Train | Loss: 0.50656
-04/30/2021 01:24:52 - INFO - __main__ -    Train | Loss: 0.50061
-04/30/2021 01:25:29 - INFO - __main__ -    Train | Loss: 0.49677
-04/30/2021 01:26:05 - INFO - __main__ -    Train | Loss: 0.49545
-04/30/2021 01:26:41 - INFO - __main__ -    Train | Loss: 0.49254
-04/30/2021 01:27:18 - INFO - __main__ -    Train | Loss: 0.49095
-04/30/2021 01:27:54 - INFO - __main__ -    Train | Loss: 0.48686
-04/30/2021 01:27:55 - INFO - __main__ -    Train | Loss: 0.48695
-04/30/2021 01:27:55 - INFO - __main__ -    
-Epoch 03 / 10
-04/30/2021 01:28:31 - INFO - __main__ -    Train | Loss: 0.32085
-04/30/2021 01:29:08 - INFO - __main__ -    Train | Loss: 0.30918
-04/30/2021 01:29:44 - INFO - __main__ -    Train | Loss: 0.30265
-04/30/2021 01:30:20 - INFO - __main__ -    Train | Loss: 0.29869
-04/30/2021 01:30:57 - INFO - __main__ -    Train | Loss: 0.29197
-04/30/2021 01:31:33 - INFO - __main__ -    Train | Loss: 0.28378
-04/30/2021 01:32:09 - INFO - __main__ -    Train | Loss: 0.28237
-04/30/2021 01:32:46 - INFO - __main__ -    Train | Loss: 0.28093
-04/30/2021 01:33:22 - INFO - __main__ -    Train | Loss: 0.28140
-04/30/2021 01:33:58 - INFO - __main__ -    Train | Loss: 0.28042
-04/30/2021 01:34:35 - INFO - __main__ -    Train | Loss: 0.28052
-04/30/2021 01:35:11 - INFO - __main__ -    Train | Loss: 0.27861
-04/30/2021 01:35:47 - INFO - __main__ -    Train | Loss: 0.27712
-04/30/2021 01:36:24 - INFO - __main__ -    Train | Loss: 0.27703
-04/30/2021 01:37:00 - INFO - __main__ -    Train | Loss: 0.27434
-04/30/2021 01:37:36 - INFO - __main__ -    Train | Loss: 0.27476
-04/30/2021 01:38:13 - INFO - __main__ -    Train | Loss: 0.27348
-04/30/2021 01:38:49 - INFO - __main__ -    Train | Loss: 0.27400
-04/30/2021 01:38:50 - INFO - __main__ -    Train | Loss: 0.27380
-04/30/2021 01:38:50 - INFO - __main__ -    
-Epoch 04 / 10
-04/30/2021 01:39:26 - INFO - __main__ -    Train | Loss: 0.16858
-04/30/2021 01:40:03 - INFO - __main__ -    Train | Loss: 0.16323
-04/30/2021 01:40:39 - INFO - __main__ -    Train | Loss: 0.16307
-04/30/2021 01:41:15 - INFO - __main__ -    Train | Loss: 0.15672
-04/30/2021 01:41:52 - INFO - __main__ -    Train | Loss: 0.15473
-04/30/2021 01:42:28 - INFO - __main__ -    Train | Loss: 0.15537
-04/30/2021 01:43:04 - INFO - __main__ -    Train | Loss: 0.15396
-04/30/2021 01:43:41 - INFO - __main__ -    Train | Loss: 0.15307
-04/30/2021 01:44:17 - INFO - __main__ -    Train | Loss: 0.15341
-04/30/2021 01:44:53 - INFO - __main__ -    Train | Loss: 0.15342
-04/30/2021 01:45:30 - INFO - __main__ -    Train | Loss: 0.15168
-04/30/2021 01:46:06 - INFO - __main__ -    Train | Loss: 0.15146
-04/30/2021 01:46:42 - INFO - __main__ -    Train | Loss: 0.15256
-04/30/2021 01:47:19 - INFO - __main__ -    Train | Loss: 0.15366
-04/30/2021 01:47:55 - INFO - __main__ -    Train | Loss: 0.15288
-04/30/2021 01:48:31 - INFO - __main__ -    Train | Loss: 0.15394
-04/30/2021 01:49:08 - INFO - __main__ -    Train | Loss: 0.15454
-04/30/2021 01:49:44 - INFO - __main__ -    Train | Loss: 0.15454
-04/30/2021 01:49:45 - INFO - __main__ -    Train | Loss: 0.15445
-04/30/2021 01:49:45 - INFO - __main__ -    
-Epoch 05 / 10
-04/30/2021 01:50:22 - INFO - __main__ -    Train | Loss: 0.10803
-04/30/2021 01:50:58 - INFO - __main__ -    Train | Loss: 0.09725
-04/30/2021 01:51:34 - INFO - __main__ -    Train | Loss: 0.09346
-04/30/2021 01:52:11 - INFO - __main__ -    Train | Loss: 0.09302
-04/30/2021 01:52:47 - INFO - __main__ -    Train | Loss: 0.09085
-04/30/2021 01:53:23 - INFO - __main__ -    Train | Loss: 0.09051
-04/30/2021 01:54:00 - INFO - __main__ -    Train | Loss: 0.09160
-04/30/2021 01:54:36 - INFO - __main__ -    Train | Loss: 0.09153
-04/30/2021 01:55:12 - INFO - __main__ -    Train | Loss: 0.09172
-04/30/2021 01:55:49 - INFO - __main__ -    Train | Loss: 0.09160
-04/30/2021 01:56:25 - INFO - __main__ -    Train | Loss: 0.08996
-04/30/2021 01:57:01 - INFO - __main__ -    Train | Loss: 0.09172
-04/30/2021 01:57:38 - INFO - __main__ -    Train | Loss: 0.09261
-04/30/2021 01:58:14 - INFO - __main__ -    Train | Loss: 0.09287
-04/30/2021 01:58:50 - INFO - __main__ -    Train | Loss: 0.09374
-04/30/2021 01:59:27 - INFO - __main__ -    Train | Loss: 0.09569
-04/30/2021 02:00:03 - INFO - __main__ -    Train | Loss: 0.09570
-04/30/2021 02:00:39 - INFO - __main__ -    Train | Loss: 0.09577
-04/30/2021 02:00:41 - INFO - __main__ -    Train | Loss: 0.09565
-04/30/2021 02:00:41 - INFO - __main__ -    
-Epoch 06 / 10
-04/30/2021 02:01:17 - INFO - __main__ -    Train | Loss: 0.05869
-04/30/2021 02:01:53 - INFO - __main__ -    Train | Loss: 0.05738
-04/30/2021 02:02:30 - INFO - __main__ -    Train | Loss: 0.05644
-04/30/2021 02:03:06 - INFO - __main__ -    Train | Loss: 0.05587
-04/30/2021 02:03:42 - INFO - __main__ -    Train | Loss: 0.05625
-04/30/2021 02:04:19 - INFO - __main__ -    Train | Loss: 0.05739
-04/30/2021 02:04:55 - INFO - __main__ -    Train | Loss: 0.05780
-04/30/2021 02:05:31 - INFO - __main__ -    Train | Loss: 0.05785
-04/30/2021 02:06:08 - INFO - __main__ -    Train | Loss: 0.05803
-04/30/2021 02:06:44 - INFO - __main__ -    Train | Loss: 0.05799
-04/30/2021 02:07:20 - INFO - __main__ -    Train | Loss: 0.05795
-04/30/2021 02:07:57 - INFO - __main__ -    Train | Loss: 0.05753
-04/30/2021 02:08:33 - INFO - __main__ -    Train | Loss: 0.05736
-04/30/2021 02:09:09 - INFO - __main__ -    Train | Loss: 0.05770
-04/30/2021 02:09:46 - INFO - __main__ -    Train | Loss: 0.05809
-04/30/2021 02:10:22 - INFO - __main__ -    Train | Loss: 0.05819
-04/30/2021 02:10:58 - INFO - __main__ -    Train | Loss: 0.05830
-04/30/2021 02:11:35 - INFO - __main__ -    Train | Loss: 0.05837
-04/30/2021 02:11:36 - INFO - __main__ -    Train | Loss: 0.05845
-04/30/2021 02:11:36 - INFO - __main__ -    
-Epoch 07 / 10
-04/30/2021 02:12:12 - INFO - __main__ -    Train | Loss: 0.04354
-04/30/2021 02:12:48 - INFO - __main__ -    Train | Loss: 0.04522
-04/30/2021 02:13:25 - INFO - __main__ -    Train | Loss: 0.04529
-04/30/2021 02:14:01 - INFO - __main__ -    Train | Loss: 0.04404
-04/30/2021 02:14:37 - INFO - __main__ -    Train | Loss: 0.04369
-04/30/2021 02:15:14 - INFO - __main__ -    Train | Loss: 0.04271
-04/30/2021 02:15:50 - INFO - __main__ -    Train | Loss: 0.04369
-04/30/2021 02:16:26 - INFO - __main__ -    Train | Loss: 0.04233
-04/30/2021 02:17:03 - INFO - __main__ -    Train | Loss: 0.04198
-04/30/2021 02:17:39 - INFO - __main__ -    Train | Loss: 0.04194
-04/30/2021 02:18:15 - INFO - __main__ -    Train | Loss: 0.04111
-04/30/2021 02:18:52 - INFO - __main__ -    Train | Loss: 0.04113
-04/30/2021 02:19:28 - INFO - __main__ -    Train | Loss: 0.04088
-04/30/2021 02:20:04 - INFO - __main__ -    Train | Loss: 0.03993
-04/30/2021 02:20:41 - INFO - __main__ -    Train | Loss: 0.04037
-04/30/2021 02:21:17 - INFO - __main__ -    Train | Loss: 0.04012
-04/30/2021 02:21:53 - INFO - __main__ -    Train | Loss: 0.03934
-04/30/2021 02:22:30 - INFO - __main__ -    Train | Loss: 0.03980
-04/30/2021 02:22:31 - INFO - __main__ -    Train | Loss: 0.03979
-04/30/2021 02:22:31 - INFO - __main__ -    
-Epoch 08 / 10
-04/30/2021 02:23:07 - INFO - __main__ -    Train | Loss: 0.03393
-04/30/2021 02:23:43 - INFO - __main__ -    Train | Loss: 0.03170
-04/30/2021 02:24:20 - INFO - __main__ -    Train | Loss: 0.02947
-04/30/2021 02:24:56 - INFO - __main__ -    Train | Loss: 0.02934
-04/30/2021 02:25:32 - INFO - __main__ -    Train | Loss: 0.02906
-04/30/2021 02:26:09 - INFO - __main__ -    Train | Loss: 0.03053
-04/30/2021 02:26:45 - INFO - __main__ -    Train | Loss: 0.03006
-04/30/2021 02:27:21 - INFO - __main__ -    Train | Loss: 0.02993
-04/30/2021 02:27:58 - INFO - __main__ -    Train | Loss: 0.02974
-04/30/2021 02:28:34 - INFO - __main__ -    Train | Loss: 0.02936
-04/30/2021 02:29:10 - INFO - __main__ -    Train | Loss: 0.02903
-04/30/2021 02:29:47 - INFO - __main__ -    Train | Loss: 0.02897
-04/30/2021 02:30:23 - INFO - __main__ -    Train | Loss: 0.02870
-04/30/2021 02:30:59 - INFO - __main__ -    Train | Loss: 0.02821
-04/30/2021 02:31:36 - INFO - __main__ -    Train | Loss: 0.02842
-04/30/2021 02:32:12 - INFO - __main__ -    Train | Loss: 0.02789
-04/30/2021 02:32:48 - INFO - __main__ -    Train | Loss: 0.02757
-04/30/2021 02:33:24 - INFO - __main__ -    Train | Loss: 0.02750
-04/30/2021 02:33:26 - INFO - __main__ -    Train | Loss: 0.02751
-04/30/2021 02:33:26 - INFO - __main__ -    
-Epoch 09 / 10
-04/30/2021 02:34:02 - INFO - __main__ -    Train | Loss: 0.01491
-04/30/2021 02:34:38 - INFO - __main__ -    Train | Loss: 0.01769
-04/30/2021 02:35:15 - INFO - __main__ -    Train | Loss: 0.01816
-04/30/2021 02:35:51 - INFO - __main__ -    Train | Loss: 0.01774
-04/30/2021 02:36:27 - INFO - __main__ -    Train | Loss: 0.01779
-04/30/2021 02:37:04 - INFO - __main__ -    Train | Loss: 0.01804
-04/30/2021 02:37:40 - INFO - __main__ -    Train | Loss: 0.01853
-04/30/2021 02:38:16 - INFO - __main__ -    Train | Loss: 0.01875
-04/30/2021 02:38:53 - INFO - __main__ -    Train | Loss: 0.01890
-04/30/2021 02:39:29 - INFO - __main__ -    Train | Loss: 0.01946
-04/30/2021 02:40:05 - INFO - __main__ -    Train | Loss: 0.01957
-04/30/2021 02:40:42 - INFO - __main__ -    Train | Loss: 0.01989
-04/30/2021 02:41:18 - INFO - __main__ -    Train | Loss: 0.01929
-04/30/2021 02:41:54 - INFO - __main__ -    Train | Loss: 0.01900
-04/30/2021 02:42:30 - INFO - __main__ -    Train | Loss: 0.01870
-04/30/2021 02:43:07 - INFO - __main__ -    Train | Loss: 0.01861
-04/30/2021 02:43:43 - INFO - __main__ -    Train | Loss: 0.01843
-04/30/2021 02:44:19 - INFO - __main__ -    Train | Loss: 0.01823
-04/30/2021 02:44:21 - INFO - __main__ -    Train | Loss: 0.01821
-04/30/2021 02:44:21 - INFO - __main__ -    
-Epoch 10 / 10
-04/30/2021 02:44:57 - INFO - __main__ -    Train | Loss: 0.01408
-04/30/2021 02:45:33 - INFO - __main__ -    Train | Loss: 0.01520
-04/30/2021 02:46:10 - INFO - __main__ -    Train | Loss: 0.01605
-04/30/2021 02:46:46 - INFO - __main__ -    Train | Loss: 0.01634
-04/30/2021 02:47:22 - INFO - __main__ -    Train | Loss: 0.01549
-04/30/2021 02:47:59 - INFO - __main__ -    Train | Loss: 0.01439
-04/30/2021 02:48:35 - INFO - __main__ -    Train | Loss: 0.01429
-04/30/2021 02:49:11 - INFO - __main__ -    Train | Loss: 0.01407
-04/30/2021 02:49:48 - INFO - __main__ -    Train | Loss: 0.01381
-04/30/2021 02:50:24 - INFO - __main__ -    Train | Loss: 0.01361
-04/30/2021 02:51:00 - INFO - __main__ -    Train | Loss: 0.01367
-04/30/2021 02:51:37 - INFO - __main__ -    Train | Loss: 0.01363
-04/30/2021 02:52:13 - INFO - __main__ -    Train | Loss: 0.01374
-04/30/2021 02:52:49 - INFO - __main__ -    Train | Loss: 0.01354
-04/30/2021 02:53:26 - INFO - __main__ -    Train | Loss: 0.01340
-04/30/2021 02:54:02 - INFO - __main__ -    Train | Loss: 0.01355
-04/30/2021 02:54:38 - INFO - __main__ -    Train | Loss: 0.01348
-04/30/2021 02:55:15 - INFO - __main__ -    Train | Loss: 0.01362
-04/30/2021 02:55:16 - INFO - __main__ -    Train | Loss: 0.01362
-Configuration saved in ./saved/0430-0105/config.json
-Model weights saved in ./saved/0430-0105/pytorch_model.bin
-04/30/2021 02:55:17 - INFO - __main__ -    Saving config and model to ./saved/0430-0105...
+04/30/2021 22:08:39 - INFO - __main__ -    Train | Loss: 5.98940
