@@ -152,13 +152,16 @@ if __name__ == "__main__":
             remove_columns=cols,
         )
 
-    exit()
 
 # Create DataLoaders
-    data_collator = default_data_collator
+    data_collator = partial(data_collator_with_neg_sampling, args=args)
     train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=data_collator, batch_size=args.train_batch_size)
     if args.valid_file:
         valid_dataloader = DataLoader(valid_dataset, collate_fn=data_collator, batch_size=args.valid_batch_size)
+
+    for step, data in enumerate(train_dataloader, 1):
+        continue
+    exit()
     
 # Optimizer
 # Split weights in two groups, one with weight decay and the other not.
@@ -196,7 +199,7 @@ if __name__ == "__main__":
     )
     
 # Metrics for evaluation
-    metrics = load_metric("./metrics.py")
+    metrics = load_metric("accuracy")
 
 
 # Train!
@@ -238,6 +241,7 @@ if __name__ == "__main__":
             if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
                 valid_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
                 model.eval()
+                #TODO
                 if args.beam:
                     all_start_top_log_probs = []
                     all_start_top_index = []

@@ -1,3 +1,6 @@
+import random
+import torch
+
 def prepare_train_features(examples, args, tokenizer):
     pad_on_right = (tokenizer.padding_side == "right")
     first_sentences, second_sentences, sentence_counts, labels = [], [], [], []
@@ -6,7 +9,7 @@ def prepare_train_features(examples, args, tokenizer):
             paras += ['' for i in range(args.neg_num + 1 - len(paras))]
         sentence_counts.append(len(paras))
         labels.append(0)    # For easier negative sampling implementation in collator.
-        for i in [label] + range(0, label) + range(label + 1, len(params)):
+        for i in [label] + list(range(0, label)) + list(range(label + 1, len(paras))):
             if pad_on_right:
                 first_sentences.append(ques)
                 second_sentences.append(paras[i])
@@ -63,29 +66,18 @@ def prepare_pred_features(examples, args, tokenizer):
 
 
 def data_collator_with_neg_sampling(features, args):
-    if not isinstance(features[0], (dict, BatchEncoding)):
-        features = [vars(f) for f in features]
-
     first = features[0]
     batch = {}
 
-    if "label" in first and first["label"] is not None:
-        label = first["label"].item() if isinstance(first["label"], torch.Tensor) else first["label"]
-        dtype = torch.long if isinstance(label, int) else torch.float
-        batch["labels"] = torch.tensor([f["label"] for f in features], dtype=dtype)
-    elif "label_ids" in first and first["label_ids"] is not None:
-        if isinstance(first["label_ids"], torch.Tensor):
-            batch["labels"] = torch.stack([f["label_ids"] for f in features])
-        else:
-            dtype = torch.long if type(first["label_ids"][0]) is int else torch.float
-            batch["labels"] = torch.tensor([f["label_ids"] for f in features], dtype=dtype)
+    all_para_counts = [len(f["input_ids"]) for f in features]
+    select_indices = [[0] + sorted(random.sample(range(1, para_count), k=args.neg_num)) \
+                        for para_count in all_para_counts]
+
+    batch["labels"] = torch.tensor([f["labels"] for f in features], dtype=torch.long)
 
     for k, v in first.items():
-        if k not in ("label", "label_ids") and v is not None and not isinstance(v, str):
-            if isinstance(v, torch.Tensor):
-                batch[k] = torch.stack([f[k] for f in features])
-            else:
-                batch[k] = torch.tensor([f[k] for f in features])
+        if k != "labels" and not isinstance(v, str):
+            batch[k] = torch.stack([torch.tensor(f[k])[i] for f, i in zip(features, select_indices)])
 
     return batch
 

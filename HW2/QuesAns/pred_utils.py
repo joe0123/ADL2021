@@ -11,12 +11,12 @@ from tqdm.auto import tqdm
 
 logger = logging.getLogger(__name__)
 
-def post_processing_function(examples, features, predictions, args, model):
+def post_processing_function(examples, features, pred_logits, args, model):
     if args.beam:
         predictions = postprocess_qa_predictions_with_beam_search(
             examples=examples,
             features=features,
-            predictions=predictions,
+            pred_logits=pred_logits,
             n_best=args.n_best,
             max_ans_len=args.max_ans_len,
             start_n_top=model.config.start_n_top,
@@ -26,7 +26,7 @@ def post_processing_function(examples, features, predictions, args, model):
         predictions = postprocess_qa_predictions(
             examples=examples,
             features=features,
-            predictions=predictions,
+            pred_logits=pred_logits,
             n_best=args.n_best,
             max_ans_len=args.max_ans_len,
         )
@@ -39,16 +39,16 @@ def post_processing_function(examples, features, predictions, args, model):
 def postprocess_qa_predictions(
     examples,
     features,
-    predictions: Tuple[np.ndarray, np.ndarray],
+    pred_logits: Tuple[np.ndarray, np.ndarray],
     n_best: int = 20,
     max_ans_len: int = 30,
     is_world_process_zero: bool = True,
 ):
-    assert len(predictions) == 2, "`predictions` should be a tuple with two elements (start_logits, end_logits)."
-    all_start_logits, all_end_logits = predictions
+    assert len(pred_logits) == 2, "`pred_logits` should be a tuple with two elements (start_logits, end_logits)."
+    all_start_logits, all_end_logits = pred_logits
 
-    assert predictions[0].shape[0] == features.shape[0], \
-            f"Got {len(predictions[0])} predictions and {len(features)} features."
+    assert pred_logits[0].shape[0] == features.shape[0], \
+            f"Got {len(pred_logits[0])} pred_logits and {len(features)} features."
 
     example_id_to_index = {k: i for i, k in enumerate(examples["id"])}
     features_per_example = collections.defaultdict(list)
@@ -119,18 +119,18 @@ def postprocess_qa_predictions(
 def postprocess_qa_predictions_with_beam_search(
     examples,
     features,
-    predictions: Tuple[np.ndarray, np.ndarray],
+    pred_logits: Tuple[np.ndarray, np.ndarray],
     n_best: int = 20,
     max_ans_len: int = 30,
     start_n_top: int = 5,
     end_n_top: int = 5,
     is_world_process_zero: bool = True,
 ):
-    assert len(predictions) == 5, "`predictions` should be a tuple with five elements."
-    start_top_log_probs, start_top_index, end_top_log_probs, end_top_index, cls_logits = predictions
+    assert len(pred_logits) == 5, "`pred_logits` should be a tuple with five elements."
+    start_top_log_probs, start_top_index, end_top_log_probs, end_top_index, cls_logits = pred_logits
 
-    assert predictions[0].shape[0] == features.shape[0], \
-            f"Got {predictions[0].shape[0]} predicitions and {features.shape[0]} features."
+    assert pred_logits[0].shape[0] == features.shape[0], \
+            f"Got {pred_logits[0].shape[0]} predictions and {features.shape[0]} features."
 
     example_id_to_index = {k: i for i, k in enumerate(examples["id"])}
     features_per_example = collections.defaultdict(list)

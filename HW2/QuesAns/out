@@ -1,19 +1,21 @@
 nohup: ignoring input
-2021-04-30 22:07:46.477360: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
-04/30/2021 22:07:47 - INFO - __main__ -    Distributed environment: NO
+2021-05-01 02:58:54.347485: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
+05/01/2021 02:58:55 - INFO - __main__ -    Distributed environment: NO
 Num processes: 1
 Process index: 0
 Local process index: 0
 Device: cuda
 Use FP16 precision: False
 
-loading configuration file https://huggingface.co/bert-base-chinese/resolve/main/config.json from cache at /home/boewoei0123/.cache/huggingface/transformers/6cc404ca8136bc87bae0fb24f2259904943d776a6c5ddc26598bbdc319476f42.0f9bcd8314d841c06633e7b92b04509f1802c16796ee67b0f1177065739e24ae
+loading configuration file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/config.json from cache at /home/boewoei0123/.cache/huggingface/transformers/b64aa51c20341fe5461d0663677dd1527cc8fb71c482d06ee75406857d0ed53a.1d3cb63600c62f190470f1f1b36eaa1689928fa06d586702865792c3a2575c0f
 Model config BertConfig {
   "architectures": [
     "BertForMaskedLM"
   ],
   "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
   "directionality": "bidi",
+  "eos_token_id": 2,
   "gradient_checkpointing": false,
   "hidden_act": "gelu",
   "hidden_dropout_prob": 0.1,
@@ -25,7 +27,8 @@ Model config BertConfig {
   "model_type": "bert",
   "num_attention_heads": 12,
   "num_hidden_layers": 12,
-  "pad_token_id": 0,
+  "output_past": true,
+  "pad_token_id": 1,
   "pooler_fc_size": 768,
   "pooler_num_attention_heads": 12,
   "pooler_num_fc_layers": 3,
@@ -38,13 +41,15 @@ Model config BertConfig {
   "vocab_size": 21128
 }
 
-loading configuration file https://huggingface.co/bert-base-chinese/resolve/main/config.json from cache at /home/boewoei0123/.cache/huggingface/transformers/6cc404ca8136bc87bae0fb24f2259904943d776a6c5ddc26598bbdc319476f42.0f9bcd8314d841c06633e7b92b04509f1802c16796ee67b0f1177065739e24ae
+loading configuration file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/config.json from cache at /home/boewoei0123/.cache/huggingface/transformers/b64aa51c20341fe5461d0663677dd1527cc8fb71c482d06ee75406857d0ed53a.1d3cb63600c62f190470f1f1b36eaa1689928fa06d586702865792c3a2575c0f
 Model config BertConfig {
   "architectures": [
     "BertForMaskedLM"
   ],
   "attention_probs_dropout_prob": 0.1,
+  "bos_token_id": 0,
   "directionality": "bidi",
+  "eos_token_id": 2,
   "gradient_checkpointing": false,
   "hidden_act": "gelu",
   "hidden_dropout_prob": 0.1,
@@ -56,7 +61,8 @@ Model config BertConfig {
   "model_type": "bert",
   "num_attention_heads": 12,
   "num_hidden_layers": 12,
-  "pad_token_id": 0,
+  "output_past": true,
+  "pad_token_id": 1,
   "pooler_fc_size": 768,
   "pooler_num_attention_heads": 12,
   "pooler_num_fc_layers": 3,
@@ -69,78 +75,81 @@ Model config BertConfig {
   "vocab_size": 21128
 }
 
-loading file https://huggingface.co/bert-base-chinese/resolve/main/vocab.txt from cache at /home/boewoei0123/.cache/huggingface/transformers/36acdf4f3edf0a14ffb2b2c68ba47e93abd9448825202377ddb16dae8114fe07.accd894ff58c6ff7bd4f3072890776c14f4ea34fcc08e79cd88c2d157756dceb
-loading file https://huggingface.co/bert-base-chinese/resolve/main/tokenizer.json from cache at /home/boewoei0123/.cache/huggingface/transformers/7e23f4e1f58f867d672f84d9a459826e41cea3be6d0fe62502ddce9920f57e48.4495f7812b44ff0568ce7c4ff3fdbb2bac5eaf330440ffa30f46893bf749184d
-loading file https://huggingface.co/bert-base-chinese/resolve/main/added_tokens.json from cache at None
-loading file https://huggingface.co/bert-base-chinese/resolve/main/special_tokens_map.json from cache at None
-loading file https://huggingface.co/bert-base-chinese/resolve/main/tokenizer_config.json from cache at /home/boewoei0123/.cache/huggingface/transformers/2dc6085404c55008ba7fc09ab7483ef3f0a4ca2496ccee0cdbf51c2b5d529dff.ec5c189f89475aac7d8cbd243960a0655cfadc3d0474da8ff2ed0bf1699c2a5f
-04/30/2021 22:07:52 - INFO - __main__ -    Saving tokenizer to ./saved/0430-2207/tokenizer...
-tokenizer config file saved in ./saved/0430-2207/tokenizer_config.json
-Special tokens file saved in ./saved/0430-2207/special_tokens_map.json
-loading weights file https://huggingface.co/bert-base-chinese/resolve/main/pytorch_model.bin from cache at /home/boewoei0123/.cache/huggingface/transformers/58592490276d9ed1e8e33f3c12caf23000c22973cb2b3218c641bd74547a1889.fabda197bfe5d6a318c2833172d6757ccc7e49f692cb949a6fabf560cee81508
-Some weights of the model checkpoint at bert-base-chinese were not used when initializing BertForQuestionAnswering: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
+loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/vocab.txt from cache at /home/boewoei0123/.cache/huggingface/transformers/92a56e79ec6564fd501527ed88ca336637eb4bfeb28d10580c3bbdfb7889a032.accd894ff58c6ff7bd4f3072890776c14f4ea34fcc08e79cd88c2d157756dceb
+loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/tokenizer.json from cache at /home/boewoei0123/.cache/huggingface/transformers/e6278a884ec926a36ddf8d3cc3c598a65dd410c8c01be870468c4f2f71bee0d7.660ed5c7513bf13d4607410502a84e0de517eb889ff8c401068a1688868e1ccb
+loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/added_tokens.json from cache at /home/boewoei0123/.cache/huggingface/transformers/87c7eedd995b4bae2c34df3baf2cbd5df5496bed675126427849c72e590f5574.5cc6e825eb228a7a5cfd27cb4d7151e97a79fb962b31aaf1813aa102e746584b
+loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/special_tokens_map.json from cache at /home/boewoei0123/.cache/huggingface/transformers/d521373fc7ac35f63d56cf303de74a202403dcf1aaa792cd01f653694be59563.dd8bd9bfd3664b530ea4e645105f557769387b3da9f79bdb55ed556bdd80611d
+loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/tokenizer_config.json from cache at /home/boewoei0123/.cache/huggingface/transformers/5dedf24c46ec573f8a27ddfa6e737869ec8df462a9a7682b35ded34301c5bdc8.d23f50bbddc3fb34db5a76d47fa9bdd5d75bf4201ad2d49abbcca25629b3e562
+05/01/2021 02:59:00 - INFO - __main__ -    Saving tokenizer to ./saved/0501-0258/tokenizer...
+tokenizer config file saved in ./saved/0501-0258/tokenizer_config.json
+Special tokens file saved in ./saved/0501-0258/special_tokens_map.json
+loading weights file https://huggingface.co/hfl/chinese-roberta-wwm-ext/resolve/main/pytorch_model.bin from cache at /home/boewoei0123/.cache/huggingface/transformers/ebc33cec9cd4890c20bd3b688fbf8e907167e0e2f209b801b3159123cd4630e4.d863eb12d1b0d00e5d41e9eb0d41914e4993c03e6de69e67bc10c79818f5fd4d
+Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext were not used when initializing BertForQuestionAnswering: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias']
 - This IS expected if you are initializing BertForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
 - This IS NOT expected if you are initializing BertForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
-Some weights of BertForQuestionAnswering were not initialized from the model checkpoint at bert-base-chinese and are newly initialized: ['qa_outputs.weight', 'qa_outputs.bias']
+Some weights of BertForQuestionAnswering were not initialized from the model checkpoint at hfl/chinese-roberta-wwm-ext and are newly initialized: ['qa_outputs.weight', 'qa_outputs.bias']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-04/30/2021 22:07:55 - WARNING - datasets.builder -    Using custom data configuration default-26b3b54ea6f652f3
-0 tables [00:00, ? tables/s]                            Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /home/boewoei0123/.cache/huggingface/datasets/json/default-26b3b54ea6f652f3/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
-Dataset json downloaded and prepared to /home/boewoei0123/.cache/huggingface/datasets/json/default-26b3b54ea6f652f3/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
-#0:   0%|          | 0/7 [00:00<?, ?ba/s]
-#1:   0%|          | 0/7 [00:00<?, ?ba/s][A
+05/01/2021 02:59:04 - WARNING - datasets.builder -    Using custom data configuration default-2fcf52cfdf1ab747
+05/01/2021 02:59:04 - WARNING - datasets.builder -    Reusing dataset json (/home/boewoei0123/.cache/huggingface/datasets/json/default-2fcf52cfdf1ab747/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02)
+#0:   0%|          | 0/5 [00:00<?, ?ba/s]
+#1:   0%|          | 0/5 [00:00<?, ?ba/s][A
 
-#2:   0%|          | 0/7 [00:00<?, ?ba/s][A[A
-
-
-#3:   0%|          | 0/7 [00:00<?, ?ba/s][A[A[A#0:  14%|█▍        | 1/7 [00:01<00:06,  1.02s/ba]
-#1:  14%|█▍        | 1/7 [00:00<00:05,  1.05ba/s][A
-
-#2:  14%|█▍        | 1/7 [00:00<00:05,  1.03ba/s][A[A
+#2:   0%|          | 0/5 [00:00<?, ?ba/s][A[A
 
 
-#3:  14%|█▍        | 1/7 [00:00<00:05,  1.06ba/s][A[A[A#0:  29%|██▊       | 2/7 [00:01<00:04,  1.03ba/s]
-#1:  29%|██▊       | 2/7 [00:01<00:04,  1.09ba/s][A
+#3:   0%|          | 0/5 [00:00<?, ?ba/s][A[A[A#0:  20%|██        | 1/5 [00:01<00:04,  1.04s/ba]
+#1:  20%|██        | 1/5 [00:00<00:03,  1.02ba/s][A
 
-#2:  29%|██▊       | 2/7 [00:01<00:04,  1.08ba/s][A[A
-
-
-#3:  29%|██▊       | 2/7 [00:01<00:04,  1.09ba/s][A[A[A#0:  43%|████▎     | 3/7 [00:02<00:03,  1.08ba/s]
-#1:  43%|████▎     | 3/7 [00:02<00:03,  1.13ba/s][A
-
-#2:  43%|████▎     | 3/7 [00:02<00:03,  1.11ba/s][A[A
+#2:  20%|██        | 1/5 [00:01<00:04,  1.03s/ba][A[A
 
 
-#3:  43%|████▎     | 3/7 [00:02<00:03,  1.12ba/s][A[A[A#0:  57%|█████▋    | 4/7 [00:03<00:02,  1.09ba/s]
-#1:  57%|█████▋    | 4/7 [00:03<00:02,  1.12ba/s][A
+#3:  20%|██        | 1/5 [00:00<00:03,  1.04ba/s][A[A[A#0:  40%|████      | 2/5 [00:01<00:02,  1.03ba/s]
+#1:  40%|████      | 2/5 [00:01<00:02,  1.07ba/s][A
 
-#2:  57%|█████▋    | 4/7 [00:03<00:02,  1.11ba/s][A[A
-
-
-#3:  57%|█████▋    | 4/7 [00:03<00:02,  1.12ba/s][A[A[A#0:  71%|███████▏  | 5/7 [00:04<00:01,  1.12ba/s]
-#1:  71%|███████▏  | 5/7 [00:04<00:01,  1.14ba/s][A
-
-#2:  71%|███████▏  | 5/7 [00:04<00:01,  1.13ba/s][A[A
+#2:  40%|████      | 2/5 [00:01<00:02,  1.03ba/s][A[A
 
 
-#3:  71%|███████▏  | 5/7 [00:04<00:01,  1.15ba/s][A[A[A#0:  86%|████████▌ | 6/7 [00:05<00:00,  1.14ba/s]#0: 100%|██████████| 7/7 [00:05<00:00,  1.30ba/s]
-#1:  86%|████████▌ | 6/7 [00:05<00:00,  1.15ba/s][A#1: 100%|██████████| 7/7 [00:05<00:00,  1.32ba/s]
+#3:  40%|████      | 2/5 [00:01<00:02,  1.09ba/s][A[A[A#0:  60%|██████    | 3/5 [00:02<00:01,  1.07ba/s]
+#1:  60%|██████    | 3/5 [00:02<00:01,  1.11ba/s][A
 
-#2:  86%|████████▌ | 6/7 [00:05<00:00,  1.15ba/s][A[A#2: 100%|██████████| 7/7 [00:05<00:00,  1.32ba/s]
+#2:  60%|██████    | 3/5 [00:02<00:01,  1.08ba/s][A[A
 
 
-#3:  86%|████████▌ | 6/7 [00:05<00:00,  1.15ba/s][A[A[A#3: 100%|██████████| 7/7 [00:05<00:00,  1.32ba/s]
+#3:  60%|██████    | 3/5 [00:02<00:01,  1.12ba/s][A[A[A#0:  80%|████████  | 4/5 [00:03<00:00,  1.08ba/s]
+#1:  80%|████████  | 4/5 [00:03<00:00,  1.10ba/s][A
+
+#2:  80%|████████  | 4/5 [00:03<00:00,  1.09ba/s][A[A
+
+
+#3:  80%|████████  | 4/5 [00:03<00:00,  1.11ba/s][A[A[A#0: 100%|██████████| 5/5 [00:04<00:00,  1.15ba/s]#0: 100%|██████████| 5/5 [00:04<00:00,  1.15ba/s]
+#1: 100%|██████████| 5/5 [00:04<00:00,  1.17ba/s][A#1: 100%|██████████| 5/5 [00:04<00:00,  1.16ba/s]
+
+#2: 100%|██████████| 5/5 [00:04<00:00,  1.16ba/s][A[A#2: 100%|██████████| 5/5 [00:04<00:00,  1.16ba/s]
+
+
+#3: 100%|██████████| 5/5 [00:04<00:00,  1.18ba/s][A[A[A#3: 100%|██████████| 5/5 [00:04<00:00,  1.18ba/s]
 
 
 
-04/30/2021 22:08:03 - INFO - __main__ -    
-******** Running training ********
-04/30/2021 22:08:03 - INFO - __main__ -    Num train examples = 43387
-04/30/2021 22:08:03 - INFO - __main__ -    Num Epochs = 10
-04/30/2021 22:08:03 - INFO - __main__ -    Instantaneous batch size per device = 8
-04/30/2021 22:08:03 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 128
-04/30/2021 22:08:03 - INFO - __main__ -    Instantaneous steps per epoch = 5424
-04/30/2021 22:08:03 - INFO - __main__ -    Update steps per epoch = 339
-04/30/2021 22:08:03 - INFO - __main__ -    Total update steps = 3390
-04/30/2021 22:08:03 - INFO - __main__ -    
-Epoch 01 / 10
-04/30/2021 22:08:39 - INFO - __main__ -    Train | Loss: 5.98940
+#0:   0%|          | 0/2 [00:00<?, ?ba/s]
+#1:   0%|          | 0/2 [00:00<?, ?ba/s][A
+
+#2:   0%|          | 0/2 [00:00<?, ?ba/s][A[A
+
+
+#3:   0%|          | 0/2 [00:00<?, ?ba/s][A[A[A
+#1:  50%|█████     | 1/2 [00:02<00:02,  2.58s/ba][A
+
+#2:  50%|█████     | 1/2 [00:02<00:02,  2.56s/ba][A[A#0:  50%|█████     | 1/2 [00:02<00:02,  2.62s/ba]
+
+
+#3:  50%|█████     | 1/2 [00:02<00:02,  2.58s/ba][A[A[A
+#1: 100%|██████████| 2/2 [00:03<00:00,  1.93s/ba][A#1: 100%|██████████| 2/2 [00:03<00:00,  1.51s/ba]#0: 100%|██████████| 2/2 [00:03<00:00,  1.97s/ba]#0: 100%|██████████| 2/2 [00:03<00:00,  1.53s/ba]
+
+#2: 100%|██████████| 2/2 [00:03<00:00,  1.93s/ba][A[A#2: 100%|██████████| 2/2 [00:03<00:00,  1.51s/ba]
+
+
+#3: 100%|██████████| 2/2 [00:03<00:00,  1.94s/ba][A[A[A#3: 100%|██████████| 2/2 [00:03<00:00,  1.51s/ba]
+
+
+
