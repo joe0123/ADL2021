@@ -128,7 +128,7 @@ if __name__ == "__main__":
     else:
         raw_datasets = load_dataset("json", data_files={"train": args.train_file})
     cols = raw_datasets["train"].column_names
-    args.ques_col, args.para_col, args.label_col = "question", "paragraphs", "label"
+    args.ques_col, args.para_col, args.label_col = "question", "paragraphs", "relevant"
     
     train_examples = raw_datasets["train"]
     #train_examples = train_examples.select(range(10))
@@ -139,7 +139,7 @@ if __name__ == "__main__":
         num_proc=4,
         remove_columns=cols,
     )
-
+    
     if args.valid_file:
         valid_examples = raw_datasets["valid"]
         #valid_examples = valid_examples.select(range(10))
@@ -150,6 +150,8 @@ if __name__ == "__main__":
             num_proc=4,
             remove_columns=cols,
         )
+
+    exit()
 
 # Create DataLoaders
     data_collator = default_data_collator
