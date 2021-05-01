@@ -34,22 +34,22 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_file", type=str, required=True)
     parser.add_argument("--valid_file", type=str)
-    parser.add_argument("--max_seq_len", type=int, default=384)
-    parser.add_argument("--stride", type=int, default=128)
+    parser.add_argument("--max_seq_len", type=int, default=512)
+    parser.add_argument("--stride", type=int, default=256)
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str, required=True)
     parser.add_argument("--beam", action="store_true")
-    parser.add_argument("--train_batch_size", type=int, default=8)
+    parser.add_argument("--train_batch_size", type=int, default=4)
     parser.add_argument("--valid_batch_size", type=int, default=32)
-    parser.add_argument("--lr", type=float, default=5e-5)
+    parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
-    parser.add_argument("--epoch_num", type=int, default=10)
+    parser.add_argument("--epoch_num", type=int, default=5)
     parser.add_argument("--grad_accum_steps", type=int, default=16)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
-    parser.add_argument("--log_steps", type=int, default=300)
-    parser.add_argument("--eval_steps", type=int, default=1500)
+    parser.add_argument("--log_steps", type=int, default=500)
+    parser.add_argument("--eval_steps", type=int, default=2500)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
     parser.add_argument("--n_best", type=int, default=20)
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     )
     
 # Metrics for evaluation
-    metrics = load_metric("./metrics.py")
+    metrics = load_metric("./qa_metrics.py")
 
 
 # Train!

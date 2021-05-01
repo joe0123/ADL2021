@@ -16,11 +16,9 @@ from transformers import (
     CONFIG_MAPPING,
     MODEL_MAPPING,
     AdamW,
-    DataCollatorWithPadding,
     AutoConfig,
     AutoModelForMultipleChoice,
     AutoTokenizer,
-    default_data_collator,
     get_scheduler,
     set_seed,
 )
@@ -36,11 +34,9 @@ def parse_args():
     parser.add_argument("--valid_file", type=str)
     parser.add_argument("--neg_num", type=int, default=4)
     parser.add_argument("--max_seq_len", type=int, default=512)
-    parser.add_argument("--stride", type=int, default=128)
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str, required=True)
-    parser.add_argument("--beam", action="store_true")
     parser.add_argument("--train_batch_size", type=int, default=4)
     parser.add_argument("--valid_batch_size", type=int, default=16)
     parser.add_argument("--lr", type=float, default=3e-5)
@@ -53,8 +49,6 @@ def parse_args():
     parser.add_argument("--eval_steps", type=int, default=2000)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
-    parser.add_argument("--n_best", type=int, default=20)
-    parser.add_argument("--max_ans_len", type=int, default=30)
     args = parser.parse_args()
     
     args.saved_dir = os.path.join(args.saved_dir, strftime("%m%d-%H%M", localtime()))
@@ -132,7 +126,7 @@ if __name__ == "__main__":
     args.ques_col, args.para_col, args.label_col = "question", "paragraphs", "relevant"
     
     train_examples = raw_datasets["train"]
-    #train_examples = train_examples.select(range(10))
+    train_examples = train_examples.select(range(10))
     prepare_train_features = partial(prepare_train_features, args=args, tokenizer=tokenizer)
     train_dataset = train_examples.map(
         prepare_train_features,
@@ -143,7 +137,7 @@ if __name__ == "__main__":
     
     if args.valid_file:
         valid_examples = raw_datasets["valid"]
-        #valid_examples = valid_examples.select(range(10))
+        valid_examples = valid_examples.select(range(10))
         prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
         valid_dataset = valid_examples.map(
             prepare_pred_features,
@@ -159,9 +153,6 @@ if __name__ == "__main__":
     if args.valid_file:
         valid_dataloader = DataLoader(valid_dataset, collate_fn=data_collator, batch_size=args.valid_batch_size)
 
-    for step, data in enumerate(train_dataloader, 1):
-        continue
-    exit()
     
 # Optimizer
 # Split weights in two groups, one with weight decay and the other not.
@@ -199,7 +190,7 @@ if __name__ == "__main__":
     )
     
 # Metrics for evaluation
-    metrics = load_metric("accuracy")
+    metrics = load_metric("./rel_metric.py")
 
 
 # Train!
@@ -213,7 +204,7 @@ if __name__ == "__main__":
     logger.info(f"Update steps per epoch = {update_steps_per_epoch}")
     logger.info(f"Total update steps = {args.max_update_steps}")
     
-    max_valid_score = 0
+    max_valid_acc = 0
     for epoch in range(args.epoch_num):
         logger.info("\nEpoch {:02d} / {:02d}".format(epoch + 1, args.epoch_num))
         total_loss = 0
@@ -241,64 +232,20 @@ if __name__ == "__main__":
             if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
                 valid_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
                 model.eval()
-                #TODO
-                if args.beam:
-                    all_start_top_log_probs = []
-                    all_start_top_index = []
-                    all_end_top_log_probs = []
-                    all_end_top_index = []
-                    all_cls_logits = []
-                else:
-                    all_start_logits = []
-                    all_end_logits = []
+                all_logits = []
                 for step, data in enumerate(valid_dataloader):
                     with torch.no_grad():
                         outputs = model(**data)
-                        if args.beam:
-                            start_top_log_probs = outputs.start_top_log_probs
-                            start_top_index = outputs.start_top_index
-                            end_top_log_probs = outputs.end_top_log_probs
-                            end_top_index = outputs.end_top_index
-                            cls_logits = outputs.cls_logits
-                            all_start_top_log_probs.append(accelerator.gather(start_top_log_probs).cpu().numpy())
-                            all_start_top_index.append(accelerator.gather(start_top_index).cpu().numpy())
-                            all_end_top_log_probs.append(accelerator.gather(end_top_log_probs).cpu().numpy())
-                            all_end_top_index.append(accelerator.gather(end_top_index).cpu().numpy())
-                            all_cls_logits.append(accelerator.gather(cls_logits).cpu().numpy())
-                        else:
-                            start_logits = outputs.start_logits
-                            end_logits = outputs.end_logits
-                            all_start_logits.append(accelerator.gather(start_logits).cpu().numpy())
-                            all_end_logits.append(accelerator.gather(end_logits).cpu().numpy())
+                        all_logits.append(accelerator.gather(outputs.logits).cpu().numpy())
 
-                if args.beam:
-                    max_len = max([x.shape[1] for x in all_end_top_log_probs])  # Get the max_length of the tensor
-                    start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, valid_dataset, max_len)
-                    start_top_index_concat = create_and_fill_np_array(all_start_top_index, valid_dataset, max_len)
-                    end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, valid_dataset, max_len)
-                    end_top_index_concat = create_and_fill_np_array(all_end_top_index, valid_dataset, max_len)
-                    all_cls_logits = np.concatenate(all_cls_logits, axis=0)
-                    outputs_numpy = (
-                        start_top_log_probs_concat,
-                        start_top_index_concat,
-                        end_top_log_probs_concat,
-                        end_top_index_concat,
-                        all_cls_logits,
-                    )
-                else:
-                    max_len = max([x.shape[1] for x in all_start_logits])
-                    start_logits_concat = create_and_fill_np_array(all_start_logits, valid_dataset, max_len)
-                    end_logits_concat = create_and_fill_np_array(all_end_logits, valid_dataset, max_len)
-                    outputs_numpy = (start_logits_concat, end_logits_concat)
+                outputs_numpy = np.concatenate(all_logits, axis=0)
 
                 valid_dataset.set_format(type=None, columns=list(valid_dataset.features.keys()))
                 predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)
-                eval_result = metrics.compute(predictions=predictions.predictions, references=predictions.label_ids)
-                valid_em, valid_f1 = eval_result["em"], eval_result["f1"]
-                logger.info("Valid | EM: {:.5f}, F1: {:.5f}".format(valid_em, valid_f1))
-                valid_score = valid_em + valid_f1
-                if valid_score >= max_valid_score:
-                    max_valid_score = valid_score
+                valid_acc = metrics.compute(predictions=predictions.predictions, references=predictions.label_ids)
+                logger.info("Valid | Acc: {:.5f}".format(valid_acc))
+                if valid_acc >= max_valid_acc:
+                    max_valid_acc = valid_acc
                     accelerator.wait_for_everyone()
                     unwrapped_model = accelerator.unwrap_model(model)
                     unwrapped_model.save_pretrained(args.saved_dir, save_function=accelerator.save)
