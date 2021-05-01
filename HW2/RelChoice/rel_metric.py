@@ -1,5 +1,5 @@
 import datasets
-import numpy
+import numpy as np
 
 _CITATION = ''
 _DESCRIPTION = ''
@@ -21,8 +21,11 @@ class Accuracy(datasets.Metric):
         )
 
     def _compute(self, predictions, references):
-        pred_numpy = [predictions[example_id]["pred"] for example_id in sorted(references.keys())]
-        ref_numpy = [references[example_id]["label"] for example_id in sorted(references.keys())]
+        pred_dict = {prediction["id"]: prediction["pred"] for prediction in predictions}
+        ref_dict = {reference["id"]: reference["label"] for reference in references}
+        example_ids = ref_dict.keys()
+        pred_numpy = [pred_dict[example_id] for example_id in example_ids]
+        ref_numpy = [ref_dict[example_id] for example_id in example_ids]
 
         score = np.mean(np.where(pred_numpy == ref_numpy, 1, 0))
         return score

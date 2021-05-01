@@ -28,8 +28,7 @@ def postprocess_relchoice_predictions(
     pred_logits,
     is_world_process_zero: bool = True,
 ):
-
-    assert pred_logits[0].shape[0] == features.shape[0], \
+    assert pred_logits.shape[0] == features.shape[0], \
             f"Got {len(pred_logits[0])} pred_logits and {len(features)} features."
 
     example_id_to_index = {k: i for i, k in enumerate(examples["id"])}

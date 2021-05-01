@@ -127,7 +127,7 @@ if __name__ == "__main__":
     args.ques_col, args.para_col, args.label_col = "question", "paragraphs", "relevant"
     
     train_examples = raw_datasets["train"]
-    train_examples = train_examples.select(range(10))
+    #train_examples = train_examples.select(range(10))
     prepare_train_features = partial(prepare_train_features, args=args, tokenizer=tokenizer)
     train_dataset = train_examples.map(
         prepare_train_features,
@@ -138,7 +138,7 @@ if __name__ == "__main__":
     
     if args.valid_file:
         valid_examples = raw_datasets["valid"]
-        valid_examples = valid_examples.select(range(10))
+        #valid_examples = valid_examples.select(range(10))
         prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
         valid_dataset = valid_examples.map(
             prepare_pred_features,
@@ -232,17 +232,18 @@ if __name__ == "__main__":
                 logger.info("Train | Loss: {:.5f}".format(total_loss / step))
         # Evaluate!
             if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
-                valid_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
+                valid_dataset.set_format(columns=["attention_mask", "input_ids", "token_type_ids"])
                 model.eval()
                 all_logits = []
                 for step, data in enumerate(valid_dataloader):
                     with torch.no_grad():
                         outputs = model(**data)
-                        all_logits.append(accelerator.gather(outputs.logits).cpu().numpy())
+                        print(outputs.logits.shape)
+                        all_logits.append(accelerator.gather(outputs.logits).squeeze().cpu().numpy())
 
                 outputs_numpy = np.concatenate(all_logits, axis=0)
 
-                valid_dataset.set_format(type=None, columns=list(valid_dataset.features.keys()))
+                valid_dataset.set_format(columns=list(valid_dataset.features.keys()))
                 predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args)
                 valid_acc = metrics.compute(predictions=predictions.predictions, references=predictions.label_ids)
                 logger.info("Valid | Acc: {:.5f}".format(valid_acc))
