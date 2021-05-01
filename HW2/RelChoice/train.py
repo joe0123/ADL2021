@@ -19,6 +19,7 @@ from transformers import (
     AutoConfig,
     AutoModelForMultipleChoice,
     AutoTokenizer,
+    default_data_collator,
     get_scheduler,
     set_seed,
 )
@@ -37,12 +38,12 @@ def parse_args():
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str, required=True)
-    parser.add_argument("--train_batch_size", type=int, default=4)
+    parser.add_argument("--train_batch_size", type=int, default=1)
     parser.add_argument("--valid_batch_size", type=int, default=16)
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
     parser.add_argument("--epoch_num", type=int, default=5)
-    parser.add_argument("--grad_accum_steps", type=int, default=16)
+    parser.add_argument("--grad_accum_steps", type=int, default=64)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
     parser.add_argument("--log_steps", type=int, default=500)
@@ -151,6 +152,7 @@ if __name__ == "__main__":
     data_collator = partial(data_collator_with_neg_sampling, args=args)
     train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=data_collator, batch_size=args.train_batch_size)
     if args.valid_file:
+        data_collator = default_data_collator
         valid_dataloader = DataLoader(valid_dataset, collate_fn=data_collator, batch_size=args.valid_batch_size)
 
     
@@ -241,7 +243,7 @@ if __name__ == "__main__":
                 outputs_numpy = np.concatenate(all_logits, axis=0)
 
                 valid_dataset.set_format(type=None, columns=list(valid_dataset.features.keys()))
-                predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)
+                predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args)
                 valid_acc = metrics.compute(predictions=predictions.predictions, references=predictions.label_ids)
                 logger.info("Valid | Acc: {:.5f}".format(valid_acc))
                 if valid_acc >= max_valid_acc:

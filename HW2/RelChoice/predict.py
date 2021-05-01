@@ -13,6 +13,8 @@ import torch
 from torch.utils.data.dataloader import DataLoader
 import transformers
 from transformers import (
+    DataCollatorWithPadding,
+    SchedulerType,
     AutoConfig,
     AutoModelForQuestionAnswering,
     AutoTokenizer,
@@ -27,12 +29,11 @@ logger = logging.getLogger(__name__)
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--raw_test_file", type=str, required=True)
     parser.add_argument("--test_file", type=str, required=True)
     parser.add_argument("--target_dir", type=str, required=True)
     parser.add_argument("--test_batch_size", type=int, default=64)
     parser.add_argument("--out_file", type=str, default="./results.json")
-    parser.add_argument("--n_best", type=int, default=20)
-    parser.add_argument("--max_ans_len", type=int, default=30)
     args = parser.parse_args()
     
     return args
@@ -78,7 +79,7 @@ if __name__ == "__main__":
 # Load and preprocess the dataset
     raw_datasets = load_dataset("json", data_files={"test": args.test_file})
     cols = raw_datasets["test"].column_names
-    args.ques_col, args.context_col, args.ans_col = "question", "context", "answers"
+    args.ques_col, args.context_col, args.label_col = "question", "context", "relevant"
     
     test_examples = raw_datasets["test"]
     prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
@@ -92,7 +93,7 @@ if __name__ == "__main__":
 # Create DataLoaders
     data_collator = default_data_collator
     test_dataloader = DataLoader(test_dataset, collate_fn=data_collator, batch_size=args.test_batch_size)
-    
+
 # Prepare everything with our accelerator.
     model, test_dataloader = accelerator.prepare(
         model, test_dataloader
@@ -105,57 +106,19 @@ if __name__ == "__main__":
     
     test_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
     model.eval()
-    if args.beam:
-        all_start_top_log_probs = []
-        all_start_top_index = []
-        all_end_top_log_probs = []
-        all_end_top_index = []
-        all_cls_logits = []
-    else:
-        all_start_logits = []
-        all_end_logits = []
+    all_logits = []
     for step, data in enumerate(test_dataloader):
         with torch.no_grad():
             outputs = model(**data)
-            if args.beam:
-                start_top_log_probs = outputs.start_top_log_probs
-                start_top_index = outputs.start_top_index
-                end_top_log_probs = outputs.end_top_log_probs
-                end_top_index = outputs.end_top_index
-                cls_logits = outputs.cls_logits
-                all_start_top_log_probs.append(accelerator.gather(start_top_log_probs).cpu().numpy())
-                all_start_top_index.append(accelerator.gather(start_top_index).cpu().numpy())
-                all_end_top_log_probs.append(accelerator.gather(end_top_log_probs).cpu().numpy())
-                all_end_top_index.append(accelerator.gather(end_top_index).cpu().numpy())
-                all_cls_logits.append(accelerator.gather(cls_logits).cpu().numpy())
-            else:
-                start_logits = outputs.start_logits
-                end_logits = outputs.end_logits
-                all_start_logits.append(accelerator.gather(start_logits).cpu().numpy())
-                all_end_logits.append(accelerator.gather(end_logits).cpu().numpy())
-
-    if args.beam:
-        max_len = max([x.shape[1] for x in all_end_top_log_probs])  # Get the max_length of the tensor
-        start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, test_dataset, max_len)
-        start_top_index_concat = create_and_fill_np_array(all_start_top_index, test_dataset, max_len)
-        end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, test_dataset, max_len)
-        end_top_index_concat = create_and_fill_np_array(all_end_top_index, test_dataset, max_len)
-        all_cls_logits = np.concatenate(all_cls_logits, axis=0)
-        outputs_numpy = (
-            start_top_log_probs_concat,
-            start_top_index_concat,
-            end_top_log_probs_concat,
-            end_top_index_concat,
-            all_cls_logits,
-        )
-    else:
-        max_len = max([x.shape[1] for x in all_start_logits])
-        start_logits_concat = create_and_fill_np_array(all_start_logits, test_dataset, max_len)
-        end_logits_concat = create_and_fill_np_array(all_end_logits, test_dataset, max_len)
-        outputs_numpy = (start_logits_concat, end_logits_concat)
+            all_logits.append(accelerator.gather(outputs.logits).cpu().numpy())
+    outputs_numpy = np.concatenate(all_logits, axis=0)
 
     test_dataset.set_format(type=None, columns=list(test_dataset.features.keys()))
-    predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args, model)
-    results = {d["id"]: d["pred"] for d in predictions.predictions}
+    predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args)
+    with open(args.raw_test_file, 'r') as f:
+        results = json.load(f)
+    example_id_to_index = {d["id"]: i for i, d in enumerate(results)}
+    for d in predictions.predictions:
+        results[example_id_to_index[d["id"]]]["relevant"] = d["paragraphs"][d["pred"]]
     with open(args.out_file, 'w') as f:
         json.dump(results, f, ensure_ascii=False, indent=4)

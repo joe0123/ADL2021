@@ -60,7 +60,10 @@ def prepare_pred_features(examples, args, tokenizer):
         padding="max_length",
     )
     
+    for k, v in tokenized_examples.items():
+        tokenized_examples[k] = [[v_] for v_ in v]
     tokenized_examples["example_id"] = [examples["id"][sample_index] for sample_index in sample_indices]
+    print(tokenized_examples)
     
     return tokenized_examples
 
