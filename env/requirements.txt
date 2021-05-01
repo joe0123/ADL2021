@@ -8,6 +8,8 @@ absl-py==0.12.0
     # via
     #   tensorboard
     #   tensorflow
+accelerate==0.2.1
+    # via -r requirements.in
 aiohttp==3.7.4.post0
     # via fsspec
 astunparse==1.6.3
@@ -42,12 +44,22 @@ cymem==2.0.5
     #   preshed
     #   spacy
     #   thinc
+datasets==1.6.0
+    # via -r requirements.in
+dill==0.3.3
+    # via
+    #   datasets
+    #   multiprocess
 filelock==3.0.12
-    # via transformers
+    # via
+    #   huggingface-hub
+    #   transformers
 flatbuffers==1.12
     # via tensorflow
 fsspec[http]==0.8.7
-    # via pytorch-lightning
+    # via
+    #   datasets
+    #   pytorch-lightning
 future==0.18.2
     # via pytorch-lightning
 gast==0.3.3
@@ -66,6 +78,8 @@ grpcio==1.32.0
     #   tensorflow
 h5py==2.10.0
     # via tensorflow
+huggingface-hub==0.0.8
+    # via datasets
 idna==2.10
     # via
     #   requests
@@ -86,6 +100,8 @@ multidict==5.1.0
     # via
     #   aiohttp
     #   yarl
+multiprocess==0.70.11.1
+    # via datasets
 murmurhash==1.0.5
     # via
     #   preshed
@@ -94,9 +110,12 @@ murmurhash==1.0.5
 numpy==1.19.5
     # via
     #   blis
+    #   datasets
     #   h5py
     #   keras-preprocessing
     #   opt-einsum
+    #   pandas
+    #   pyarrow
     #   pytorch-lightning
     #   scikit-learn
     #   scipy
@@ -113,8 +132,11 @@ opt-einsum==3.3.0
     # via tensorflow
 packaging==20.9
     # via
+    #   datasets
     #   spacy
     #   transformers
+pandas==1.2.4
+    # via datasets
 pathy==0.4.0
     # via spacy
 preshed==3.0.5
@@ -125,6 +147,10 @@ protobuf==3.15.6
     # via
     #   tensorboard
     #   tensorflow
+pyaml==20.4.0
+    # via accelerate
+pyarrow==4.0.0
+    # via datasets
 pyasn1-modules==0.2.8
     # via google-auth
 pyasn1==0.4.8
@@ -137,10 +163,16 @@ pydantic==1.7.3
     #   thinc
 pyparsing==2.4.7
     # via packaging
+python-dateutil==2.8.1
+    # via pandas
 pytorch-lightning==1.2.3
     # via -r requirements.in
+pytz==2021.1
+    # via pandas
 pyyaml==5.3.1
-    # via pytorch-lightning
+    # via
+    #   pyaml
+    #   pytorch-lightning
 regex==2021.4.4
     # via
     #   sacremoses
@@ -149,7 +181,9 @@ requests-oauthlib==1.3.0
     # via google-auth-oauthlib
 requests==2.25.1
     # via
+    #   datasets
     #   fsspec
+    #   huggingface-hub
     #   requests-oauthlib
     #   smart-open
     #   spacy
@@ -175,6 +209,7 @@ six==1.15.0
     #   h5py
     #   keras-preprocessing
     #   protobuf
+    #   python-dateutil
     #   sacremoses
     #   tensorboard
     #   tensorflow
@@ -209,10 +244,13 @@ tokenizers==0.10.2
 torch==1.7.1
     # via
     #   -r requirements.in
+    #   accelerate
     #   pytorch-lightning
-tqdm==4.56.2
+tqdm==4.49.0
     # via
     #   -r requirements.in
+    #   datasets
+    #   huggingface-hub
     #   pytorch-lightning
     #   sacremoses
     #   spacy
@@ -243,6 +281,8 @@ wheel==0.36.2
     #   tensorflow
 wrapt==1.12.1
     # via tensorflow
+xxhash==2.0.2
+    # via datasets
 yarl==1.6.3
     # via aiohttp
 

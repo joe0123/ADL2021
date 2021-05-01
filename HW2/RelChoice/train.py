@@ -38,12 +38,12 @@ def parse_args():
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str, required=True)
-    parser.add_argument("--train_batch_size", type=int, default=1)
+    parser.add_argument("--train_batch_size", type=int, default=4)
     parser.add_argument("--valid_batch_size", type=int, default=16)
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
     parser.add_argument("--epoch_num", type=int, default=5)
-    parser.add_argument("--grad_accum_steps", type=int, default=64)
+    parser.add_argument("--grad_accum_steps", type=int, default=16)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
     parser.add_argument("--log_steps", type=int, default=500)
@@ -150,10 +150,12 @@ if __name__ == "__main__":
 
 # Create DataLoaders
     data_collator = partial(data_collator_with_neg_sampling, args=args)
-    train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=data_collator, batch_size=args.train_batch_size)
+    train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=data_collator, 
+                            batch_size=args.train_batch_size, num_workers=4)
     if args.valid_file:
         data_collator = default_data_collator
-        valid_dataloader = DataLoader(valid_dataset, collate_fn=data_collator, batch_size=args.valid_batch_size)
+        valid_dataloader = DataLoader(valid_dataset, collate_fn=data_collator, 
+                            batch_size=args.valid_batch_size, num_workers=4)
 
     
 # Optimizer
@@ -238,8 +240,7 @@ if __name__ == "__main__":
                 for step, data in enumerate(valid_dataloader):
                     with torch.no_grad():
                         outputs = model(**data)
-                        print(outputs.logits.shape)
-                        all_logits.append(accelerator.gather(outputs.logits).squeeze().cpu().numpy())
+                        all_logits.append(accelerator.gather(outputs.logits).squeeze(-1).cpu().numpy())
 
                 outputs_numpy = np.concatenate(all_logits, axis=0)
 
