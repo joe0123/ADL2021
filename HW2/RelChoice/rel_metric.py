@@ -24,8 +24,8 @@ class Accuracy(datasets.Metric):
         pred_dict = {prediction["id"]: prediction["pred"] for prediction in predictions}
         ref_dict = {reference["id"]: reference["label"] for reference in references}
         example_ids = ref_dict.keys()
-        pred_numpy = [pred_dict[example_id] for example_id in example_ids]
-        ref_numpy = [ref_dict[example_id] for example_id in example_ids]
+        pred_numpy = np.array([pred_dict[example_id] for example_id in example_ids])
+        ref_numpy = np.array([ref_dict[example_id] for example_id in example_ids])
 
         score = np.mean(np.where(pred_numpy == ref_numpy, 1, 0))
         return score

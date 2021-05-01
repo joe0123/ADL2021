@@ -1,6 +1,6 @@
 nohup: ignoring input
-2021-05-01 13:49:31.722454: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
-05/01/2021 13:49:33 - INFO - __main__ -    Distributed environment: NO
+2021-05-01 15:36:15.748202: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
+05/01/2021 15:36:17 - INFO - __main__ -    Distributed environment: NO
 Num processes: 1
 Process index: 0
 Local process index: 0
@@ -74,55 +74,56 @@ loading file https://huggingface.co/bert-base-chinese/resolve/main/tokenizer.jso
 loading file https://huggingface.co/bert-base-chinese/resolve/main/added_tokens.json from cache at None
 loading file https://huggingface.co/bert-base-chinese/resolve/main/special_tokens_map.json from cache at None
 loading file https://huggingface.co/bert-base-chinese/resolve/main/tokenizer_config.json from cache at /home/joehuang/.cache/huggingface/transformers/2dc6085404c55008ba7fc09ab7483ef3f0a4ca2496ccee0cdbf51c2b5d529dff.ec5c189f89475aac7d8cbd243960a0655cfadc3d0474da8ff2ed0bf1699c2a5f
-05/01/2021 13:49:38 - INFO - __main__ -    Saving tokenizer to ./saved/0501-1349/tokenizer...
-tokenizer config file saved in ./saved/0501-1349/tokenizer_config.json
-Special tokens file saved in ./saved/0501-1349/special_tokens_map.json
+05/01/2021 15:36:21 - INFO - __main__ -    Saving tokenizer to ./saved/0501-1536/tokenizer...
+tokenizer config file saved in ./saved/0501-1536/tokenizer_config.json
+Special tokens file saved in ./saved/0501-1536/special_tokens_map.json
 loading weights file https://huggingface.co/bert-base-chinese/resolve/main/pytorch_model.bin from cache at /home/joehuang/.cache/huggingface/transformers/58592490276d9ed1e8e33f3c12caf23000c22973cb2b3218c641bd74547a1889.fabda197bfe5d6a318c2833172d6757ccc7e49f692cb949a6fabf560cee81508
 Some weights of the model checkpoint at bert-base-chinese were not used when initializing BertForMultipleChoice: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
 - This IS expected if you are initializing BertForMultipleChoice from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
 - This IS NOT expected if you are initializing BertForMultipleChoice from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
 Some weights of BertForMultipleChoice were not initialized from the model checkpoint at bert-base-chinese and are newly initialized: ['classifier.weight', 'classifier.bias']
 You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-05/01/2021 13:49:42 - WARNING - datasets.builder -    Using custom data configuration default-213c3ac2c9921693
-0 tables [00:00, ? tables/s]1 tables [00:00,  5.93 tables/s]                                0 tables [00:00, ? tables/s]                            Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /home/joehuang/.cache/huggingface/datasets/json/default-213c3ac2c9921693/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
-Dataset json downloaded and prepared to /home/joehuang/.cache/huggingface/datasets/json/default-213c3ac2c9921693/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
+05/01/2021 15:36:26 - WARNING - datasets.builder -    Using custom data configuration default-016cbf44725263e8
+0 tables [00:00, ? tables/s]1 tables [00:00,  6.38 tables/s]                                0 tables [00:00, ? tables/s]                            Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /home/joehuang/.cache/huggingface/datasets/json/default-016cbf44725263e8/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
+Dataset json downloaded and prepared to /home/joehuang/.cache/huggingface/datasets/json/default-016cbf44725263e8/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
 #0:   0%|          | 0/5 [00:00<?, ?ba/s]
 #1:   0%|          | 0/5 [00:00<?, ?ba/s][A
 
 #2:   0%|          | 0/5 [00:00<?, ?ba/s][A[A
 
 
-#3:   0%|          | 0/5 [00:00<?, ?ba/s][A[A[A#0:  20%|██        | 1/5 [00:06<00:25,  6.28s/ba]
-#1:  20%|██        | 1/5 [00:06<00:25,  6.31s/ba][A
+#3:   0%|          | 0/5 [00:00<?, ?ba/s][A[A[A#0:  20%|██        | 1/5 [00:06<00:25,  6.45s/ba]
+#1:  20%|██        | 1/5 [00:06<00:25,  6.41s/ba][A
 
-#2:  20%|██        | 1/5 [00:06<00:25,  6.40s/ba][A[A
-
-
-#3:  20%|██        | 1/5 [00:06<00:25,  6.28s/ba][A[A[A#0:  40%|████      | 2/5 [00:12<00:18,  6.26s/ba]
-#1:  40%|████      | 2/5 [00:12<00:19,  6.35s/ba][A
-
-#2:  40%|████      | 2/5 [00:12<00:19,  6.41s/ba][A[A
+#2:  20%|██        | 1/5 [00:06<00:26,  6.59s/ba][A[A
 
 
-#3:  40%|████      | 2/5 [00:12<00:19,  6.37s/ba][A[A[A#0:  60%|██████    | 3/5 [00:18<00:12,  6.28s/ba]
-#1:  60%|██████    | 3/5 [00:19<00:12,  6.34s/ba][A
+#3:  20%|██        | 1/5 [00:06<00:25,  6.42s/ba][A[A[A#0:  40%|████      | 2/5 [00:12<00:19,  6.47s/ba]
+#1:  40%|████      | 2/5 [00:12<00:19,  6.46s/ba][A
 
-#2:  60%|██████    | 3/5 [00:19<00:12,  6.37s/ba][A[A
-
-
-#3:  60%|██████    | 3/5 [00:19<00:12,  6.35s/ba][A[A[A#0:  80%|████████  | 4/5 [00:25<00:06,  6.25s/ba]
-#1:  80%|████████  | 4/5 [00:25<00:06,  6.27s/ba][A
-
-#2:  80%|████████  | 4/5 [00:25<00:06,  6.26s/ba][A[A
+#2:  40%|████      | 2/5 [00:12<00:19,  6.49s/ba][A[A
 
 
-#3:  80%|████████  | 4/5 [00:25<00:06,  6.29s/ba][A[A[A#0: 100%|██████████| 5/5 [00:30<00:00,  6.06s/ba]#0: 100%|██████████| 5/5 [00:30<00:00,  6.12s/ba]
-#1: 100%|██████████| 5/5 [00:30<00:00,  6.03s/ba][A#1: 100%|██████████| 5/5 [00:30<00:00,  6.13s/ba]
+#3:  40%|████      | 2/5 [00:12<00:19,  6.44s/ba][A[A[A#0:  60%|██████    | 3/5 [00:19<00:12,  6.41s/ba]
+#1:  60%|██████    | 3/5 [00:19<00:12,  6.44s/ba][A
 
-#2: 100%|██████████| 5/5 [00:30<00:00,  6.06s/ba][A[A#2: 100%|██████████| 5/5 [00:30<00:00,  6.14s/ba]
+#2:  60%|██████    | 3/5 [00:19<00:12,  6.42s/ba][A[A
 
 
-#3: 100%|██████████| 5/5 [00:31<00:00,  6.14s/ba][A[A[A#3: 100%|██████████| 5/5 [00:31<00:00,  6.22s/ba]
+#3:  60%|██████    | 3/5 [00:19<00:12,  6.44s/ba][A[A[A#0:  80%|████████  | 4/5 [00:25<00:06,  6.33s/ba]
+#1:  80%|████████  | 4/5 [00:25<00:06,  6.38s/ba][A
+
+#2:  80%|████████  | 4/5 [00:25<00:06,  6.29s/ba][A[A
+
+
+#3:  80%|████████  | 4/5 [00:25<00:06,  6.43s/ba][A[A[A#0: 100%|██████████| 5/5 [00:30<00:00,  6.04s/ba]#0: 100%|██████████| 5/5 [00:30<00:00,  6.15s/ba]
+
+#2: 100%|██████████| 5/5 [00:30<00:00,  6.05s/ba][A[A#2: 100%|██████████| 5/5 [00:30<00:00,  6.11s/ba]
+#1: 100%|██████████| 5/5 [00:31<00:00,  6.18s/ba][A#1: 100%|██████████| 5/5 [00:31<00:00,  6.26s/ba]
+
+
+#3: 100%|██████████| 5/5 [00:31<00:00,  6.16s/ba][A[A[A#3: 100%|██████████| 5/5 [00:31<00:00,  6.26s/ba]
+
 
 
 #0:   0%|          | 0/2 [00:00<?, ?ba/s]
@@ -131,29 +132,4 @@ Dataset json downloaded and prepared to /home/joehuang/.cache/huggingface/datase
 #2:   0%|          | 0/2 [00:00<?, ?ba/s][A[A
 
 
-#3:   0%|          | 0/2 [00:00<?, ?ba/s][A[A[A#0:  50%|█████     | 1/2 [00:06<00:06,  6.49s/ba]
-#1:  50%|█████     | 1/2 [00:06<00:06,  6.47s/ba][A
-
-#2:  50%|█████     | 1/2 [00:06<00:06,  6.46s/ba][A[A
-
-
-#3:  50%|█████     | 1/2 [00:07<00:07,  7.02s/ba][A[A[A#0: 100%|██████████| 2/2 [00:07<00:00,  4.97s/ba]#0: 100%|██████████| 2/2 [00:07<00:00,  3.96s/ba]
-#1: 100%|██████████| 2/2 [00:07<00:00,  4.97s/ba][A#1: 100%|██████████| 2/2 [00:07<00:00,  3.98s/ba]
-
-#2: 100%|██████████| 2/2 [00:07<00:00,  4.95s/ba][A[A#2: 100%|██████████| 2/2 [00:07<00:00,  3.95s/ba]
-
-
-#3: 100%|██████████| 2/2 [00:08<00:00,  5.36s/ba][A[A[A#3: 100%|██████████| 2/2 [00:08<00:00,  4.25s/ba]
-
-
-05/01/2021 13:50:30 - INFO - __main__ -    
-******** Running training ********
-05/01/2021 13:50:30 - INFO - __main__ -    Num train examples = 19528
-05/01/2021 13:50:30 - INFO - __main__ -    Num Epochs = 5
-05/01/2021 13:50:30 - INFO - __main__ -    Instantaneous batch size per device = 4
-05/01/2021 13:50:30 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 64
-05/01/2021 13:50:30 - INFO - __main__ -    Instantaneous steps per epoch = 4882
-05/01/2021 13:50:30 - INFO - __main__ -    Update steps per epoch = 306
-05/01/2021 13:50:30 - INFO - __main__ -    Total update steps = 1530
-05/01/2021 13:50:30 - INFO - __main__ -    
-Epoch 01 / 05
+#3:   0%|          | 0/2 [00:00<?, ?ba/s][A[A[A
