@@ -16,7 +16,7 @@ from transformers import (
     DataCollatorWithPadding,
     SchedulerType,
     AutoConfig,
-    AutoModelForQuestionAnswering,
+    AutoModelForMultipleChoice,
     AutoTokenizer,
     default_data_collator,
     set_seed,
@@ -74,14 +74,15 @@ if __name__ == "__main__":
 # Load pretrained model and tokenizer
     config = AutoConfig.from_pretrained(args.target_dir)
     tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
-    model = AutoModelForQuestionAnswering.from_pretrained(args.target_dir, config=config)
+    model = AutoModelForMultipleChoice.from_pretrained(args.target_dir, config=config)
 
 # Load and preprocess the dataset
     raw_datasets = load_dataset("json", data_files={"test": args.test_file})
     cols = raw_datasets["test"].column_names
-    args.ques_col, args.context_col, args.label_col = "question", "context", "relevant"
+    args.ques_col, args.para_col, args.label_col = "question", "paragraphs", "relevant"
     
     test_examples = raw_datasets["test"]
+    #test_examples = test_examples.select(range(10))
     prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
     test_dataset = test_examples.map(
         prepare_pred_features,
@@ -104,21 +105,22 @@ if __name__ == "__main__":
     logger.info("\n******** Running predicting ********")
     logger.info(f"Num test examples = {len(test_dataset)}")
     
-    test_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
+    test_dataset.set_format(columns=["attention_mask", "input_ids", "token_type_ids"])
     model.eval()
     all_logits = []
     for step, data in enumerate(test_dataloader):
         with torch.no_grad():
             outputs = model(**data)
-            all_logits.append(accelerator.gather(outputs.logits).cpu().numpy())
+            all_logits.append(accelerator.gather(outputs.logits).squeeze(-1).cpu().numpy())
     outputs_numpy = np.concatenate(all_logits, axis=0)
 
-    test_dataset.set_format(type=None, columns=list(test_dataset.features.keys()))
+    test_dataset.set_format(columns=list(test_dataset.features.keys()))
     predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args)
     with open(args.raw_test_file, 'r') as f:
         results = json.load(f)
     example_id_to_index = {d["id"]: i for i, d in enumerate(results)}
     for d in predictions.predictions:
-        results[example_id_to_index[d["id"]]]["relevant"] = d["paragraphs"][d["pred"]]
+        index = example_id_to_index[d["id"]]
+        results[index]["relevant"] = results[index]["paragraphs"][d["pred"]]
     with open(args.out_file, 'w') as f:
-        json.dump(results, f, ensure_ascii=False, indent=4)
+        json.dump(results, f, ensure_ascii=False, indent=2)
