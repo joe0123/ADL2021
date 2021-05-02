@@ -61,7 +61,6 @@ def postprocess_qa_predictions(
     logger.setLevel(logging.INFO if is_world_process_zero else logging.WARN)
     logger.info(f"Post-processing {len(examples)} example predictions split into {len(features)} features.")
     
-    # TODO: More robust: add null score?
     for example_index, example in enumerate(tqdm(examples)):
         feature_indices = features_per_example[example_index]
 

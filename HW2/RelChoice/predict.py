@@ -73,7 +73,8 @@ if __name__ == "__main__":
     
 # Load pretrained model and tokenizer
     config = AutoConfig.from_pretrained(args.target_dir)
-    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=False)
+    #tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
     model = AutoModelForMultipleChoice.from_pretrained(args.target_dir, config=config)
 
 # Load and preprocess the dataset
@@ -122,5 +123,7 @@ if __name__ == "__main__":
     for d in predictions.predictions:
         index = example_id_to_index[d["id"]]
         results[index]["relevant"] = results[index]["paragraphs"][d["pred"]]
+    
+    os.makedirs(os.path.dirname(args.out_file), exist_ok=True)
     with open(args.out_file, 'w') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)

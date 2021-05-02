@@ -107,7 +107,7 @@ if __name__ == "__main__":
             "You are instantiating a new tokenizer from scratch. This is not supported by this script."
             "You can do it from another script, save it, and load it from here, using --tokenizer_name."
         )
-
+    
     logger.info("Saving tokenizer to {}...".format(os.path.join(args.saved_dir, "tokenizer")))
     tokenizer.save_pretrained(args.saved_dir)
 

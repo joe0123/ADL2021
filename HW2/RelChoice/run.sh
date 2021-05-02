@@ -9,4 +9,4 @@
 
 
 python make_data.py -q ../dataset/public.json -c ../dataset/context.json -o public
-python predict.py --raw_test_file ../dataset/public.json --test_file task_data/public_0.json --target_dir saved/xlnet
+python predict.py --raw_test_file ../dataset/public.json --test_file task_data/public_0.json --target_dir saved/0502-1335

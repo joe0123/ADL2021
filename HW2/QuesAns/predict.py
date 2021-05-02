@@ -157,5 +157,7 @@ if __name__ == "__main__":
     test_dataset.set_format(type=None, columns=list(test_dataset.features.keys()))
     predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args, model)
     results = {d["id"]: d["pred"] for d in predictions.predictions}
+    
+    os.makedirs(os.path.dirname(args.out_file), exist_ok=True)
     with open(args.out_file, 'w') as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
