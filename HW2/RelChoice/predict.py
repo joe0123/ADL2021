@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument("--raw_test_file", type=str, required=True)
     parser.add_argument("--test_file", type=str, required=True)
     parser.add_argument("--target_dir", type=str, required=True)
-    parser.add_argument("--test_batch_size", type=int, default=64)
+    parser.add_argument("--test_batch_size", type=int, default=16)
     parser.add_argument("--out_file", type=str, default="./results.json")
     args = parser.parse_args()
     
@@ -73,7 +73,8 @@ if __name__ == "__main__":
     
 # Load pretrained model and tokenizer
     config = AutoConfig.from_pretrained(args.target_dir)
-    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=False)
+    #tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
     model = AutoModelForMultipleChoice.from_pretrained(args.target_dir, config=config)
 
 # Load and preprocess the dataset

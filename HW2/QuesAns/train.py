@@ -233,7 +233,7 @@ if __name__ == "__main__":
                 logger.info("Train | Loss: {:.5f}".format(total_loss / step))
         # Evaluate!
             if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
-                valid_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
+                valid_dataset.set_format(columns=["attention_mask", "input_ids", "token_type_ids"])
                 model.eval()
                 if args.beam:
                     all_start_top_log_probs = []
@@ -284,7 +284,7 @@ if __name__ == "__main__":
                     end_logits_concat = create_and_fill_np_array(all_end_logits, valid_dataset, max_len)
                     outputs_numpy = (start_logits_concat, end_logits_concat)
 
-                valid_dataset.set_format(type=None, columns=list(valid_dataset.features.keys()))
+                valid_dataset.set_format(columns=list(valid_dataset.features.keys()))
                 predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)
                 eval_result = metrics.compute(predictions=predictions.predictions, references=predictions.label_ids)
                 valid_em, valid_f1 = eval_result["em"], eval_result["f1"]
