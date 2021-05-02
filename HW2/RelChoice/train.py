@@ -37,7 +37,7 @@ def parse_args():
     parser.add_argument("--max_seq_len", type=int, default=512)
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
-    parser.add_argument("--model_name", type=str, required=True)
+    parser.add_argument("--model_name", type=str)
     parser.add_argument("--train_batch_size", type=int, default=4)
     parser.add_argument("--valid_batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=3e-5)

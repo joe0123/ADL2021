@@ -38,7 +38,7 @@ def parse_args():
     parser.add_argument("--stride", type=int, default=256)
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
-    parser.add_argument("--model_name", type=str, required=True)
+    parser.add_argument("--model_name", type=str)
     parser.add_argument("--beam", action="store_true")
     parser.add_argument("--train_batch_size", type=int, default=4)
     parser.add_argument("--valid_batch_size", type=int, default=32)
