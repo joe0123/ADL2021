@@ -27,6 +27,7 @@ from transformers import (
 
 from data_utils import *
 from pred_utils import *
+from models import *
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,8 @@ def parse_args():
     parser.add_argument("--eval_steps", type=int, default=2500)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
+    parser.add_argument("--start_n_top", type=int, default=5, help="For beam model")
+    parser.add_argument("--end_n_top", type=int, default=5, help="For beam model")
     parser.add_argument("--n_best", type=int, default=20)
     parser.add_argument("--max_ans_len", type=int, default=30)
     args = parser.parse_args()
@@ -60,6 +63,13 @@ def parse_args():
     os.makedirs(args.saved_dir, exist_ok=True)
     
     return args
+
+def beam_model_mapping(model_name):
+    if "bert" in model_name.lower():
+        return BertForBeamQuestionAnswering
+    else:
+        raise NotImplementedError
+
 
 if __name__ == "__main__":
 # Parse arguments and save them.
@@ -114,12 +124,20 @@ if __name__ == "__main__":
 
     logger.info("Saving tokenizer to {}...".format(os.path.join(args.saved_dir, "tokenizer")))
     tokenizer.save_pretrained(args.saved_dir)
-
-    if args.model_name:
-        model = AutoModelForQuestionAnswering.from_pretrained(args.model_name, config=config)
+    
+    if args.beam:
+        config.__dict__["start_n_top"] = args.start_n_top
+        config.__dict__["end_n_top"] = args.end_n_top
+        if args.model_name:
+            model = beam_model_mapping(args.model_name).from_pretrained(args.model_name, config=config)
+        else:
+            model = beam_model_mapping(args.model_name).from_config(config)
     else:
-        logger.info("Training new model from scratch")
-        model = AutoModelForQuestionAnswering.from_config(config)
+        if args.model_name:
+            model = AutoModelForQuestionAnswering.from_pretrained(args.model_name, config=config)
+        else:
+            logger.info("Training new model from scratch")
+            model = AutoModelForQuestionAnswering.from_config(config)
 
 
 # Load and preprocess the datasets

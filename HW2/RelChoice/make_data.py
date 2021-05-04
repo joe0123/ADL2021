@@ -2,6 +2,7 @@ import os
 import json
 import argparse
 import numpy as np
+import re
 
 np.random.seed(1114)
 
@@ -28,7 +29,8 @@ if __name__ == "__main__":
     else:
         split_indices = [np.arange(len(ques_data)).tolist()]
 
-    
+    rule_rm = re.compile(r"[^A-Z0-9\u4e00-\u9fa5]")
+    context_data = [rule_rm.sub('', d) for d in context_data]
     for si, ids in enumerate(split_indices):
         with open(os.path.join(args.outdir, args.outfile_prefix + "_{}.json".format(si)), 'w') as f:
             for i in ids:
@@ -39,7 +41,7 @@ if __name__ == "__main__":
                     if p == q_data["relevant"]:
                         rel = pi
                 data = {"id": q_data["id"],
-                        "question": q_data["question"],
+                        "question": rule_rm.sub('', q_data["question"]),
                         "paragraphs": paragraphs,
                         "relevant": rel}
                 print(json.dumps(data, ensure_ascii=False), file=f)
