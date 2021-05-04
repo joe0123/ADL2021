@@ -1,175 +1,0 @@
-nohup: ignoring input
-2021-05-04 04:04:26.137836: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
-05/04/2021 04:04:27 - INFO - __main__ -    Distributed environment: NO
-Num processes: 1
-Process index: 0
-Local process index: 0
-Device: cuda
-Use FP16 precision: False
-
-loading configuration file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/8b32d82613732358ebd14a0aec836e0092922cb81fe944dba9d75ffdbdb5767f.8f39eb26d38bdc8cf5a64796e556f2675f19d84ee1952698e8ddf39372c16e86
-Model config XLNetConfig {
-  "architectures": [
-    "XLNetLMHeadModel"
-  ],
-  "attn_type": "bi",
-  "bi_data": false,
-  "bos_token_id": 1,
-  "clamp_len": -1,
-  "d_head": 64,
-  "d_inner": 3072,
-  "d_model": 768,
-  "dropout": 0.1,
-  "end_n_top": 5,
-  "eos_token_id": 2,
-  "ff_activation": "relu",
-  "initializer_range": 0.02,
-  "layer_norm_eps": 1e-12,
-  "mem_len": null,
-  "model_type": "xlnet",
-  "n_head": 12,
-  "n_layer": 12,
-  "output_past": true,
-  "pad_token_id": 5,
-  "reuse_len": null,
-  "same_length": false,
-  "start_n_top": 5,
-  "summary_activation": "tanh",
-  "summary_last_dropout": 0.1,
-  "summary_type": "last",
-  "summary_use_proj": true,
-  "transformers_version": "4.5.0",
-  "untie_r": true,
-  "use_mems_eval": true,
-  "use_mems_train": false,
-  "vocab_size": 32000
-}
-
-loading configuration file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/8b32d82613732358ebd14a0aec836e0092922cb81fe944dba9d75ffdbdb5767f.8f39eb26d38bdc8cf5a64796e556f2675f19d84ee1952698e8ddf39372c16e86
-Model config XLNetConfig {
-  "architectures": [
-    "XLNetLMHeadModel"
-  ],
-  "attn_type": "bi",
-  "bi_data": false,
-  "bos_token_id": 1,
-  "clamp_len": -1,
-  "d_head": 64,
-  "d_inner": 3072,
-  "d_model": 768,
-  "dropout": 0.1,
-  "end_n_top": 5,
-  "eos_token_id": 2,
-  "ff_activation": "relu",
-  "initializer_range": 0.02,
-  "layer_norm_eps": 1e-12,
-  "mem_len": null,
-  "model_type": "xlnet",
-  "n_head": 12,
-  "n_layer": 12,
-  "output_past": true,
-  "pad_token_id": 5,
-  "reuse_len": null,
-  "same_length": false,
-  "start_n_top": 5,
-  "summary_activation": "tanh",
-  "summary_last_dropout": 0.1,
-  "summary_type": "last",
-  "summary_use_proj": true,
-  "transformers_version": "4.5.0",
-  "untie_r": true,
-  "use_mems_eval": true,
-  "use_mems_train": false,
-  "vocab_size": 32000
-}
-
-loading file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/spiece.model from cache at /dhome/boewoei0123/.cache/huggingface/transformers/9345b8cd17628eee3d057985cbcdb87426a05dac03927c0883450fbb1a569f9f.6ea411ea38650fd3ef16b0358032669ef47b3189b437d8384e381ddb8e3bf1fc
-loading file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/tokenizer.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/5f75bb0d377fac1e48238ff8642202b903c8da5496939fd658aea541a58fc7d8.f2920ee526ef61b738ba712d8d8d1bb2b53ba1a553ab15544f980b275aa3a241
-loading file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/added_tokens.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/dcccb00fccb20365fb3ef599009b627e991d368e5c15c944020146317a841eb5.5cc6e825eb228a7a5cfd27cb4d7151e97a79fb962b31aaf1813aa102e746584b
-loading file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/special_tokens_map.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/671aec90d8845d3e532547d77ba89aec76b417df8249e1541f6905df54077b32.d116fe7accce3fec558ec1ac6bb9c3a2373d0406d6407a0786c77194e7912f44
-loading file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/tokenizer_config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/cf826080d903bfa3d003b82a3cd341976ec4826f627573a24fea2eafaa5aaf96.d23f50bbddc3fb34db5a76d47fa9bdd5d75bf4201ad2d49abbcca25629b3e562
-05/04/2021 04:04:32 - INFO - __main__ -    Saving tokenizer to ./saved/0504-0404/tokenizer...
-tokenizer config file saved in ./saved/0504-0404/tokenizer_config.json
-Special tokens file saved in ./saved/0504-0404/special_tokens_map.json
-loading weights file https://huggingface.co/hfl/chinese-xlnet-base/resolve/main/pytorch_model.bin from cache at /dhome/boewoei0123/.cache/huggingface/transformers/4155c4f0f96b03bcfa202eac1e1aedb5e9786f4a857d02e0b657b65379dab8bd.72b0ec262ea4c39f29e3639455dfab61b80c6598755289696f03721bb705efb4
-Some weights of the model checkpoint at hfl/chinese-xlnet-base were not used when initializing XLNetForMultipleChoice: ['lm_loss.weight', 'lm_loss.bias']
-- This IS expected if you are initializing XLNetForMultipleChoice from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
-- This IS NOT expected if you are initializing XLNetForMultipleChoice from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
-Some weights of XLNetForMultipleChoice were not initialized from the model checkpoint at hfl/chinese-xlnet-base and are newly initialized: ['sequence_summary.summary.weight', 'sequence_summary.summary.bias', 'logits_proj.weight', 'logits_proj.bias']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-05/04/2021 04:04:36 - WARNING - datasets.builder -    Using custom data configuration default-3ec179f3c78302a3
-0 tables [00:00, ? tables/s]1 tables [00:00,  3.86 tables/s]                                0 tables [00:00, ? tables/s]                            Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /dhome/boewoei0123/.cache/huggingface/datasets/json/default-3ec179f3c78302a3/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
-Dataset json downloaded and prepared to /dhome/boewoei0123/.cache/huggingface/datasets/json/default-3ec179f3c78302a3/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
-#0:   0%|          | 0/5 [00:00<?, ?ba/s]
-#1:   0%|          | 0/5 [00:00<?, ?ba/s][A
-
-#2:   0%|          | 0/5 [00:00<?, ?ba/s][A[A
-
-
-#3:   0%|          | 0/5 [00:00<?, ?ba/s][A[A[A#0:  20%|██        | 1/5 [00:02<00:11,  2.94s/ba]
-#1:  20%|██        | 1/5 [00:02<00:11,  2.92s/ba][A
-
-#2:  20%|██        | 1/5 [00:03<00:12,  3.07s/ba][A[A
-
-
-#3:  20%|██        | 1/5 [00:02<00:11,  2.85s/ba][A[A[A#0:  40%|████      | 2/5 [00:05<00:08,  2.90s/ba]
-#1:  40%|████      | 2/5 [00:05<00:08,  2.89s/ba][A
-
-#2:  40%|████      | 2/5 [00:06<00:09,  3.03s/ba][A[A
-
-
-#3:  40%|████      | 2/5 [00:05<00:08,  2.84s/ba][A[A[A#0:  60%|██████    | 3/5 [00:08<00:05,  2.89s/ba]
-#1:  60%|██████    | 3/5 [00:08<00:05,  2.88s/ba][A
-
-#2:  60%|██████    | 3/5 [00:08<00:06,  3.00s/ba][A[A
-
-
-#3:  60%|██████    | 3/5 [00:08<00:05,  2.84s/ba][A[A[A#0:  80%|████████  | 4/5 [00:11<00:02,  2.81s/ba]
-#1:  80%|████████  | 4/5 [00:11<00:02,  2.81s/ba][A
-
-#2:  80%|████████  | 4/5 [00:11<00:02,  2.90s/ba][A[A
-
-
-#3:  80%|████████  | 4/5 [00:11<00:02,  2.77s/ba][A[A[A#0: 100%|██████████| 5/5 [00:13<00:00,  2.73s/ba]#0: 100%|██████████| 5/5 [00:13<00:00,  2.76s/ba]
-#1: 100%|██████████| 5/5 [00:13<00:00,  2.74s/ba][A#1: 100%|██████████| 5/5 [00:13<00:00,  2.77s/ba]
-
-#2: 100%|██████████| 5/5 [00:14<00:00,  2.82s/ba][A[A#2: 100%|██████████| 5/5 [00:14<00:00,  2.85s/ba]
-
-
-#3: 100%|██████████| 5/5 [00:13<00:00,  2.67s/ba][A[A[A#3: 100%|██████████| 5/5 [00:13<00:00,  2.71s/ba]
-
-
-#0:   0%|          | 0/2 [00:00<?, ?ba/s]
-#1:   0%|          | 0/2 [00:00<?, ?ba/s][A
-
-#2:   0%|          | 0/2 [00:00<?, ?ba/s][A[A
-
-
-#3:   0%|          | 0/2 [00:00<?, ?ba/s][A[A[A#0:  50%|█████     | 1/2 [00:03<00:03,  3.15s/ba]
-#1:  50%|█████     | 1/2 [00:03<00:03,  3.14s/ba][A
-
-#2:  50%|█████     | 1/2 [00:03<00:03,  3.12s/ba][A[A
-
-
-#3:  50%|█████     | 1/2 [00:03<00:03,  3.08s/ba][A[A[A#0: 100%|██████████| 2/2 [00:03<00:00,  2.42s/ba]#0: 100%|██████████| 2/2 [00:03<00:00,  1.94s/ba]
-#1: 100%|██████████| 2/2 [00:03<00:00,  2.42s/ba][A#1: 100%|██████████| 2/2 [00:03<00:00,  1.94s/ba]
-
-#2: 100%|██████████| 2/2 [00:03<00:00,  2.40s/ba][A[A#2: 100%|██████████| 2/2 [00:03<00:00,  1.93s/ba]
-
-
-#3: 100%|██████████| 2/2 [00:03<00:00,  2.36s/ba][A[A[A#3: 100%|██████████| 2/2 [00:03<00:00,  1.88s/ba]
-
-
-
-05/04/2021 04:05:04 - INFO - __main__ -    
-******** Running training ********
-05/04/2021 04:05:04 - INFO - __main__ -    Num train examples = 19528
-05/04/2021 04:05:04 - INFO - __main__ -    Num Epochs = 3
-05/04/2021 04:05:04 - INFO - __main__ -    Instantaneous batch size per device = 4
-05/04/2021 04:05:04 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 64
-05/04/2021 04:05:04 - INFO - __main__ -    Instantaneous steps per epoch = 4882
-05/04/2021 04:05:04 - INFO - __main__ -    Update steps per epoch = 306
-05/04/2021 04:05:04 - INFO - __main__ -    Total update steps = 918
-05/04/2021 04:05:04 - INFO - __main__ -    
-Epoch 01 / 03
-05/04/2021 04:12:42 - INFO - __main__ -    Train | Loss: 1.57471
