@@ -4,7 +4,7 @@ export CUDA_VISIBLE_DEVICES='2'
 #python train.py --train_file task_data/train_valid_0.json --valid_file task_data/train_valid_1.json --model_name hfl/chinese-roberta-wwm-ext
 #python train.py --train_file task_data/train_valid_0.json --valid_file task_data/train_valid_1.json --model_name hfl/chinese-bert-wwm-ext
 #python train.py --train_file task_data/train_valid_0.json --valid_file task_data/train_valid_1.json --model_name bert-base-chinese
-#CUDA_VISIBLE_DEVICES='2' python train.py --train_file task_data/train_valid_0.json --valid_file task_data/train_valid_1.json --config_name bert-base-chinese --tokenizer_name bert-base-chinese --lr 5e-5 --sched_type constant --epoch 10
+python train.py --train_file task_data/train_valid_0.json --valid_file task_data/train_valid_1.json --config_name saved/q4_small_val/bert_config.json --tokenizer_name saved/q4_small_val/bert_config.json --lr 5e-5 --sched_type constant --epoch 10
 
 #python make_data.py -q ../dataset/train.json -c ../dataset/context.json -o train -s 0
 #python train.py --train_file task_data/train_0.json --model_name hfl/chinese-xlnet-base
@@ -15,5 +15,5 @@ export CUDA_VISIBLE_DEVICES='2'
 #CUDA_VISIBLE_DEVICES='2' python train.py --train_file task_data/train_0.json --config_name bert-base-chinese --tokenizer_name bert-base-chinese --lr 5e-5 --sched_type constant --epoch 5
 
 
-python make_data.py -q ../dataset/public.json -c ../dataset/context.json -o public
-python predict.py --raw_test_file ../dataset/public.json --test_file task_data/public_0.json --target_dir saved/bert
+#python make_data.py -q ../dataset/public.json -c ../dataset/context.json -o public
+#python predict.py --raw_test_file ../dataset/public.json --test_file task_data/public_0.json --target_dir saved/q4

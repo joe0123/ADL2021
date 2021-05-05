@@ -118,11 +118,12 @@ if __name__ == "__main__":
     test_dataset.set_format(columns=list(test_dataset.features.keys()))
     predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args)
     with open(args.raw_test_file, 'r') as f:
-        results = json.load(f)
-    example_id_to_index = {d["id"]: i for i, d in enumerate(results)}
-    for d in predictions.predictions:
+        raw_test_data = json.load(f)
+    example_id_to_index = {d["id"]: i for i, d in enumerate(raw_test_data)}
+    results = []
+    for i, d in enumerate(predictions.predictions):
         index = example_id_to_index[d["id"]]
-        results[index]["relevant"] = results[index]["paragraphs"][d["pred"]]
+        results.append({**raw_test_data[index], "relevant": raw_test_data[index]["paragraphs"][d["pred"]]})
     
     os.makedirs(os.path.dirname(args.out_file), exist_ok=True)
     with open(args.out_file, 'w') as f:

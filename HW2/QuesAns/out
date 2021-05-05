@@ -1,253 +1,0 @@
-nohup: ignoring input
-2021-05-03 18:20:00.016243: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
-05/03/2021 18:20:01 - INFO - __main__ -    Distributed environment: NO
-Num processes: 1
-Process index: 0
-Local process index: 0
-Device: cuda
-Use FP16 precision: False
-
-loading configuration file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/c675789bf641993533370bd5ee9afeb828f8997b7396bb0b762da288ec1a655a.005957455a4af5ed5fa988c1015d37b4468e1327fd25bb0cb86f4822e1d8870a
-Model config BertConfig {
-  "architectures": [
-    "BertForMaskedLM"
-  ],
-  "attention_probs_dropout_prob": 0.1,
-  "bos_token_id": 0,
-  "directionality": "bidi",
-  "eos_token_id": 2,
-  "gradient_checkpointing": false,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 1024,
-  "initializer_range": 0.02,
-  "intermediate_size": 4096,
-  "layer_norm_eps": 1e-12,
-  "max_position_embeddings": 512,
-  "model_type": "bert",
-  "num_attention_heads": 16,
-  "num_hidden_layers": 24,
-  "output_past": true,
-  "pad_token_id": 1,
-  "pooler_fc_size": 768,
-  "pooler_num_attention_heads": 12,
-  "pooler_num_fc_layers": 3,
-  "pooler_size_per_head": 128,
-  "pooler_type": "first_token_transform",
-  "position_embedding_type": "absolute",
-  "transformers_version": "4.5.0",
-  "type_vocab_size": 2,
-  "use_cache": true,
-  "vocab_size": 21128
-}
-
-loading configuration file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/c675789bf641993533370bd5ee9afeb828f8997b7396bb0b762da288ec1a655a.005957455a4af5ed5fa988c1015d37b4468e1327fd25bb0cb86f4822e1d8870a
-Model config BertConfig {
-  "architectures": [
-    "BertForMaskedLM"
-  ],
-  "attention_probs_dropout_prob": 0.1,
-  "bos_token_id": 0,
-  "directionality": "bidi",
-  "eos_token_id": 2,
-  "gradient_checkpointing": false,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 1024,
-  "initializer_range": 0.02,
-  "intermediate_size": 4096,
-  "layer_norm_eps": 1e-12,
-  "max_position_embeddings": 512,
-  "model_type": "bert",
-  "num_attention_heads": 16,
-  "num_hidden_layers": 24,
-  "output_past": true,
-  "pad_token_id": 1,
-  "pooler_fc_size": 768,
-  "pooler_num_attention_heads": 12,
-  "pooler_num_fc_layers": 3,
-  "pooler_size_per_head": 128,
-  "pooler_type": "first_token_transform",
-  "position_embedding_type": "absolute",
-  "transformers_version": "4.5.0",
-  "type_vocab_size": 2,
-  "use_cache": true,
-  "vocab_size": 21128
-}
-
-loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/vocab.txt from cache at /dhome/boewoei0123/.cache/huggingface/transformers/9c86d721fa0ff0587ec0e2f72a39a2e4a0b3492dcae39bce7a430a67036a6130.accd894ff58c6ff7bd4f3072890776c14f4ea34fcc08e79cd88c2d157756dceb
-loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/tokenizer.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/55c6f69080f3df245c3e8e7a1d6a88abc2b09e9cbbff14b1aeb2e5c6bd5a9bb2.660ed5c7513bf13d4607410502a84e0de517eb889ff8c401068a1688868e1ccb
-loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/added_tokens.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/f78dad79121ad042f880db7b90feb65e3a57bb9980bd8637d06b38000a08718c.5cc6e825eb228a7a5cfd27cb4d7151e97a79fb962b31aaf1813aa102e746584b
-loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/special_tokens_map.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/2ab629a76f19e1d2091febaa74a86ae81b60f9395360d815476a127037a7281e.dd8bd9bfd3664b530ea4e645105f557769387b3da9f79bdb55ed556bdd80611d
-loading file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/tokenizer_config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/1e77e98a6ad918d1f2a3c81b8401cf960155b7d9f561a8f2f72fe6e2808b5622.d23f50bbddc3fb34db5a76d47fa9bdd5d75bf4201ad2d49abbcca25629b3e562
-05/03/2021 18:20:06 - INFO - __main__ -    Saving tokenizer to ./saved/0503-1820/tokenizer...
-tokenizer config file saved in ./saved/0503-1820/tokenizer_config.json
-Special tokens file saved in ./saved/0503-1820/special_tokens_map.json
-loading weights file https://huggingface.co/hfl/chinese-roberta-wwm-ext-large/resolve/main/pytorch_model.bin from cache at /dhome/boewoei0123/.cache/huggingface/transformers/034b2d859a25f74cf471fe744232a082a85d17cdff179b744ecb4a21adfec99a.5e011b19fe5c0c1e2410943e1c0e22fb0b0781401537358294cb545021fa23b8
-Some weights of the model checkpoint at hfl/chinese-roberta-wwm-ext-large were not used when initializing BertForQuestionAnswering: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias']
-- This IS expected if you are initializing BertForQuestionAnswering from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
-- This IS NOT expected if you are initializing BertForQuestionAnswering from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
-Some weights of BertForQuestionAnswering were not initialized from the model checkpoint at hfl/chinese-roberta-wwm-ext-large and are newly initialized: ['qa_outputs.weight', 'qa_outputs.bias']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-05/03/2021 18:20:17 - WARNING - datasets.builder -    Using custom data configuration default-ee26d45acfeb0899
-0 tables [00:00, ? tables/s]                            Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /dhome/boewoei0123/.cache/huggingface/datasets/json/default-ee26d45acfeb0899/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
-Dataset json downloaded and prepared to /dhome/boewoei0123/.cache/huggingface/datasets/json/default-ee26d45acfeb0899/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
-#0:   0%|          | 0/7 [00:00<?, ?ba/s]
-#1:   0%|          | 0/7 [00:00<?, ?ba/s][A
-
-#2:   0%|          | 0/7 [00:00<?, ?ba/s][A[A
-
-
-#3:   0%|          | 0/7 [00:00<?, ?ba/s][A[A[A#0:  14%|█▍        | 1/7 [00:01<00:08,  1.37s/ba]
-#1:  14%|█▍        | 1/7 [00:01<00:08,  1.34s/ba][A
-
-#2:  14%|█▍        | 1/7 [00:01<00:08,  1.35s/ba][A[A
-
-
-#3:  14%|█▍        | 1/7 [00:01<00:08,  1.38s/ba][A[A[A#0:  29%|██▊       | 2/7 [00:02<00:06,  1.35s/ba]
-#1:  29%|██▊       | 2/7 [00:02<00:06,  1.28s/ba][A
-
-#2:  29%|██▊       | 2/7 [00:02<00:06,  1.28s/ba][A[A
-
-
-#3:  29%|██▊       | 2/7 [00:02<00:06,  1.29s/ba][A[A[A
-#1:  43%|████▎     | 3/7 [00:03<00:04,  1.23s/ba][A#0:  43%|████▎     | 3/7 [00:03<00:05,  1.29s/ba]
-
-#2:  43%|████▎     | 3/7 [00:03<00:04,  1.23s/ba][A[A
-
-
-#3:  43%|████▎     | 3/7 [00:03<00:04,  1.24s/ba][A[A[A
-#1:  57%|█████▋    | 4/7 [00:04<00:03,  1.19s/ba][A#0:  57%|█████▋    | 4/7 [00:04<00:03,  1.24s/ba]
-
-#2:  57%|█████▋    | 4/7 [00:04<00:03,  1.20s/ba][A[A
-
-
-#3:  57%|█████▋    | 4/7 [00:04<00:03,  1.19s/ba][A[A[A
-#1:  71%|███████▏  | 5/7 [00:05<00:02,  1.20s/ba][A#0:  71%|███████▏  | 5/7 [00:06<00:02,  1.23s/ba]
-
-#2:  71%|███████▏  | 5/7 [00:05<00:02,  1.20s/ba][A[A
-
-
-#3:  71%|███████▏  | 5/7 [00:05<00:02,  1.20s/ba][A[A[A
-#1:  86%|████████▌ | 6/7 [00:07<00:01,  1.17s/ba][A#0:  86%|████████▌ | 6/7 [00:07<00:01,  1.20s/ba]
-#1: 100%|██████████| 7/7 [00:07<00:00,  1.16ba/s][A#1: 100%|██████████| 7/7 [00:07<00:00,  1.02s/ba]#0: 100%|██████████| 7/7 [00:07<00:00,  1.14ba/s]#0: 100%|██████████| 7/7 [00:07<00:00,  1.06s/ba]
-
-#2:  86%|████████▌ | 6/7 [00:06<00:01,  1.16s/ba][A[A
-
-#2: 100%|██████████| 7/7 [00:07<00:00,  1.18ba/s][A[A#2: 100%|██████████| 7/7 [00:07<00:00,  1.01s/ba]
-
-
-#3:  86%|████████▌ | 6/7 [00:06<00:01,  1.17s/ba][A[A[A
-
-
-#3: 100%|██████████| 7/7 [00:07<00:00,  1.17ba/s][A[A[A#3: 100%|██████████| 7/7 [00:07<00:00,  1.02s/ba]
-
-
-
-05/03/2021 18:20:30 - INFO - __main__ -    
-******** Running training ********
-05/03/2021 18:20:30 - INFO - __main__ -    Num train examples = 32307
-05/03/2021 18:20:30 - INFO - __main__ -    Num Epochs = 5
-05/03/2021 18:20:30 - INFO - __main__ -    Instantaneous batch size per device = 4
-05/03/2021 18:20:30 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 64
-05/03/2021 18:20:30 - INFO - __main__ -    Instantaneous steps per epoch = 8077
-05/03/2021 18:20:30 - INFO - __main__ -    Update steps per epoch = 505
-05/03/2021 18:20:30 - INFO - __main__ -    Total update steps = 2525
-05/03/2021 18:20:30 - INFO - __main__ -    
-Epoch 01 / 05
-05/03/2021 18:22:26 - INFO - __main__ -    Train | Loss: 5.95607
-05/03/2021 18:24:23 - INFO - __main__ -    Train | Loss: 5.41953
-05/03/2021 18:26:22 - INFO - __main__ -    Train | Loss: 4.37596
-05/03/2021 18:28:22 - INFO - __main__ -    Train | Loss: 3.57603
-05/03/2021 18:30:21 - INFO - __main__ -    Train | Loss: 3.04672
-05/03/2021 18:32:20 - INFO - __main__ -    Train | Loss: 2.67757
-05/03/2021 18:34:19 - INFO - __main__ -    Train | Loss: 2.40854
-05/03/2021 18:36:17 - INFO - __main__ -    Train | Loss: 2.20346
-05/03/2021 18:38:15 - INFO - __main__ -    Train | Loss: 2.04092
-05/03/2021 18:40:13 - INFO - __main__ -    Train | Loss: 1.90929
-05/03/2021 18:42:13 - INFO - __main__ -    Train | Loss: 1.79863
-05/03/2021 18:44:12 - INFO - __main__ -    Train | Loss: 1.70972
-05/03/2021 18:46:13 - INFO - __main__ -    Train | Loss: 1.63076
-05/03/2021 18:48:13 - INFO - __main__ -    Train | Loss: 1.56577
-05/03/2021 18:50:14 - INFO - __main__ -    Train | Loss: 1.50604
-05/03/2021 18:52:14 - INFO - __main__ -    Train | Loss: 1.45363
-05/03/2021 18:52:33 - INFO - __main__ -    Train | Loss: 1.44709
-05/03/2021 18:52:33 - INFO - __main__ -    
-Epoch 02 / 05
-05/03/2021 18:54:33 - INFO - __main__ -    Train | Loss: 0.49324
-05/03/2021 18:56:32 - INFO - __main__ -    Train | Loss: 0.47958
-05/03/2021 18:58:30 - INFO - __main__ -    Train | Loss: 0.48169
-05/03/2021 19:00:27 - INFO - __main__ -    Train | Loss: 0.48105
-05/03/2021 19:02:25 - INFO - __main__ -    Train | Loss: 0.47716
-05/03/2021 19:04:22 - INFO - __main__ -    Train | Loss: 0.46919
-05/03/2021 19:06:20 - INFO - __main__ -    Train | Loss: 0.46635
-05/03/2021 19:08:17 - INFO - __main__ -    Train | Loss: 0.46318
-05/03/2021 19:10:14 - INFO - __main__ -    Train | Loss: 0.46094
-05/03/2021 19:12:11 - INFO - __main__ -    Train | Loss: 0.46240
-05/03/2021 19:14:09 - INFO - __main__ -    Train | Loss: 0.45904
-05/03/2021 19:16:07 - INFO - __main__ -    Train | Loss: 0.46856
-05/03/2021 19:18:05 - INFO - __main__ -    Train | Loss: 0.46651
-05/03/2021 19:20:02 - INFO - __main__ -    Train | Loss: 0.46948
-05/03/2021 19:22:02 - INFO - __main__ -    Train | Loss: 0.46858
-05/03/2021 19:24:02 - INFO - __main__ -    Train | Loss: 0.47054
-05/03/2021 19:24:21 - INFO - __main__ -    Train | Loss: 0.47083
-05/03/2021 19:24:21 - INFO - __main__ -    
-Epoch 03 / 05
-05/03/2021 19:26:20 - INFO - __main__ -    Train | Loss: 0.33462
-05/03/2021 19:28:18 - INFO - __main__ -    Train | Loss: 0.32260
-05/03/2021 19:30:17 - INFO - __main__ -    Train | Loss: 0.31555
-05/03/2021 19:32:16 - INFO - __main__ -    Train | Loss: 0.31437
-05/03/2021 19:34:15 - INFO - __main__ -    Train | Loss: 0.31349
-05/03/2021 19:36:12 - INFO - __main__ -    Train | Loss: 0.30868
-05/03/2021 19:38:09 - INFO - __main__ -    Train | Loss: 0.30683
-05/03/2021 19:40:06 - INFO - __main__ -    Train | Loss: 0.30652
-05/03/2021 19:42:03 - INFO - __main__ -    Train | Loss: 0.30454
-05/03/2021 19:43:59 - INFO - __main__ -    Train | Loss: 0.30302
-05/03/2021 19:45:55 - INFO - __main__ -    Train | Loss: 0.30395
-05/03/2021 19:47:52 - INFO - __main__ -    Train | Loss: 0.30530
-05/03/2021 19:49:48 - INFO - __main__ -    Train | Loss: 0.30443
-05/03/2021 19:51:44 - INFO - __main__ -    Train | Loss: 0.30495
-05/03/2021 19:53:40 - INFO - __main__ -    Train | Loss: 0.30492
-05/03/2021 19:55:36 - INFO - __main__ -    Train | Loss: 0.30570
-05/03/2021 19:55:54 - INFO - __main__ -    Train | Loss: 0.30589
-05/03/2021 19:55:54 - INFO - __main__ -    
-Epoch 04 / 05
-05/03/2021 19:57:50 - INFO - __main__ -    Train | Loss: 0.22609
-05/03/2021 19:59:47 - INFO - __main__ -    Train | Loss: 0.22269
-05/03/2021 20:01:43 - INFO - __main__ -    Train | Loss: 0.22765
-05/03/2021 20:03:40 - INFO - __main__ -    Train | Loss: 0.23101
-05/03/2021 20:05:36 - INFO - __main__ -    Train | Loss: 0.23359
-05/03/2021 20:07:32 - INFO - __main__ -    Train | Loss: 0.23525
-05/03/2021 20:09:29 - INFO - __main__ -    Train | Loss: 0.23677
-05/03/2021 20:11:25 - INFO - __main__ -    Train | Loss: 0.23916
-05/03/2021 20:13:22 - INFO - __main__ -    Train | Loss: 0.24020
-05/03/2021 20:15:18 - INFO - __main__ -    Train | Loss: 0.23886
-05/03/2021 20:17:14 - INFO - __main__ -    Train | Loss: 0.23905
-05/03/2021 20:19:10 - INFO - __main__ -    Train | Loss: 0.23929
-05/03/2021 20:21:07 - INFO - __main__ -    Train | Loss: 0.23806
-05/03/2021 20:23:03 - INFO - __main__ -    Train | Loss: 0.23822
-05/03/2021 20:25:01 - INFO - __main__ -    Train | Loss: 0.23760
-05/03/2021 20:26:57 - INFO - __main__ -    Train | Loss: 0.23777
-05/03/2021 20:27:15 - INFO - __main__ -    Train | Loss: 0.23709
-05/03/2021 20:27:15 - INFO - __main__ -    
-Epoch 05 / 05
-05/03/2021 20:29:11 - INFO - __main__ -    Train | Loss: 0.21696
-05/03/2021 20:31:08 - INFO - __main__ -    Train | Loss: 0.21506
-05/03/2021 20:33:05 - INFO - __main__ -    Train | Loss: 0.21110
-05/03/2021 20:35:02 - INFO - __main__ -    Train | Loss: 0.20651
-05/03/2021 20:36:59 - INFO - __main__ -    Train | Loss: 0.20462
-05/03/2021 20:38:57 - INFO - __main__ -    Train | Loss: 0.20540
-05/03/2021 20:40:54 - INFO - __main__ -    Train | Loss: 0.20738
-05/03/2021 20:42:51 - INFO - __main__ -    Train | Loss: 0.20835
-05/03/2021 20:44:49 - INFO - __main__ -    Train | Loss: 0.20894
-05/03/2021 20:46:45 - INFO - __main__ -    Train | Loss: 0.20770
-05/03/2021 20:48:41 - INFO - __main__ -    Train | Loss: 0.20824
-05/03/2021 20:50:38 - INFO - __main__ -    Train | Loss: 0.20932
-05/03/2021 20:52:34 - INFO - __main__ -    Train | Loss: 0.20756
-05/03/2021 20:54:31 - INFO - __main__ -    Train | Loss: 0.20740
-05/03/2021 20:56:28 - INFO - __main__ -    Train | Loss: 0.20794
-05/03/2021 20:58:26 - INFO - __main__ -    Train | Loss: 0.20719
-05/03/2021 20:58:44 - INFO - __main__ -    Train | Loss: 0.20745
-Configuration saved in ./saved/0503-1820/config.json
-Model weights saved in ./saved/0503-1820/pytorch_model.bin
-05/03/2021 20:58:47 - INFO - __main__ -    Saving config and model to ./saved/0503-1820...

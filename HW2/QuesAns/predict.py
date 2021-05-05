@@ -158,6 +158,8 @@ if __name__ == "__main__":
     predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args, model)
     results = {d["id"]: d["pred"] for d in predictions.predictions}
     
-    os.makedirs(os.path.dirname(args.out_file), exist_ok=True)
+    out_dir = os.path.dirname(args.out_file)
+    if len(out_dir) > 0:
+        os.makedirs(out_dir, exist_ok=True)
     with open(args.out_file, 'w') as f:
         json.dump(results, f, ensure_ascii=False, indent=4)
