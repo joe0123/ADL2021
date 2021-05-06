@@ -1,6 +1,6 @@
 import os
 import sys
-import logging
+import json
 import argparse
 import logging
 import math
@@ -16,24 +16,22 @@ from transformers import (
     DataCollatorWithPadding,
     SchedulerType,
     AutoConfig,
-    AutoModelForMultipleChoice,
+    AutoModelForSequenceClassification,
     AutoTokenizer,
-    default_data_collator,
+    DataCollatorWithPadding,
     set_seed,
 )
 
 from data_utils import *
-from pred_utils import *
 
 logger = logging.getLogger(__name__)
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--raw_test_file", type=str, required=True)
     parser.add_argument("--test_file", type=str, required=True)
     parser.add_argument("--target_dir", type=str, required=True)
     parser.add_argument("--test_batch_size", type=int, default=16)
-    parser.add_argument("--out_file", type=str, default="./results.json")
+    parser.add_argument("--out_file", type=str, default="./results.csv")
     args = parser.parse_args()
     
     return args
@@ -72,26 +70,28 @@ if __name__ == "__main__":
     
 # Load pretrained model and tokenizer
     config = AutoConfig.from_pretrained(args.target_dir)
-    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
-    model = AutoModelForMultipleChoice.from_pretrained(args.target_dir, config=config)
+    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=False)
+    model = AutoModelForSequenceClassification.from_pretrained(args.target_dir, config=config)
 
 # Load and preprocess the dataset
     raw_datasets = load_dataset("json", data_files={"test": args.test_file})
     cols = raw_datasets["test"].column_names
-    args.ques_col, args.para_col, args.label_col = "question", "paragraphs", "relevant"
+    args.text_col, args.intent_col = "text", "intent"
+    intent2id = config.label2id
+    id2intent = config.id2label
     
     test_examples = raw_datasets["test"]
     #test_examples = test_examples.select(range(10))
-    prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
+    prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, intent2id=intent2id)
     test_dataset = test_examples.map(
-        prepare_pred_features,
+        prepare_features,
         batched=True,
         num_proc=4,
         remove_columns=cols,
     )
 
 # Create DataLoaders
-    data_collator = default_data_collator
+    data_collator = DataCollatorWithPadding(tokenizer)
     test_dataloader = DataLoader(test_dataset, collate_fn=data_collator, batch_size=args.test_batch_size)
 
 # Prepare everything with our accelerator.
@@ -105,23 +105,16 @@ if __name__ == "__main__":
     
     test_dataset.set_format(columns=["attention_mask", "input_ids", "token_type_ids"])
     model.eval()
-    all_logits = []
+    all_predictions, all_ids = [], []
     for step, data in enumerate(test_dataloader):
         with torch.no_grad():
             outputs = model(**data)
-            all_logits.append(accelerator.gather(outputs.logits).squeeze(-1).cpu().numpy())
-    outputs_numpy = np.concatenate(all_logits, axis=0)
-
-    test_dataset.set_format(columns=list(test_dataset.features.keys()))
-    predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args)
-    with open(args.raw_test_file, 'r') as f:
-        raw_test_data = json.load(f)
-    example_id_to_index = {d["id"]: i for i, d in enumerate(raw_test_data)}
-    results = []
-    for i, d in enumerate(predictions.predictions):
-        index = example_id_to_index[d["id"]]
-        results.append({**raw_test_data[index], "relevant": raw_test_data[index]["paragraphs"][d["pred"]]})
-    
+            predictions = outputs.logits.argmax(dim=-1)
+            all_predictions += accelerator.gather(predictions).cpu().tolist()
+    results = {example_id: id2intent[pred] for example_id, pred in zip(test_examples["id"], all_predictions)}
     os.makedirs(os.path.dirname(args.out_file), exist_ok=True)
     with open(args.out_file, 'w') as f:
-        json.dump(results, f, ensure_ascii=False, indent=2)
+        f.write("id,intent\n")
+        for idx, label in sorted(results.items()):
+            f.write("{},{}\n".format(idx, label))
+

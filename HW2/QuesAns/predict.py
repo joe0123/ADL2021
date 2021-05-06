@@ -98,7 +98,6 @@ if __name__ == "__main__":
         model, test_dataloader
     )
 
-
 # Test!
     logger.info("\n******** Running predicting ********")
     logger.info(f"Num test examples = {len(test_dataset)}")

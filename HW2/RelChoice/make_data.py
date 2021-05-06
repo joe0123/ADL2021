@@ -10,12 +10,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-q", "--ques_data", required=True, type=str)
     parser.add_argument("-c", "--context_data", required=True, type=str)
-    parser.add_argument("-o", "--outfile_prefix", required=True, type=str)
-    parser.add_argument("-d", "--outdir", default="task_data", type=str)
+    parser.add_argument("-o", "--out_prefix", required=True, type=str)
+    parser.add_argument("-d", "--out_dir", default="task_data", type=str)
     parser.add_argument("-s", "--split_ratio", default=0, type=float)
     args = parser.parse_args()
 
-    os.makedirs(args.outdir, exist_ok=True)
+    os.makedirs(args.out_dir, exist_ok=True)
     
     with open(args.ques_data, 'r') as f:
         ques_data = json.load(f)
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         split_indices = [np.arange(len(ques_data)).tolist()]
 
     for si, ids in enumerate(split_indices):
-        with open(os.path.join(args.outdir, args.outfile_prefix + "_{}.json".format(si)), 'w') as f:
+        with open(os.path.join(args.out_dir, args.out_prefix + "_{}.json".format(si)), 'w') as f:
             for i in ids:
                 q_data = ques_data[i]
                 paragraphs = []
