@@ -27,7 +27,6 @@ from transformers import (
 
 from data_utils import *
 from pred_utils import *
-from models import *
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +39,6 @@ def parse_args():
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str)
-    parser.add_argument("--beam", action="store_true")
     parser.add_argument("--train_batch_size", type=int, default=4)
     parser.add_argument("--valid_batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=3e-5)
@@ -53,8 +51,6 @@ def parse_args():
     parser.add_argument("--eval_steps", type=int, default=2500)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
-    parser.add_argument("--start_n_top", type=int, default=5, help="For beam model")
-    parser.add_argument("--end_n_top", type=int, default=5, help="For beam model")
     parser.add_argument("--n_best", type=int, default=20)
     parser.add_argument("--max_ans_len", type=int, default=30)
     args = parser.parse_args()
@@ -63,12 +59,6 @@ def parse_args():
     os.makedirs(args.saved_dir, exist_ok=True)
     
     return args
-
-def beam_model_mapping(model_name):
-    if "bert" in model_name.lower():
-        return BertForBeamQuestionAnswering
-    else:
-        raise NotImplementedError
 
 
 if __name__ == "__main__":
@@ -125,19 +115,11 @@ if __name__ == "__main__":
     logger.info("Saving tokenizer to {}...".format(os.path.join(args.saved_dir, "tokenizer")))
     tokenizer.save_pretrained(args.saved_dir)
     
-    if args.beam:
-        config.__dict__["start_n_top"] = args.start_n_top
-        config.__dict__["end_n_top"] = args.end_n_top
-        if args.model_name:
-            model = beam_model_mapping(args.model_name).from_pretrained(args.model_name, config=config)
-        else:
-            model = beam_model_mapping(args.model_name).from_config(config)
+    if args.model_name:
+        model = AutoModelForQuestionAnswering.from_pretrained(args.model_name, config=config)
     else:
-        if args.model_name:
-            model = AutoModelForQuestionAnswering.from_pretrained(args.model_name, config=config)
-        else:
-            logger.info("Training new model from scratch")
-            model = AutoModelForQuestionAnswering.from_config(config)
+        logger.info("Training new model from scratch")
+        model = AutoModelForQuestionAnswering.from_config(config)
 
 
 # Load and preprocess the datasets
@@ -253,54 +235,20 @@ if __name__ == "__main__":
             if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
                 valid_dataset.set_format(columns=["attention_mask", "input_ids", "token_type_ids"])
                 model.eval()
-                if args.beam:
-                    all_start_top_log_probs = []
-                    all_start_top_index = []
-                    all_end_top_log_probs = []
-                    all_end_top_index = []
-                    all_cls_logits = []
-                else:
-                    all_start_logits = []
-                    all_end_logits = []
+                all_start_logits = []
+                all_end_logits = []
                 for step, data in enumerate(valid_dataloader):
                     with torch.no_grad():
                         outputs = model(**data)
-                        if args.beam:
-                            start_top_log_probs = outputs.start_top_log_probs
-                            start_top_index = outputs.start_top_index
-                            end_top_log_probs = outputs.end_top_log_probs
-                            end_top_index = outputs.end_top_index
-                            cls_logits = outputs.cls_logits
-                            all_start_top_log_probs.append(accelerator.gather(start_top_log_probs).cpu().numpy())
-                            all_start_top_index.append(accelerator.gather(start_top_index).cpu().numpy())
-                            all_end_top_log_probs.append(accelerator.gather(end_top_log_probs).cpu().numpy())
-                            all_end_top_index.append(accelerator.gather(end_top_index).cpu().numpy())
-                            all_cls_logits.append(accelerator.gather(cls_logits).cpu().numpy())
-                        else:
-                            start_logits = outputs.start_logits
-                            end_logits = outputs.end_logits
-                            all_start_logits.append(accelerator.gather(start_logits).cpu().numpy())
-                            all_end_logits.append(accelerator.gather(end_logits).cpu().numpy())
+                        start_logits = outputs.start_logits
+                        end_logits = outputs.end_logits
+                        all_start_logits.append(accelerator.gather(start_logits).cpu().numpy())
+                        all_end_logits.append(accelerator.gather(end_logits).cpu().numpy())
 
-                if args.beam:
-                    max_len = max([x.shape[1] for x in all_end_top_log_probs])  # Get the max_length of the tensor
-                    start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, valid_dataset, max_len)
-                    start_top_index_concat = create_and_fill_np_array(all_start_top_index, valid_dataset, max_len)
-                    end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, valid_dataset, max_len)
-                    end_top_index_concat = create_and_fill_np_array(all_end_top_index, valid_dataset, max_len)
-                    all_cls_logits = np.concatenate(all_cls_logits, axis=0)
-                    outputs_numpy = (
-                        start_top_log_probs_concat,
-                        start_top_index_concat,
-                        end_top_log_probs_concat,
-                        end_top_index_concat,
-                        all_cls_logits,
-                    )
-                else:
-                    max_len = max([x.shape[1] for x in all_start_logits])
-                    start_logits_concat = create_and_fill_np_array(all_start_logits, valid_dataset, max_len)
-                    end_logits_concat = create_and_fill_np_array(all_end_logits, valid_dataset, max_len)
-                    outputs_numpy = (start_logits_concat, end_logits_concat)
+                max_len = max([x.shape[1] for x in all_start_logits])
+                start_logits_concat = create_and_fill_np_array(all_start_logits, valid_dataset, max_len)
+                end_logits_concat = create_and_fill_np_array(all_end_logits, valid_dataset, max_len)
+                outputs_numpy = (start_logits_concat, end_logits_concat)
 
                 valid_dataset.set_format(columns=list(valid_dataset.features.keys()))
                 predictions = post_processing_function(valid_examples, valid_dataset, outputs_numpy, args, model)

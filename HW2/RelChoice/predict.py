@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument("--raw_test_file", type=str, required=True)
     parser.add_argument("--test_file", type=str, required=True)
     parser.add_argument("--target_dir", type=str, required=True)
-    parser.add_argument("--test_batch_size", type=int, default=16)
+    parser.add_argument("--test_batch_size", type=int, default=32)
     parser.add_argument("--out_file", type=str, default="./results.json")
     args = parser.parse_args()
     
