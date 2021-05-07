@@ -1,287 +1,0 @@
-nohup: ignoring input
-2021-05-06 07:09:51.524797: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
-05/06/2021 07:09:52 - INFO - __main__ -    Distributed environment: NO
-Num processes: 1
-Process index: 0
-Local process index: 0
-Device: cuda
-Use FP16 precision: False
-
-05/06/2021 07:09:53 - WARNING - datasets.builder -    Using custom data configuration default-124b92c6e0b88f42
-0 tables [00:00, ? tables/s]                            0 tables [00:00, ? tables/s]                            loading configuration file https://huggingface.co/bert-base-uncased/resolve/main/config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/3c61d016573b14f7f008c02c4e51a366c67ab274726fe2910691e2a761acf43e.37395cee442ab11005bcd270f3c34464dc1704b715b5d7d52b1a461abe3b9e4e
-Model config BertConfig {
-  "architectures": [
-    "BertForMaskedLM"
-  ],
-  "attention_probs_dropout_prob": 0.1,
-  "gradient_checkpointing": false,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 768,
-  "id2label": {
-    "0": "accept_reservations",
-    "1": "account_blocked",
-    "2": "alarm",
-    "3": "application_status",
-    "4": "apr",
-    "5": "are_you_a_bot",
-    "6": "balance",
-    "7": "bill_balance",
-    "8": "bill_due",
-    "9": "book_flight",
-    "10": "book_hotel",
-    "11": "calculator",
-    "12": "calendar",
-    "13": "calendar_update",
-    "14": "calories",
-    "15": "cancel",
-    "16": "cancel_reservation",
-    "17": "car_rental",
-    "18": "card_declined",
-    "19": "carry_on",
-    "20": "change_accent",
-    "21": "change_ai_name",
-    "22": "change_language",
-    "23": "change_speed",
-    "24": "change_user_name",
-    "25": "change_volume",
-    "26": "confirm_reservation",
-    "27": "cook_time",
-    "28": "credit_limit",
-    "29": "credit_limit_change",
-    "30": "credit_score",
-    "31": "current_location",
-    "32": "damaged_card",
-    "33": "date",
-    "34": "definition",
-    "35": "direct_deposit",
-    "36": "directions",
-    "37": "distance",
-    "38": "do_you_have_pets",
-    "39": "exchange_rate",
-    "40": "expiration_date",
-    "41": "find_phone",
-    "42": "flight_status",
-    "43": "flip_coin",
-    "44": "food_last",
-    "45": "freeze_account",
-    "46": "fun_fact",
-    "47": "gas",
-    "48": "gas_type",
-    "49": "goodbye",
-    "50": "greeting",
-    "51": "how_busy",
-    "52": "how_old_are_you",
-    "53": "improve_credit_score",
-    "54": "income",
-    "55": "ingredient_substitution",
-    "56": "ingredients_list",
-    "57": "insurance",
-    "58": "insurance_change",
-    "59": "interest_rate",
-    "60": "international_fees",
-    "61": "international_visa",
-    "62": "jump_start",
-    "63": "last_maintenance",
-    "64": "lost_luggage",
-    "65": "make_call",
-    "66": "maybe",
-    "67": "meal_suggestion",
-    "68": "meaning_of_life",
-    "69": "measurement_conversion",
-    "70": "meeting_schedule",
-    "71": "min_payment",
-    "72": "mpg",
-    "73": "new_card",
-    "74": "next_holiday",
-    "75": "next_song",
-    "76": "no",
-    "77": "nutrition_info",
-    "78": "oil_change_how",
-    "79": "oil_change_when",
-    "80": "order",
-    "81": "order_checks",
-    "82": "order_status",
-    "83": "pay_bill",
-    "84": "payday",
-    "85": "pin_change",
-    "86": "play_music",
-    "87": "plug_type",
-    "88": "pto_balance",
-    "89": "pto_request",
-    "90": "pto_request_status",
-    "91": "pto_used",
-    "92": "recipe",
-    "93": "redeem_rewards",
-    "94": "reminder",
-    "95": "reminder_update",
-    "96": "repeat",
-    "97": "replacement_card_duration",
-    "98": "report_fraud",
-    "99": "report_lost_card",
-    "100": "reset_settings",
-    "101": "restaurant_reservation",
-    "102": "restaurant_reviews",
-    "103": "restaurant_suggestion",
-    "104": "rewards_balance",
-    "105": "roll_dice",
-    "106": "rollover_401k",
-    "107": "routing",
-    "108": "schedule_maintenance",
-    "109": "schedule_meeting",
-    "110": "share_location",
-    "111": "shopping_list",
-    "112": "shopping_list_update",
-    "113": "smart_home",
-    "114": "spelling",
-    "115": "spending_history",
-    "116": "sync_device",
-    "117": "taxes",
-    "118": "tell_joke",
-    "119": "text",
-    "120": "thank_you",
-    "121": "time",
-    "122": "timer",
-    "123": "timezone",
-    "124": "tire_change",
-    "125": "tire_pressure",
-    "126": "todo_list",
-    "127": "todo_list_update",
-    "128": "traffic",
-    "129": "transactions",
-    "130": "transfer",
-    "131": "translate",
-    "132": "travel_alert",
-    "133": "travel_notification",
-    "134": "travel_suggestion",
-    "135": "uber",
-    "136": "update_playlist",
-    "137": "user_name",
-    "138": "vaccines",
-    "139": "w2",
-    "140": "weather",
-    "141": "what_are_your_hobbies",
-    "142": "what_can_i_ask_you",
-    "143": "what_is_your_name",
-    "144": "what_song",
-    "145": "where_are_you_from",
-    "146": "whisper_mode",
-    "147": "who_do_you_work_for",
-    "148": "who_made_you",
-    "149": "yes"
-  },
-  "initializer_range": 0.02,
-  "intermediate_size": 3072,
-  "layer_norm_eps": 1e-12,
-  "max_position_embeddings": 512,
-  "model_type": "bert",
-  "num_attention_heads": 12,
-  "num_hidden_layers": 12,
-  "pad_token_id": 0,
-  "position_embedding_type": "absolute",
-  "transformers_version": "4.5.0",
-  "type_vocab_size": 2,
-  "use_cache": true,
-  "vocab_size": 30522
-}
-
-loading configuration file https://huggingface.co/bert-base-uncased/resolve/main/config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/3c61d016573b14f7f008c02c4e51a366c67ab274726fe2910691e2a761acf43e.37395cee442ab11005bcd270f3c34464dc1704b715b5d7d52b1a461abe3b9e4e
-Model config BertConfig {
-  "architectures": [
-    "BertForMaskedLM"
-  ],
-  "attention_probs_dropout_prob": 0.1,
-  "gradient_checkpointing": false,
-  "hidden_act": "gelu",
-  "hidden_dropout_prob": 0.1,
-  "hidden_size": 768,
-  "initializer_range": 0.02,
-  "intermediate_size": 3072,
-  "layer_norm_eps": 1e-12,
-  "max_position_embeddings": 512,
-  "model_type": "bert",
-  "num_attention_heads": 12,
-  "num_hidden_layers": 12,
-  "pad_token_id": 0,
-  "position_embedding_type": "absolute",
-  "transformers_version": "4.5.0",
-  "type_vocab_size": 2,
-  "use_cache": true,
-  "vocab_size": 30522
-}
-
-loading file https://huggingface.co/bert-base-uncased/resolve/main/vocab.txt from cache at /dhome/boewoei0123/.cache/huggingface/transformers/45c3f7a79a80e1cf0a489e5c62b43f173c15db47864303a55d623bb3c96f72a5.d789d64ebfe299b0e416afc4a169632f903f693095b4629a7ea271d5a0cf2c99
-loading file https://huggingface.co/bert-base-uncased/resolve/main/tokenizer.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/534479488c54aeaf9c3406f647aa2ec13648c06771ffe269edabebd4c412da1d.7f2721073f19841be16f41b0a70b600ca6b880c8f3df6f3535cbc704371bdfa4
-loading file https://huggingface.co/bert-base-uncased/resolve/main/added_tokens.json from cache at None
-loading file https://huggingface.co/bert-base-uncased/resolve/main/special_tokens_map.json from cache at None
-loading file https://huggingface.co/bert-base-uncased/resolve/main/tokenizer_config.json from cache at /dhome/boewoei0123/.cache/huggingface/transformers/c1d7f0a763fb63861cc08553866f1fc3e5a6f4f07621be277452d26d71303b7e.20430bd8e10ef77a7d2977accefe796051e01bc2fc4aa146bc862997a1a15e79
-05/06/2021 07:09:58 - INFO - __main__ -    Saving tokenizer to ./saved/0506-0709/tokenizer...
-tokenizer config file saved in ./saved/0506-0709/tokenizer_config.json
-Special tokens file saved in ./saved/0506-0709/special_tokens_map.json
-loading weights file https://huggingface.co/bert-base-uncased/resolve/main/pytorch_model.bin from cache at /dhome/boewoei0123/.cache/huggingface/transformers/a8041bf617d7f94ea26d15e218abd04afc2004805632abc0ed2066aa16d50d04.faf6ea826ae9c5867d12b22257f9877e6b8367890837bd60f7c54a29633f7f2f
-Some weights of the model checkpoint at bert-base-uncased were not used when initializing BertForSequenceClassification: ['cls.predictions.bias', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias', 'cls.predictions.decoder.weight', 'cls.seq_relationship.weight', 'cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.transform.LayerNorm.bias']
-- This IS expected if you are initializing BertForSequenceClassification from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
-- This IS NOT expected if you are initializing BertForSequenceClassification from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
-Some weights of BertForSequenceClassification were not initialized from the model checkpoint at bert-base-uncased and are newly initialized: ['classifier.weight', 'classifier.bias']
-You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
-Downloading and preparing dataset json/default (download: Unknown size, generated: Unknown size, post-processed: Unknown size, total: Unknown size) to /dhome/boewoei0123/.cache/huggingface/datasets/json/default-124b92c6e0b88f42/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02...
-Dataset json downloaded and prepared to /dhome/boewoei0123/.cache/huggingface/datasets/json/default-124b92c6e0b88f42/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02. Subsequent calls will reuse this data.
-#0:   0%|          | 0/4 [00:00<?, ?ba/s]
-#1:   0%|          | 0/4 [00:00<?, ?ba/s][A
-
-#2:   0%|          | 0/4 [00:00<?, ?ba/s][A[A
-
-
-#3:   0%|          | 0/4 [00:00<?, ?ba/s][A[A[A#0:  25%|██▌       | 1/4 [00:00<00:00,  4.76ba/s]
-#1:  25%|██▌       | 1/4 [00:00<00:00,  4.76ba/s][A
-
-#2:  25%|██▌       | 1/4 [00:00<00:00,  4.69ba/s][A[A
-
-
-#3:  25%|██▌       | 1/4 [00:00<00:00,  4.89ba/s][A[A[A#0:  75%|███████▌  | 3/4 [00:00<00:00,  6.14ba/s]
-#1:  75%|███████▌  | 3/4 [00:00<00:00,  6.10ba/s][A#0: 100%|██████████| 4/4 [00:00<00:00, 11.28ba/s]
-
-#2:  75%|███████▌  | 3/4 [00:00<00:00,  6.00ba/s][A[A
-
-
-#3:  75%|███████▌  | 3/4 [00:00<00:00,  6.29ba/s][A[A[A#2: 100%|██████████| 4/4 [00:00<00:00, 10.86ba/s]#3: 100%|██████████| 4/4 [00:00<00:00, 11.45ba/s]#1: 100%|██████████| 4/4 [00:00<00:00, 10.22ba/s]
-
-
-
-#0:   0%|          | 0/1 [00:00<?, ?ba/s]
-#1:   0%|          | 0/1 [00:00<?, ?ba/s][A
-
-#2:   0%|          | 0/1 [00:00<?, ?ba/s][A[A
-
-
-#3:   0%|          | 0/1 [00:00<?, ?ba/s][A[A[A#0: 100%|██████████| 1/1 [00:00<00:00,  5.19ba/s]#0: 100%|██████████| 1/1 [00:00<00:00,  5.18ba/s]
-#1: 100%|██████████| 1/1 [00:00<00:00,  5.17ba/s][A#1: 100%|██████████| 1/1 [00:00<00:00,  5.16ba/s]
-
-#2: 100%|██████████| 1/1 [00:00<00:00,  5.19ba/s][A[A#2: 100%|██████████| 1/1 [00:00<00:00,  5.18ba/s]
-
-
-#3: 100%|██████████| 1/1 [00:00<00:00,  5.30ba/s][A[A[A#3: 100%|██████████| 1/1 [00:00<00:00,  5.29ba/s]
-
-
-
-05/06/2021 07:10:09 - INFO - __main__ -    
-******** Running training ********
-05/06/2021 07:10:09 - INFO - __main__ -    Num train examples = 15000
-05/06/2021 07:10:09 - INFO - __main__ -    Num Epochs = 3
-05/06/2021 07:10:09 - INFO - __main__ -    Instantaneous batch size per device = 4
-05/06/2021 07:10:09 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 64
-05/06/2021 07:10:09 - INFO - __main__ -    Instantaneous steps per epoch = 3750
-05/06/2021 07:10:09 - INFO - __main__ -    Update steps per epoch = 235
-05/06/2021 07:10:09 - INFO - __main__ -    Total update steps = 705
-05/06/2021 07:10:09 - INFO - __main__ -    
-Epoch 01 / 03
-05/06/2021 07:10:36 - INFO - __main__ -    Train | Loss: 5.05330
-05/06/2021 07:11:02 - INFO - __main__ -    Train | Loss: 5.02322
-05/06/2021 07:11:28 - INFO - __main__ -    Train | Loss: 4.94766
-05/06/2021 07:11:54 - INFO - __main__ -    Train | Loss: 4.82542
-Traceback (most recent call last):
-  File "train.py", line 246, in <module>
-    references=accelerator.gather(data["labels"]))
-  File "/dhome/boewoei0123/miniconda3/envs/adl/lib/python3.8/site-packages/transformers/tokenization_utils_base.py", line 230, in __getitem__
-    return self.data[item]
-KeyError: 'labels'

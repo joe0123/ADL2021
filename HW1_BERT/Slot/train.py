@@ -17,9 +17,9 @@ from transformers import (
     MODEL_MAPPING,
     AdamW,
     AutoConfig,
-    AutoModelForSequenceClassification,
+    AutoModelForTokenClassification,
     AutoTokenizer,
-    DataCollatorWithPadding,
+    DataCollatorForTokenClassification,
     get_scheduler,
     set_seed,
 )
@@ -92,20 +92,20 @@ if __name__ == "__main__":
     else:
         raw_datasets = load_dataset("json", data_files={"train": args.train_file})
     cols = raw_datasets["train"].column_names
-    args.text_col, args.intent_col = "text", "intent"
+    args.token_col, args.tag_col = "tokens", "tags"
 
     train_examples = raw_datasets["train"]
     if args.valid_file:
         valid_examples = raw_datasets["valid"]
     
-    intent2id = {intent: i for i, intent in enumerate(sorted(list(set(train_examples[args.intent_col]))))}
-    id2intent = {v: k for k, v in intent2id.items()}
+    tag2id = {tag: i for i, tag in enumerate(list(set([t for tags in train_examples[args.tag_col] for t in tags])))}
+    id2tag = {v: k for k, v in tag2id.items()}
 
 # Load pretrained tokenizer and model. Also, save tokenizer.
     if args.config_name:
-        config = AutoConfig.from_pretrained(args.config_name, id2label=id2intent)
+        config = AutoConfig.from_pretrained(args.config_name, id2label=id2tag)
     elif args.model_name:
-        config = AutoConfig.from_pretrained(args.model_name, id2label=id2intent)
+        config = AutoConfig.from_pretrained(args.model_name, id2label=id2tag)
     else:
         config = CONFIG_MAPPING[args.model_type]()
         logger.warning("You are instantiating a new config instance from scratch.")
@@ -124,15 +124,15 @@ if __name__ == "__main__":
     tokenizer.save_pretrained(args.saved_dir)
 
     if args.model_name:
-        model = AutoModelForSequenceClassification.from_pretrained(args.model_name, config=config)
+        model = AutoModelForTokenClassification.from_pretrained(args.model_name, config=config)
     else:
         logger.info("Training new model from scratch")
-        model = AutoModelForSequenceClassification.from_config(config)
+        model = AutoModelForTokenClassification.from_config(config)
 
 
 # Preprocess the datasets
-    #train_examples = train_examples.select(range(10))
-    prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, intent2id=intent2id)
+    train_examples = train_examples.select(range(10))
+    prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, tag2id=tag2id)
     train_dataset = train_examples.map(
         prepare_features,
         batched=True,
@@ -141,8 +141,8 @@ if __name__ == "__main__":
     )
     
     if args.valid_file:
-        #valid_examples = valid_examples.select(range(10))
-        prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, intent2id=intent2id)
+        valid_examples = valid_examples.select(range(10))
+        prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, tag2id=tag2id)
         valid_dataset = valid_examples.map(
             prepare_features,
             batched=True,
@@ -151,7 +151,7 @@ if __name__ == "__main__":
         )
 
 # Create DataLoaders
-    data_collator = DataCollatorWithPadding(tokenizer)
+    data_collator =  DataCollatorForTokenClassification(tokenizer)
     train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=data_collator, 
                         batch_size=args.train_batch_size, num_workers=4)
     if args.valid_file:
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     )
     
 # Metrics for evaluation
-    metrics = load_metric("accuracy")
+    metrics = load_metric("tag_metrics.py")
 
 # Train!
     total_train_batch_size = args.train_batch_size * accelerator.num_processes * args.grad_accum_steps
