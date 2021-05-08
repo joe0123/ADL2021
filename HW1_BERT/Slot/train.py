@@ -39,12 +39,12 @@ def parse_args():
     parser.add_argument("--valid_batch_size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=3e-5)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
-    parser.add_argument("--epoch_num", type=int, default=5)
+    parser.add_argument("--epoch_num", type=int, default=10)
     parser.add_argument("--grad_accum_steps", type=int, default=2)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
-    parser.add_argument("--log_steps", type=int, default=50)
-    parser.add_argument("--eval_steps", type=int, default=250)
+    parser.add_argument("--log_steps", type=int, default=25)
+    parser.add_argument("--eval_steps", type=int, default=100)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
     args = parser.parse_args()
@@ -131,7 +131,7 @@ if __name__ == "__main__":
 
 
 # Preprocess the datasets
-    train_examples = train_examples.select(range(10))
+    #train_examples = train_examples.select(range(10))
     prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, tag2id=tag2id)
     train_dataset = train_examples.map(
         prepare_features,
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     )
     
     if args.valid_file:
-        valid_examples = valid_examples.select(range(10))
+        #valid_examples = valid_examples.select(range(10))
         prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, tag2id=tag2id)
         valid_dataset = valid_examples.map(
             prepare_features,
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     )
     
 # Metrics for evaluation
-    metrics = load_metric("tag_metrics.py")
+    metrics = load_metric("./tag_metrics.py")
 
 # Train!
     total_train_batch_size = args.train_batch_size * accelerator.num_processes * args.grad_accum_steps
@@ -234,14 +234,14 @@ if __name__ == "__main__":
         # Evaluate!
             if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
                 model.eval()
-                all_logits = []
                 for step, data in enumerate(valid_dataloader):
                     with torch.no_grad():
                         outputs = model(**data)
-                        predictions = outputs.logits.argmax(dim=-1)
-                        metrics.add_batch(predictions=accelerator.gather(predictions),
-                                        references=accelerator.gather(data["labels"]))
-                valid_acc = metrics.compute()["accuracy"]
+                        predictions = accelerator.gather(outputs.logits.argmax(dim=-1))
+                        references=accelerator.gather(data["labels"])
+                        predictions = torch.where(references != -100, predictions, references)
+                        metrics.add_batch(predictions=predictions, references=references)
+                valid_acc = metrics.compute()
                 logger.info("Valid | Acc: {:.5f}".format(valid_acc))
                 if valid_acc >= max_valid_acc:
                     max_valid_acc = valid_acc

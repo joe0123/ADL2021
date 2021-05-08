@@ -104,54 +104,20 @@ if __name__ == "__main__":
     
     test_dataset.set_format(type="torch", columns=["attention_mask", "input_ids", "token_type_ids"])
     model.eval()
-    if args.beam:
-        all_start_top_log_probs = []
-        all_start_top_index = []
-        all_end_top_log_probs = []
-        all_end_top_index = []
-        all_cls_logits = []
-    else:
-        all_start_logits = []
-        all_end_logits = []
+    all_start_logits = []
+    all_end_logits = []
     for step, data in enumerate(test_dataloader):
         with torch.no_grad():
             outputs = model(**data)
-            if args.beam:
-                start_top_log_probs = outputs.start_top_log_probs
-                start_top_index = outputs.start_top_index
-                end_top_log_probs = outputs.end_top_log_probs
-                end_top_index = outputs.end_top_index
-                cls_logits = outputs.cls_logits
-                all_start_top_log_probs.append(accelerator.gather(start_top_log_probs).cpu().numpy())
-                all_start_top_index.append(accelerator.gather(start_top_index).cpu().numpy())
-                all_end_top_log_probs.append(accelerator.gather(end_top_log_probs).cpu().numpy())
-                all_end_top_index.append(accelerator.gather(end_top_index).cpu().numpy())
-                all_cls_logits.append(accelerator.gather(cls_logits).cpu().numpy())
-            else:
-                start_logits = outputs.start_logits
-                end_logits = outputs.end_logits
-                all_start_logits.append(accelerator.gather(start_logits).cpu().numpy())
-                all_end_logits.append(accelerator.gather(end_logits).cpu().numpy())
+            start_logits = outputs.start_logits
+            end_logits = outputs.end_logits
+            all_start_logits.append(accelerator.gather(start_logits).cpu().numpy())
+            all_end_logits.append(accelerator.gather(end_logits).cpu().numpy())
 
-    if args.beam:
-        max_len = max([x.shape[1] for x in all_end_top_log_probs])  # Get the max_length of the tensor
-        start_top_log_probs_concat = create_and_fill_np_array(all_start_top_log_probs, test_dataset, max_len)
-        start_top_index_concat = create_and_fill_np_array(all_start_top_index, test_dataset, max_len)
-        end_top_log_probs_concat = create_and_fill_np_array(all_end_top_log_probs, test_dataset, max_len)
-        end_top_index_concat = create_and_fill_np_array(all_end_top_index, test_dataset, max_len)
-        all_cls_logits = np.concatenate(all_cls_logits, axis=0)
-        outputs_numpy = (
-            start_top_log_probs_concat,
-            start_top_index_concat,
-            end_top_log_probs_concat,
-            end_top_index_concat,
-            all_cls_logits,
-        )
-    else:
-        max_len = max([x.shape[1] for x in all_start_logits])
-        start_logits_concat = create_and_fill_np_array(all_start_logits, test_dataset, max_len)
-        end_logits_concat = create_and_fill_np_array(all_end_logits, test_dataset, max_len)
-        outputs_numpy = (start_logits_concat, end_logits_concat)
+    max_len = max([x.shape[1] for x in all_start_logits])
+    start_logits_concat = create_and_fill_np_array(all_start_logits, test_dataset, max_len)
+    end_logits_concat = create_and_fill_np_array(all_end_logits, test_dataset, max_len)
+    outputs_numpy = (start_logits_concat, end_logits_concat)
 
     test_dataset.set_format(type=None, columns=list(test_dataset.features.keys()))
     predictions = post_processing_function(test_examples, test_dataset, outputs_numpy, args, model)

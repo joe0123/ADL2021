@@ -16,9 +16,9 @@ from transformers import (
     DataCollatorWithPadding,
     SchedulerType,
     AutoConfig,
-    AutoModelForSequenceClassification,
+    AutoModelForTokenClassification,
     AutoTokenizer,
-    DataCollatorWithPadding,
+    DataCollatorForTokenClassification,
     set_seed,
 )
 
@@ -30,7 +30,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_file", type=str, required=True)
     parser.add_argument("--target_dir", type=str, required=True)
-    parser.add_argument("--test_batch_size", type=int, default=16)
+    parser.add_argument("--test_batch_size", type=int, default=64)
     parser.add_argument("--out_file", type=str, default="./results.csv")
     args = parser.parse_args()
     
@@ -70,19 +70,19 @@ if __name__ == "__main__":
     
 # Load pretrained model and tokenizer
     config = AutoConfig.from_pretrained(args.target_dir)
-    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=False)
-    model = AutoModelForSequenceClassification.from_pretrained(args.target_dir, config=config)
+    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
+    model = AutoModelForTokenClassification.from_pretrained(args.target_dir, config=config)
 
 # Load and preprocess the dataset
     raw_datasets = load_dataset("json", data_files={"test": args.test_file})
     cols = raw_datasets["test"].column_names
-    args.text_col, args.intent_col = "text", "intent"
-    intent2id = config.label2id
-    id2intent = config.id2label
+    args.token_col, args.tag_col = "tokens", "tags"
+    tag2id = config.label2id
+    id2tag = config.id2label
     
     test_examples = raw_datasets["test"]
     #test_examples = test_examples.select(range(10))
-    prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, intent2id=intent2id)
+    prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer, tag2id=tag2id)
     test_dataset = test_examples.map(
         prepare_features,
         batched=True,
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     )
 
 # Create DataLoaders
-    data_collator = DataCollatorWithPadding(tokenizer)
+    data_collator = DataCollatorForTokenClassification(tokenizer)
     test_dataloader = DataLoader(test_dataset, collate_fn=data_collator, batch_size=args.test_batch_size)
 
 # Prepare everything with our accelerator.
@@ -103,18 +103,20 @@ if __name__ == "__main__":
     logger.info("\n******** Running predicting ********")
     logger.info(f"Num test examples = {len(test_dataset)}")
     
-    test_dataset.set_format(columns=["attention_mask", "input_ids", "token_type_ids"])
     model.eval()
-    all_predictions, all_ids = [], []
+    all_predictions = []
     for step, data in enumerate(test_dataloader):
         with torch.no_grad():
             outputs = model(**data)
-            predictions = outputs.logits.argmax(dim=-1)
-            all_predictions += accelerator.gather(predictions).cpu().tolist()
-    results = {example_id: id2intent[pred] for example_id, pred in zip(test_examples["id"], all_predictions)}
+            predictions = accelerator.gather(outputs.logits.argmax(dim=-1))
+            references=accelerator.gather(data["labels"])
+            predictions = torch.where(references != -100, predictions, references)
+            all_predictions += predictions.cpu().tolist()
+    results = {example_id: ' '.join([id2tag[tag_id] for tag_id in pred if tag_id != -100])    \
+                            for example_id, pred in zip(test_examples["id"], all_predictions)}
     os.makedirs(os.path.dirname(args.out_file), exist_ok=True)
     with open(args.out_file, 'w') as f:
-        f.write("id,intent\n")
+        f.write("id,tags\n")
         for idx, label in sorted(results.items()):
             f.write("{},{}\n".format(idx, label))
 

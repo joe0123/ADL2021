@@ -1,11 +1,5 @@
-import sys
 import datasets
-import collections
-import json
-import os
 
-import spacy
-from tqdm import tqdm
 
 _CITATION = ''
 _DESCRIPTION = ''
@@ -19,18 +13,14 @@ class Accuracy(datasets.Metric):
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
             features=datasets.Features({
-                "predictions": datasets.Value("null"),
-                "references": datasets.Value("null"),
-            }),
+                "predictions": datasets.Sequence(datasets.Value("int32", id="label"), id="sequence"),
+                "references": datasets.Sequence(datasets.Value("int32", id="label"), id="sequence"),
+                }),
         )
 
     def _compute(self, predictions, references):
-        predictions = np.array(predictions)
-        references = np.array(references)
-        targets = np.where(references != -100)
-        score = np.all(predictions[targets] == references[targets], axis=1)
-        print(score)
-        score = np.mean(score)
+        trues = [p == r for p, r in zip(predictions, references)]
+        score = sum(trues) / len(trues)
         return score
 
 

@@ -70,7 +70,7 @@ if __name__ == "__main__":
     
 # Load pretrained model and tokenizer
     config = AutoConfig.from_pretrained(args.target_dir)
-    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=False)
+    tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
     model = AutoModelForSequenceClassification.from_pretrained(args.target_dir, config=config)
 
 # Load and preprocess the dataset
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     
     test_dataset.set_format(columns=["attention_mask", "input_ids", "token_type_ids"])
     model.eval()
-    all_predictions, all_ids = [], []
+    all_predictions = []
     for step, data in enumerate(test_dataloader):
         with torch.no_grad():
             outputs = model(**data)
