@@ -2,7 +2,6 @@ import os
 import json
 import argparse
 import numpy as np
-import re
 
 np.random.seed(1114)
 

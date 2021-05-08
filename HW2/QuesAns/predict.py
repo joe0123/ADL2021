@@ -1,6 +1,5 @@
 import os
 import sys
-import logging
 import argparse
 import logging
 import math
