@@ -3,8 +3,8 @@ channels:
   - defaults
 dependencies:
   - python=3.8
-  - cudatoolkit=10.2
-  - cudnn=7.6
+  - cudatoolkit=11.0
+  - nvidia::cudnn=8.0
   - pip
   - pip:
       - pip-tools
