@@ -22,6 +22,8 @@ class TWRouge(datasets.Metric):
         )
 
     def _compute(self, predictions, references):
+        predictions = [pred.strip() + '\n' for pred in predictions]
+        references = [ref.strip() + '\n' for ref in references]
         return get_rouge(predictions, references)
 
 

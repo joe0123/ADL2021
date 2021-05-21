@@ -1,2 +1,2 @@
-ckiptagger[gdown]
+ckiptagger[gdown,tf]
 rouge

@@ -9,12 +9,12 @@ def main(args):
     with open(args.reference) as file:
         for line in file:
             line = json.loads(line)
-            refs[line['id']] = line['title']
+            refs[line['id']] = line['title'].strip() + '\n'
 
     with open(args.submission) as file:
         for line in file:
             line = json.loads(line)
-            preds[line['id']] = line['title']
+            preds[line['id']] = line['title'].strip() + '\n'
 
     keys =  refs.keys()
     refs = [refs[key] for key in keys]

@@ -21,6 +21,7 @@ from transformers import (
     AutoModelForSeq2SeqLM,
     AutoTokenizer,
     DataCollatorForSeq2Seq,
+    default_data_collator,
     get_scheduler,
     set_seed,
 )
@@ -34,22 +35,22 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--train_file", type=str, required=True)
     parser.add_argument("--valid_file", type=str)
-    parser.add_argument("--max_source_len", type=int, default=1024)
-    parser.add_argument("--max_target_len", type=int, default=128)
-    parser.add_argument("--beam_num", type=int, default=1)
+    parser.add_argument("--max_source_len", type=int, default=256)
+    parser.add_argument("--max_target_len", type=int, default=64)
+    parser.add_argument("--beam_num", type=int, default=5)
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str)
-    parser.add_argument("--train_batch_size", type=int, default=4)
+    parser.add_argument("--train_batch_size", type=int, default=8)
     parser.add_argument("--valid_batch_size", type=int, default=16)
     parser.add_argument("--lr", type=float, default=5e-5)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
-    parser.add_argument("--epoch_num", type=int, default=3)
-    parser.add_argument("--grad_accum_steps", type=int, default=4)
+    parser.add_argument("--epoch_num", type=int, default=10)
+    parser.add_argument("--grad_accum_steps", type=int, default=1)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
     parser.add_argument("--log_steps", type=int, default=300)
-    parser.add_argument("--eval_steps", type=int, default=1500)
+    parser.add_argument("--eval_steps", type=int, default=1200)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
     args = parser.parse_args()
@@ -131,26 +132,32 @@ if __name__ == "__main__":
         raw_datasets = load_dataset("json", data_files={"train": args.train_file})
     cols = raw_datasets["train"].column_names
     args.text_col, args.title_col = "maintext", "title"
-
-    prepare_features = partial(prepare_features, args=args, tokenizer=tokenizer)
-    prepared_datasets = raw_datasets.map(
-        prepare_features,
+    
+    train_examples = raw_datasets["train"]
+    prepare_train_features = partial(prepare_train_features, args=args, tokenizer=tokenizer)
+    train_dataset = train_examples.map(
+        prepare_train_features,
         batched=True,
         num_proc=4,
         remove_columns=cols,
     )
-    
-    train_dataset = prepared_datasets["train"]
-    #train_dataset = train_dataset.select(range(10))
+
     if args.valid_file:
-        valid_dataset = prepared_datasets["valid"]
-        #valid_dataset = valid_dataset.select(range(10))
+        valid_examples = raw_datasets["valid"]
+        prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
+        valid_dataset = valid_examples.map(
+            prepare_pred_features,
+            batched=True,
+            num_proc=4,
+            remove_columns=cols,
+        )
 
 # Create DataLoaders
     data_collator = DataCollatorForSeq2Seq(tokenizer, model=model, label_pad_token_id=-100)
     train_dataloader = DataLoader(train_dataset, shuffle=True, collate_fn=data_collator, 
                             batch_size=args.train_batch_size, num_workers=4)
     if args.valid_file:
+        data_collator = default_data_collator
         valid_dataloader = DataLoader(valid_dataset, collate_fn=data_collator, 
                             batch_size=args.valid_batch_size, num_workers=4)
 
@@ -188,7 +195,6 @@ if __name__ == "__main__":
         num_warmup_steps=int(args.max_update_steps * args.warmup_ratio),
         num_training_steps=args.max_update_steps,
     )
-
 
 # Metrics for evaluation
     metrics = load_metric("./metric.py")
@@ -235,6 +241,7 @@ if __name__ == "__main__":
                     "max_length": args.max_target_len,
                     "num_beams": args.beam_num,
                 }
+                all_predictions = []
                 for step, data in enumerate(valid_dataloader):
                     with torch.no_grad():
                         generated_tokens = accelerator.unwrap_model(model).generate(
@@ -245,16 +252,12 @@ if __name__ == "__main__":
                         generated_tokens = accelerator.pad_across_processes(
                             generated_tokens, dim=1, pad_index=tokenizer.pad_token_id
                         )
-                        labels = data["labels"]
                         generated_tokens = accelerator.gather(generated_tokens).cpu().numpy()
-                        labels = accelerator.gather(labels).cpu().numpy()
-                        labels = np.where(labels != -100, labels, tokenizer.pad_token_id)
                         decoded_preds = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
-                        decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-                        print(decoded_preds)
-                        metrics.add_batch(predictions=decoded_preds, references=decoded_labels)
+                        all_predictions += decoded_preds
                 
-                valid_scores = metrics.compute()
+                all_references = valid_examples[args.title_col]
+                valid_scores = metrics.compute(predictions=all_predictions, references=all_references)
                 valid_r1 = valid_scores["rouge-1"]['f']
                 valid_r2 = valid_scores["rouge-2"]['f']
                 valid_rL = valid_scores["rouge-l"]['f']
@@ -268,6 +271,7 @@ if __name__ == "__main__":
                     unwrapped_model = accelerator.unwrap_model(model)
                     unwrapped_model.save_pretrained(args.saved_dir, save_function=accelerator.save)
                     logger.info("Saving config and model to {}...".format(args.saved_dir))
+    
     if not args.valid_file:
         accelerator.wait_for_everyone()
         unwrapped_model = accelerator.unwrap_model(model)

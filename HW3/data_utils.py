@@ -1,4 +1,4 @@
-def prepare_features(examples, args, tokenizer):
+def prepare_train_features(examples, args, tokenizer):
     inputs = examples[args.text_col]
     targets = examples[args.title_col]
 
@@ -12,5 +12,11 @@ def prepare_features(examples, args, tokenizer):
     labels["input_ids"] = [[(l if l != tokenizer.pad_token_id else -100) for l in label] for label in labels["input_ids"]]
 
     model_inputs["labels"] = labels["input_ids"]
+    return model_inputs
+
+
+def prepare_pred_features(examples, args, tokenizer):
+    inputs = examples[args.text_col]
+    model_inputs = tokenizer(inputs, max_length=args.max_source_len, padding="max_length", truncation=True)
     return model_inputs
 
