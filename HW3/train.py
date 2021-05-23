@@ -37,20 +37,18 @@ def parse_args():
     parser.add_argument("--valid_file", type=str)
     parser.add_argument("--max_source_len", type=int, default=256)
     parser.add_argument("--max_target_len", type=int, default=64)
-    parser.add_argument("--beam_num", type=int, default=5)
     parser.add_argument("--config_name", type=str)
     parser.add_argument("--tokenizer_name", type=str)
     parser.add_argument("--model_name", type=str)
-    parser.add_argument("--train_batch_size", type=int, default=8)
-    parser.add_argument("--valid_batch_size", type=int, default=16)
-    parser.add_argument("--lr", type=float, default=5e-5)
+    parser.add_argument("--train_batch_size", type=int, default=16)
+    parser.add_argument("--valid_batch_size", type=int, default=64)
+    parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
-    parser.add_argument("--epoch_num", type=int, default=10)
-    parser.add_argument("--grad_accum_steps", type=int, default=1)
+    parser.add_argument("--epoch_num", type=int, default=20)
+    parser.add_argument("--grad_accum_steps", type=int, default=4)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
-    parser.add_argument("--log_steps", type=int, default=300)
-    parser.add_argument("--eval_steps", type=int, default=1200)
+    parser.add_argument("--log_steps", type=int, default=200)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
     args = parser.parse_args()
@@ -234,43 +232,42 @@ if __name__ == "__main__":
         # Log train loss
             if step % args.log_steps == 0 or step == len(train_dataloader):
                 logger.info("Train | Loss: {:.5f}".format(total_loss / step))
-        # Evaluate!
-            if args.valid_file and (step % args.eval_steps == 0 or step == len(train_dataloader)):
-                model.eval()
-                gen_kwargs = {
-                    "max_length": args.max_target_len,
-                    "num_beams": args.beam_num,
-                }
-                all_predictions = []
-                for step, data in enumerate(valid_dataloader):
-                    with torch.no_grad():
-                        generated_tokens = accelerator.unwrap_model(model).generate(
-                            data["input_ids"],
-                            attention_mask=data["attention_mask"],
-                            **gen_kwargs,
-                        )
-                        generated_tokens = accelerator.pad_across_processes(
-                            generated_tokens, dim=1, pad_index=tokenizer.pad_token_id
-                        )
-                        generated_tokens = accelerator.gather(generated_tokens).cpu().numpy()
-                        decoded_preds = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
-                        all_predictions += decoded_preds
-                
-                all_references = valid_examples[args.title_col]
-                valid_scores = metrics.compute(predictions=all_predictions, references=all_references)
-                valid_r1 = valid_scores["rouge-1"]['f']
-                valid_r2 = valid_scores["rouge-2"]['f']
-                valid_rL = valid_scores["rouge-l"]['f']
-                valid_mean = (valid_r1 + valid_r2 + valid_rL) / 3
-                logger.info("Valid | Rouge-1: {:.5f}, Rouge-2: {:.5f}, Rouge-L: {:.5f}".format(valid_r1, \
-                                                                                                valid_r2, \
-                                                                                                valid_rL))
-                if valid_mean >= max_valid_mean:
-                    max_valid_mean = valid_mean
-                    accelerator.wait_for_everyone()
-                    unwrapped_model = accelerator.unwrap_model(model)
-                    unwrapped_model.save_pretrained(args.saved_dir, save_function=accelerator.save)
-                    logger.info("Saving config and model to {}...".format(args.saved_dir))
+    # Evaluate!
+        if args.valid_file:
+            model.eval()
+            gen_kwargs = {
+                "max_length": args.max_target_len,
+            }
+            all_predictions = []
+            for step, data in enumerate(valid_dataloader):
+                with torch.no_grad():
+                    generated_tokens = accelerator.unwrap_model(model).generate(
+                        data["input_ids"],
+                        attention_mask=data["attention_mask"],
+                        **gen_kwargs,
+                    )
+                    generated_tokens = accelerator.pad_across_processes(
+                        generated_tokens, dim=1, pad_index=tokenizer.pad_token_id
+                    )
+                    generated_tokens = accelerator.gather(generated_tokens).cpu().numpy()
+                    decoded_preds = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+                    all_predictions += decoded_preds
+            
+            all_references = valid_examples[args.title_col]
+            valid_scores = metrics.compute(predictions=all_predictions, references=all_references)
+            valid_r1 = valid_scores["rouge-1"]['f']
+            valid_r2 = valid_scores["rouge-2"]['f']
+            valid_rL = valid_scores["rouge-l"]['f']
+            valid_mean = (valid_r1 + valid_r2 + valid_rL) / 3
+            logger.info("Valid | Rouge-1: {:.5f}, Rouge-2: {:.5f}, Rouge-L: {:.5f}".format(valid_r1, \
+                                                                                            valid_r2, \
+                                                                                            valid_rL))
+            if valid_mean >= max_valid_mean:
+                max_valid_mean = valid_mean
+                accelerator.wait_for_everyone()
+                unwrapped_model = accelerator.unwrap_model(model)
+                unwrapped_model.save_pretrained(args.saved_dir, save_function=accelerator.save)
+                logger.info("Saving config and model to {}...".format(args.saved_dir))
     
     if not args.valid_file:
         accelerator.wait_for_everyone()

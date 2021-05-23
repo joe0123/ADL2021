@@ -14,14 +14,10 @@ import torch
 from torch.utils.data.dataloader import DataLoader
 import transformers
 from transformers import (
-    CONFIG_MAPPING,
-    MODEL_MAPPING,
-    AdamW,
     AutoConfig,
     AutoModelForSeq2SeqLM,
     AutoTokenizer,
     default_data_collator,
-    get_scheduler,
     set_seed,
 )
 
@@ -34,10 +30,14 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--test_file", type=str, required=True)
     parser.add_argument("--target_dir", type=str, required=True)
-    parser.add_argument("--test_batch_size", type=int, default=64)
+    parser.add_argument("--test_batch_size", type=int, default=32)
     parser.add_argument("--out_file", type=str, default="./results.jsonl")
-    parser.add_argument("--max_target_len", type=int, default=64)
-    parser.add_argument("--beam_num", type=int, default=5)
+    parser.add_argument("--beam_size", type=int, default=1)
+    parser.add_argument("--do_sample", action="store_true")
+    parser.add_argument("--top_k", type=int, default=0)
+    parser.add_argument("--top_p", type=float, default=1)
+    parser.add_argument("--temperature", type=float, default=1)
+    parser.add_argument("--seed", type=int, default=14)
     args = parser.parse_args()
     
     return args
@@ -71,11 +71,12 @@ if __name__ == "__main__":
         datasets.utils.logging.set_verbosity_error()
         transformers.utils.logging.set_verbosity_error()
 
-# If passed along, set the training seed now.
+# If passed along, set the generation seed now.
     if args.seed is not None:
         set_seed(args.seed)
+
     
-# Load pretrained model and tokenizer
+# Load trained model and tokenizer
     config = AutoConfig.from_pretrained(args.target_dir)
     tokenizer = AutoTokenizer.from_pretrained(args.target_dir, use_fast=True)
     model = AutoModelForSeq2SeqLM.from_pretrained(args.target_dir, config=config)    
@@ -109,14 +110,17 @@ if __name__ == "__main__":
     model, test_dataloader = accelerator.prepare(model, test_dataloader)
 
 # Test!
-    total_train_batch_size = args.train_batch_size * accelerator.num_processes * args.grad_accum_steps
-    logger.info("\n******** Running training ********")
+    logger.info("\n******** Running testing ********")
     logger.info(f"Num test examples = {len(test_dataset)}")
     
     model.eval()
     gen_kwargs = {
         "max_length": args.max_target_len,
-        "num_beams": args.beam_num,
+        "num_beams": args.beam_size,
+        "do_sample": args.do_sample,
+        "top_k": args.top_k,
+        "top_p": args.top_p,
+        "temperature": args.temperature,
     }
     all_preds = []
     for step, data in enumerate(test_dataloader):
