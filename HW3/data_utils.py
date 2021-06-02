@@ -1,4 +1,4 @@
-def prepare_train_features(examples, args, tokenizer):
+def prepare_train_features(examples, indices, args, tokenizer):
     inputs = examples[args.text_col]
     targets = examples[args.title_col]
 
@@ -10,8 +10,11 @@ def prepare_train_features(examples, args, tokenizer):
 
     # Replace all tokenizer.pad_token_id in the labels by -100 as we want to ignore padding in the loss.
     labels["input_ids"] = [[(l if l != tokenizer.pad_token_id else -100) for l in label] for label in labels["input_ids"]]
-
+    
     model_inputs["labels"] = labels["input_ids"]
+
+    model_inputs["indices"] = indices
+
     return model_inputs
 
 

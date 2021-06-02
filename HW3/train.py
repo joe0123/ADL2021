@@ -12,6 +12,7 @@ from datasets import load_dataset, load_metric
 from accelerate import Accelerator
 import torch
 from torch.utils.data.dataloader import DataLoader
+from torch.nn.utils import clip_grad_norm_ 
 import transformers
 from transformers import (
     CONFIG_MAPPING,
@@ -28,6 +29,8 @@ from transformers import (
 
 
 from data_utils import *
+from metrics import *
+from rl_loss import *
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +48,15 @@ def parse_args():
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
     parser.add_argument("--epoch_num", type=int, default=20)
+    parser.add_argument("--grad_max_norm", type=float, default=5)
     parser.add_argument("--grad_accum_steps", type=int, default=4)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])
     parser.add_argument("--warmup_ratio", type=float, default=0.1)
-    parser.add_argument("--log_steps", type=int, default=200)
+    parser.add_argument("--rl_ratio", type=float, default=0)
+    parser.add_argument("--rl_top_k", type=float, default=0)
+    parser.add_argument("--rl_top_p", type=float, default=0.2)
+    parser.add_argument("--rl_temperature", type=float, default=0.5)
+    parser.add_argument("--log_steps", type=int, default=250)
     parser.add_argument("--saved_dir", type=str, default="./saved")
     parser.add_argument("--seed", type=int, default=14)
     args = parser.parse_args()
@@ -132,9 +140,11 @@ if __name__ == "__main__":
     args.text_col, args.title_col = "maintext", "title"
     
     train_examples = raw_datasets["train"]
+    #train_examples = train_examples.select(range(10))
     prepare_train_features = partial(prepare_train_features, args=args, tokenizer=tokenizer)
     train_dataset = train_examples.map(
         prepare_train_features,
+        with_indices=True,
         batched=True,
         num_proc=4,
         remove_columns=cols,
@@ -142,6 +152,7 @@ if __name__ == "__main__":
 
     if args.valid_file:
         valid_examples = raw_datasets["valid"]
+        #valid_examples = valid_examples.select(range(10))
         prepare_pred_features = partial(prepare_pred_features, args=args, tokenizer=tokenizer)
         valid_dataset = valid_examples.map(
             prepare_pred_features,
@@ -194,8 +205,6 @@ if __name__ == "__main__":
         num_training_steps=args.max_update_steps,
     )
 
-# Metrics for evaluation
-    metrics = load_metric("./metric.py")
 
 # Train!
     total_train_batch_size = args.train_batch_size * accelerator.num_processes * args.grad_accum_steps
@@ -211,11 +220,23 @@ if __name__ == "__main__":
     max_valid_mean = 0
     for epoch in range(args.epoch_num):
         logger.info("\nEpoch {:02d} / {:02d}".format(epoch + 1, args.epoch_num))
-        total_loss = 0
+        total_ml_loss, total_rl_loss, total_loss = 0, 0, 0
         for step, data in enumerate(train_dataloader, 1):
             model.train()
+            refs = train_examples.select(data["indices"])[args.title_col]
+            data = {k: v for k, v in data.items() if k != "indices"}
             outputs = model(**data)
-            loss = outputs.loss
+            if args.rl_ratio < 1:
+                ml_loss = outputs.loss
+                total_ml_loss += ml_loss.item()
+            else:
+                ml_loss = 0
+            if args.rl_ratio > 0:
+                rl_loss = compute_rl_loss(data, outputs.logits, refs, model, tokenizer, accelerator, args)
+                total_rl_loss += rl_loss.item()
+            else:
+                rl_loss = 0
+            loss = args.rl_ratio * rl_loss + (1 - args.rl_ratio) * ml_loss
             total_loss += loss.item()
             if len(train_dataloader) % args.grad_accum_steps != 0 \
                     and len(train_dataloader) - step < args.grad_accum_steps:
@@ -223,15 +244,22 @@ if __name__ == "__main__":
             else:
                 loss = loss / args.grad_accum_steps
             accelerator.backward(loss)
-            
+        
         # Update model parameters
             if step % args.grad_accum_steps == 0 or step == len(train_dataloader):
+                clip_grad_norm_(model.parameters(), max_norm=args.grad_max_norm) 
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
         # Log train loss
             if step % args.log_steps == 0 or step == len(train_dataloader):
-                logger.info("Train | Loss: {:.5f}".format(total_loss / step))
+                if args.rl_ratio == 0 or args.rl_ratio == 1:
+                    logger.info("Train | Loss: {:.5f}".format(total_loss / step))
+                else:
+                    logger.info("Train | Loss: {:.5f} (ML: {:.5f}, RL:{:.5f})".format(total_loss / step,
+                                                                                    total_ml_loss / step,
+                                                                                    total_rl_loss / step))
+
     # Evaluate!
         if args.valid_file:
             model.eval()
@@ -254,7 +282,7 @@ if __name__ == "__main__":
                     all_predictions += decoded_preds
             
             all_references = valid_examples[args.title_col]
-            valid_scores = metrics.compute(predictions=all_predictions, references=all_references)
+            valid_scores = compute_rouge(predictions=all_predictions, references=all_references)
             valid_r1 = valid_scores["rouge-1"]['f']
             valid_r2 = valid_scores["rouge-2"]['f']
             valid_rL = valid_scores["rouge-l"]['f']
