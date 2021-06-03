@@ -47,7 +47,7 @@ def parse_args():
     parser.add_argument("--valid_batch_size", type=int, default=64)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--weight_decay", type=float, default=1e-2)
-    parser.add_argument("--epoch_num", type=int, default=20)
+    parser.add_argument("--epoch_num", type=int, default=10)
     parser.add_argument("--grad_max_norm", type=float, default=5)
     parser.add_argument("--grad_accum_steps", type=int, default=4)
     parser.add_argument("--sched_type", type=str, default="linear", choices=["linear", "cosine", "constant"])

@@ -1,157 +1,0 @@
-nohup: ignoring input
-2021-06-02 18:43:47.472378: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcudart.so.11.0
-2021-06-02 18:43:48.673614: I tensorflow/compiler/jit/xla_cpu_device.cc:41] Not creating XLA devices, tf_xla_enable_xla_devices not set
-2021-06-02 18:43:48.674593: I tensorflow/stream_executor/platform/default/dso_loader.cc:49] Successfully opened dynamic library libcuda.so.1
-2021-06-02 18:43:48.727777: E tensorflow/stream_executor/cuda/cuda_driver.cc:328] failed call to cuInit: CUDA_ERROR_NO_DEVICE: no CUDA-capable device is detected
-2021-06-02 18:43:48.727825: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:169] retrieving CUDA diagnostic information for host: hpcuda2
-2021-06-02 18:43:48.727832: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:176] hostname: hpcuda2
-2021-06-02 18:43:48.728203: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:200] libcuda reported version is: 455.45.1
-2021-06-02 18:43:48.728229: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:204] kernel reported version is: 455.45.1
-2021-06-02 18:43:48.728235: I tensorflow/stream_executor/cuda/cuda_diagnostics.cc:310] kernel version seems to match DSO: 455.45.1
-2021-06-02 18:43:50.060497: I tensorflow/core/platform/cpu_feature_guard.cc:142] This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  AVX2 AVX512F FMA
-To enable them in other operations, rebuild TensorFlow with the appropriate compiler flags.
-2021-06-02 18:43:50.065273: I tensorflow/compiler/jit/xla_gpu_device.cc:99] Not creating XLA devices, tf_xla_enable_xla_devices not set
-2021-06-02 18:43:50.122333: I tensorflow/compiler/mlir/mlir_graph_optimization_pass.cc:196] None of the MLIR optimization passes are enabled (registered 0 passes)
-2021-06-02 18:43:50.248060: I tensorflow/core/platform/profile_utils/cpu_utils.cc:112] CPU Frequency: 2100000000 Hz
-/dhome/boewoei0123/miniconda3/envs/adl/lib/python3.8/site-packages/tensorflow/python/keras/layers/legacy_rnn/rnn_cell_impl.py:903: UserWarning: `tf.nn.rnn_cell.LSTMCell` is deprecated and will be removed in a future version. This class is equivalent as `tf.keras.layers.LSTMCell`, and will be replaced by that in Tensorflow 2.0.
-  warnings.warn("`tf.nn.rnn_cell.LSTMCell` is deprecated and will be "
-/dhome/boewoei0123/miniconda3/envs/adl/lib/python3.8/site-packages/tensorflow/python/keras/engine/base_layer_v1.py:1727: UserWarning: `layer.add_variable` is deprecated and will be removed in a future version. Please use `layer.add_weight` method instead.
-  warnings.warn('`layer.add_variable` is deprecated and '
-06/02/2021 18:43:50 - INFO - __main__ -    Distributed environment: NO
-Num processes: 1
-Process index: 0
-Local process index: 0
-Device: cuda
-Use FP16 precision: False
-
-loading configuration file saved/mt5_small/config.json
-Model config MT5Config {
-  "_name_or_path": "google/mt5-small",
-  "architectures": [
-    "MT5ForConditionalGeneration"
-  ],
-  "d_ff": 1024,
-  "d_kv": 64,
-  "d_model": 512,
-  "decoder_start_token_id": 0,
-  "dropout_rate": 0.1,
-  "eos_token_id": 1,
-  "feed_forward_proj": "gated-gelu",
-  "initializer_factor": 1.0,
-  "is_encoder_decoder": true,
-  "layer_norm_epsilon": 1e-06,
-  "model_type": "mt5",
-  "num_decoder_layers": 8,
-  "num_heads": 6,
-  "num_layers": 8,
-  "pad_token_id": 0,
-  "relative_attention_num_buckets": 32,
-  "tie_word_embeddings": false,
-  "tokenizer_class": "T5Tokenizer",
-  "transformers_version": "4.6.1",
-  "use_cache": true,
-  "vocab_size": 250100
-}
-
-loading configuration file saved/mt5_small/config.json
-Model config MT5Config {
-  "_name_or_path": "google/mt5-small",
-  "architectures": [
-    "MT5ForConditionalGeneration"
-  ],
-  "d_ff": 1024,
-  "d_kv": 64,
-  "d_model": 512,
-  "decoder_start_token_id": 0,
-  "dropout_rate": 0.1,
-  "eos_token_id": 1,
-  "feed_forward_proj": "gated-gelu",
-  "initializer_factor": 1.0,
-  "is_encoder_decoder": true,
-  "layer_norm_epsilon": 1e-06,
-  "model_type": "mt5",
-  "num_decoder_layers": 8,
-  "num_heads": 6,
-  "num_layers": 8,
-  "pad_token_id": 0,
-  "relative_attention_num_buckets": 32,
-  "tie_word_embeddings": false,
-  "tokenizer_class": "T5Tokenizer",
-  "transformers_version": "4.6.1",
-  "use_cache": true,
-  "vocab_size": 250100
-}
-
-Didn't find file saved/mt5_small/added_tokens.json. We won't load it.
-loading file saved/mt5_small/spiece.model
-loading file saved/mt5_small/tokenizer.json
-loading file None
-loading file saved/mt5_small/special_tokens_map.json
-loading file saved/mt5_small/tokenizer_config.json
-06/02/2021 18:43:51 - INFO - __main__ -    Saving tokenizer to ./saved/0602-1843/tokenizer...
-tokenizer config file saved in ./saved/0602-1843/tokenizer_config.json
-Special tokens file saved in ./saved/0602-1843/special_tokens_map.json
-Copy vocab file to ./saved/0602-1843/spiece.model
-loading weights file saved/mt5_small/pytorch_model.bin
-All model checkpoint weights were used when initializing MT5ForConditionalGeneration.
-
-All the weights of MT5ForConditionalGeneration were initialized from the model checkpoint at saved/mt5_small.
-If your task is similar to the task the model of the checkpoint was trained on, you can already use MT5ForConditionalGeneration for predictions without further training.
-06/02/2021 18:43:56 - WARNING - datasets.builder -    Using custom data configuration default-fc840707cc71cdb4
-06/02/2021 18:43:56 - WARNING - datasets.builder -    Reusing dataset json (/dhome/boewoei0123/.cache/huggingface/datasets/json/default-fc840707cc71cdb4/0.0.0/83d5b3a2f62630efc6b5315f00f20209b4ad91a00ac586597caee3a4da0bef02)
- #0:   0%|          | 0/6 [00:00<?, ?ba/s]
- #1:   0%|          | 0/6 [00:00<?, ?ba/s][A
-
- #2:   0%|          | 0/6 [00:00<?, ?ba/s][A[A
-
-
- #3:   0%|          | 0/6 [00:00<?, ?ba/s][A[A[A
- #1:  17%|█▋        | 1/6 [00:01<00:09,  1.90s/ba][A #0:  17%|█▋        | 1/6 [00:02<00:11,  2.35s/ba]
-
- #2:  17%|█▋        | 1/6 [00:01<00:09,  1.80s/ba][A[A
-
-
- #3:  17%|█▋        | 1/6 [00:02<00:10,  2.05s/ba][A[A[A
- #1:  33%|███▎      | 2/6 [00:03<00:07,  1.96s/ba][A
-
- #2:  33%|███▎      | 2/6 [00:03<00:07,  1.84s/ba][A[A #0:  33%|███▎      | 2/6 [00:04<00:09,  2.30s/ba]
-
-
- #3:  33%|███▎      | 2/6 [00:03<00:07,  1.99s/ba][A[A[A
- #1:  50%|█████     | 3/6 [00:05<00:05,  1.95s/ba][A
-
- #2:  50%|█████     | 3/6 [00:05<00:05,  1.89s/ba][A[A #0:  50%|█████     | 3/6 [00:06<00:06,  2.18s/ba]
-
-
- #3:  50%|█████     | 3/6 [00:05<00:05,  1.96s/ba][A[A[A
- #1:  67%|██████▋   | 4/6 [00:07<00:03,  1.90s/ba][A
-
- #2:  67%|██████▋   | 4/6 [00:07<00:03,  1.87s/ba][A[A #0:  67%|██████▋   | 4/6 [00:08<00:04,  2.10s/ba]
-
-
- #3:  67%|██████▋   | 4/6 [00:07<00:03,  1.94s/ba][A[A[A
- #1:  83%|████████▎ | 5/6 [00:09<00:01,  1.86s/ba][A
-
- #2:  83%|████████▎ | 5/6 [00:09<00:01,  1.86s/ba][A[A #0:  83%|████████▎ | 5/6 [00:10<00:01,  1.98s/ba]
- #1: 100%|██████████| 6/6 [00:10<00:00,  1.51s/ba][A #1: 100%|██████████| 6/6 [00:10<00:00,  1.71s/ba]
-
- #2: 100%|██████████| 6/6 [00:10<00:00,  1.51s/ba][A[A #2: 100%|██████████| 6/6 [00:10<00:00,  1.69s/ba]
-
-
- #3:  83%|████████▎ | 5/6 [00:09<00:01,  1.99s/ba][A[A[A #0: 100%|██████████| 6/6 [00:11<00:00,  1.57s/ba] #0: 100%|██████████| 6/6 [00:11<00:00,  1.86s/ba]
-
-
- #3: 100%|██████████| 6/6 [00:10<00:00,  1.57s/ba][A[A[A #3: 100%|██████████| 6/6 [00:10<00:00,  1.78s/ba]
-
-06/02/2021 18:44:13 - INFO - __main__ -    
-******** Running training ********
-06/02/2021 18:44:13 - INFO - __main__ -    Num train examples = 21710
-06/02/2021 18:44:13 - INFO - __main__ -    Num Epochs = 5
-06/02/2021 18:44:13 - INFO - __main__ -    Instantaneous batch size per device = 16
-06/02/2021 18:44:13 - INFO - __main__ -    Total train batch size (w/ parallel, distributed & accumulation) = 64
-06/02/2021 18:44:13 - INFO - __main__ -    Instantaneous steps per epoch = 1357
-06/02/2021 18:44:13 - INFO - __main__ -    Update steps per epoch = 340
-06/02/2021 18:44:13 - INFO - __main__ -    Total update steps = 1700
-06/02/2021 18:44:13 - INFO - __main__ -    
-Epoch 01 / 05
-06/02/2021 18:54:10 - INFO - __main__ -    Train | Loss: -0.68294
