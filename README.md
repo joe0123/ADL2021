@@ -5,10 +5,9 @@
 This course is about Natural Language Processing, including Sentiment or Intent Classification, Slot Tagging, Question Answering, Text Generation, and so on.
 
 ## Homework 0 - Sentiment Classification
-### Task description
+### Task description ([Slides](https://docs.google.com/presentation/d/1CqYNZFZDhn-d5ZD30zjw_O36CQUwSOemwwXnTLG07RE/))
 
 A binary classification problem for sentiment analysis in Chinese
-* https://docs.google.com/presentation/d/1CqYNZFZDhn-d5ZD30zjw_O36CQUwSOemwwXnTLG07RE/
 
 ### Source Code
 * https://github.com/joe0123/ADL2021/tree/master/HW0
@@ -20,10 +19,9 @@ A binary classification problem for sentiment analysis in Chinese
 
 
 ## Homework 1 - Intent Classification and Slot Tagging
-### Task description
+### Task description ([Slides](https://docs.google.com/presentation/d/1HOH3TD7gdfwKh1JnJRG3QHb2yg86_fvRFrHjpieGYCE))
 
 There are two problems in this homework. One is multi-class intent classification, and the other is BIO slot tagging.
-* https://docs.google.com/presentation/d/1HOH3TD7gdfwKh1JnJRG3QHb2yg86_fvRFrHjpieGYCE
 
 ### Source Code
 
