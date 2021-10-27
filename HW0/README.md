@@ -1,6 +1,9 @@
 # ADL HW0 - Text sentiment classification
 ## Task description
-https://docs.google.com/presentation/d/1CqYNZFZDhn-d5ZD30zjw_O36CQUwSOemwwXnTLG07RE/
+
+A binary classification problem for sentiment analysis in Chinese
+* https://docs.google.com/presentation/d/1CqYNZFZDhn-d5ZD30zjw_O36CQUwSOemwwXnTLG07RE/
+* https://www.kaggle.com/c/ntu-adl-hw0-spring-2021
 
 ## Requirement
 * tqdm == 4.56.0
