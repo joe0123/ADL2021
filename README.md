@@ -1,8 +1,8 @@
 # Applied Deep Learning 2021
 
-> Homework of [Applied Deep Learning 2021 at NTU](https://www.csie.ntu.edu.tw/~miulab/s109-adl/) (Lectured by Yun-Nung / Vivian, Chen)
+Homework of [Applied Deep Learning 2021 at NTU](https://www.csie.ntu.edu.tw/~miulab/s109-adl/) (Lectured by Yun-Nung / Vivian, Chen)
 
-This course is about Natural Language Processing, including Sentiment or Intent Classification, Slot Tagging, Question Answering, Text Generation, and so on.
+> This course is about Natural Language Processing, including Sentiment or Intent Classification, Slot Tagging, Question Answering, Text Generation, and so on.
 
 ## Homework 0 - Sentiment Classification
 ### Task description ([Slides](https://docs.google.com/presentation/d/1CqYNZFZDhn-d5ZD30zjw_O36CQUwSOemwwXnTLG07RE/))
